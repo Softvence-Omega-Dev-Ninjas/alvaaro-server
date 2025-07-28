@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { CouponService } from './coupon.service';
 import { CreateCouponDto } from './dto/create-coupon.dto';
 import { UpdateCouponDto } from './dto/update-coupon.dto';
@@ -9,7 +17,7 @@ export class CouponController {
 
   @Post()
   create(@Body() createCouponDto: CreateCouponDto) {
-    return this.couponService.create(createCouponDto);
+    return this.couponService.createCoupon();
   }
 
   @Get()
