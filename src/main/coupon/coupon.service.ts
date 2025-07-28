@@ -34,30 +34,37 @@ export class CouponService {
   }
 
   async findAll() {
-    const couponsList = await this.stripe.coupons.list({
-      limit: 10,
+    try {
+      const couponsList = await this.stripe.coupons.list({
+        limit: 10,
+      });
+      const coupons = couponsList.data.map((coupon) => ({
+        id: coupon.id,
+        duration: coupon.duration,
+        percent_off: coupon.percent_off,
+        redeem_by: coupon.redeem_by ? new Date(coupon.redeem_by * 1000) : null,
+        duration_in_months: coupon.duration_in_months,
+        name: coupon.name,
+        start_date: coupon.metadata?.start_date,
+      }));
+      return coupons;
+    } catch (error) {
+      console.error('Error fetching coupons:', error.message);
+      throw new Error(`Error fetching coupons: ${error.message}`);
+    }
+  }
+
+  update(id: string, updateCouponDto: UpdateCouponDto) {
+    const updatedCoupon = this.stripe.coupons.update(id, {
+      metadata: {
+        ...updateCouponDto,
+      },
     });
-    const coupons = couponsList.data.map((coupon) => ({
-      id: coupon.id,
-      duration: coupon.duration,
-      percent_off: coupon.percent_off,
-      redeem_by: coupon.redeem_by ? new Date(coupon.redeem_by * 1000) : null,
-      duration_in_months: coupon.duration_in_months,
-      name: coupon.name,
-      metadata: coupon.metadata,
-    }));
-    return coupons;
+    return updatedCoupon;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} coupon`;
-  }
-
-  update(id: number, updateCouponDto: UpdateCouponDto) {
-    return `This action updates a #${id} coupon`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} coupon`;
+  removeCoupon(id: string) {
+    const deletedCoupon = this.stripe.coupons.del(id);
+    return deletedCoupon;
   }
 }
