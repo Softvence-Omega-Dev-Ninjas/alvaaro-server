@@ -7,6 +7,20 @@ CREATE TYPE "CategoryType" AS ENUM ('CAR', 'WATCH', 'JEWELLERY', 'REAL_ESTATE', 
 -- CreateEnum
 CREATE TYPE "SubscriptionPlanType" AS ENUM ('BASIC', 'BUSINESS', 'ENTERPRISE');
 
+-- CreateEnum
+CREATE TYPE "VerificationStatusType" AS ENUM ('PENDING', 'VERIFIED', 'REJECTED');
+
+-- CreateTable
+CREATE TABLE "Coupon" (
+    "id" TEXT NOT NULL,
+    "couponCode" TEXT NOT NULL,
+    "percent_off" TEXT NOT NULL,
+    "start_date" TIMESTAMP(3) NOT NULL,
+    "redeem_by" TIMESTAMP(3) NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL
+);
+
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
@@ -31,7 +45,7 @@ CREATE TABLE "Seller" (
     "state" TEXT NOT NULL,
     "city" TEXT NOT NULL,
     "zip" TEXT NOT NULL,
-    "isVerified" BOOLEAN NOT NULL DEFAULT false,
+    "verificationStatus" "VerificationStatusType" NOT NULL DEFAULT 'PENDING',
     "subscriptionStatus" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL
@@ -173,6 +187,9 @@ CREATE TABLE "Newsletter" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Coupon_id_key" ON "Coupon"("id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_id_key" ON "User"("id");

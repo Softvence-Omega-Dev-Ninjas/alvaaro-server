@@ -17,7 +17,7 @@ export class CouponController {
 
   @Post()
   create(@Body() createCouponDto: CreateCouponDto) {
-    return this.couponService.createCoupon();
+    return this.couponService.createCoupon(createCouponDto);
   }
 
   @Get()

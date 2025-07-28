@@ -14,18 +14,29 @@ export class CouponService {
     });
   }
 
-  async createCoupon() {
+  async createCoupon(createCouponDto: CreateCouponDto) {
+    console.log('Creating coupon with data:', createCouponDto);
     try {
-      const coupon = await this.stripe.coupons.create({
-        duration: 'repeating',
-        percent_off: 25,
-        redeem_by: Math.floor(new Date('2025-10-1').getTime() / 1000),
-        duration_in_months: 3,
-        name: 'Limited Time Offer',
+      const couponParams: Stripe.CouponCreateParams = {
+        name: createCouponDto.couponCode,
+        // duration: 'repeating',
+        percent_off: parseFloat(createCouponDto.percent_off),
+        currency: 'usd',
+        redeem_by: createCouponDto.redeem_by
+          ? Math.floor(new Date(createCouponDto.redeem_by).getTime() / 1000)
+          : undefined,
         metadata: {
-          start_date: '2025-08-01',
+          start_date: createCouponDto.start_date
+            ? new Date(createCouponDto.start_date).toISOString()
+            : null,
+          end_date: createCouponDto.redeem_by
+            ? new Date(createCouponDto.redeem_by).toISOString()
+            : null,
         },
-      });
+      };
+
+      const coupon = await this.stripe.coupons.create(couponParams);
+
       return coupon;
     } catch (error) {
       console.error('Error creating coupon:', error.message);
@@ -54,14 +65,7 @@ export class CouponService {
     }
   }
 
-  update(id: string, updateCouponDto: UpdateCouponDto) {
-    const updatedCoupon = this.stripe.coupons.update(id, {
-      metadata: {
-        ...updateCouponDto,
-      },
-    });
-    return updatedCoupon;
-  }
+  update(id: string, updateCouponDto: UpdateCouponDto) {}
 
   removeCoupon(id: string) {
     const deletedCoupon = this.stripe.coupons.del(id);
