@@ -3,23 +3,25 @@ import { CreateCouponDto } from './dto/create-coupon.dto';
 import { UpdateCouponDto } from './dto/update-coupon.dto';
 import Stripe from 'stripe';
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
+import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 
 @Injectable()
 export class CouponService {
   private readonly stripe: Stripe;
   constructor(private readonly prisma: PrismaService) {
-    // Initialize Stripe with your secret key
-    this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-      apiVersion: '2025-06-30.basil',
-    });
+    this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
   }
 
-  async createCoupon(createCouponDto: CreateCouponDto) {
+  async createCoupon(createCouponDto: CreateCouponDto): Promise<any> {
     console.log('Creating coupon with data:', createCouponDto);
+
+    let stripeCouponId: string | null = null;
+
     try {
+      // First create the Stripe coupon
       const couponParams: Stripe.CouponCreateParams = {
         name: createCouponDto.couponCode,
-        duration: 'repeating',
+        duration: 'once', // Add required duration field
         percent_off: parseFloat(createCouponDto.percent_off),
         currency: 'usd',
         redeem_by: createCouponDto.redeem_by
@@ -28,28 +30,73 @@ export class CouponService {
         metadata: {
           start_date: createCouponDto.start_date
             ? new Date(createCouponDto.start_date).toISOString()
-            : null,
+            : '',
           end_date: createCouponDto.redeem_by
             ? new Date(createCouponDto.redeem_by).toISOString()
-            : null,
+            : '',
+          couponName: createCouponDto.couponName,
         },
       };
 
-      const coupon = await this.stripe.coupons.create(couponParams);
-      console.log('Coupon created successfully:', coupon);
-      const formattedCoupon = {
-        couponCode: coupon.name ?? '',
-        percent_off: (coupon.percent_off ?? 0).toString(),
-        redeem_by: coupon.metadata?.end_date ?? '',
-        start_date: coupon.metadata?.start_date ?? '',
-      };
-      // const result = await this.prisma.coupon.create({
-      //   data: formattedCoupon,
-      // });
-      // return result;
+      const existingCoupon = await this.prisma.coupon.findMany({
+        where: {
+          couponCode: createCouponDto.couponCode,
+          OR: [
+            {
+              start_date: createCouponDto.start_date,
+            },
+            {
+              redeem_by: createCouponDto.redeem_by,
+            },
+          ],
+        },
+      });
+      console.log('Existing coupons found:', existingCoupon);
+      if (existingCoupon) {
+        return ApiResponse.error(
+          'Coupon already exists with the same start date or redeem by date and coupon code ',
+        );
+      }
+      const stripeCoupon = await this.stripe.coupons.create(couponParams);
+      stripeCouponId = stripeCoupon.id;
+
+      // Use Prisma transaction to create database record
+      const result = await this.prisma.$transaction(async (prisma) => {
+        const couponData = {
+          couponCode: stripeCoupon.name ?? '',
+          percent_off: (stripeCoupon.percent_off ?? 0).toString(),
+          redeem_by: stripeCoupon.metadata?.end_date ?? '',
+          start_date: stripeCoupon.metadata?.start_date ?? '',
+          couponName: stripeCoupon.metadata?.couponName ?? '',
+        };
+
+        const dbCoupon = await prisma.coupon.create({
+          data: couponData,
+        });
+
+        return dbCoupon;
+      });
+
+      console.log('Coupon created successfully:', result);
+      return result;
     } catch (error) {
       console.error('Error creating coupon:', error.message);
-      return `Error creating coupon: ${error.message}`;
+
+      // Rollback: Delete the Stripe coupon if it was created
+      if (stripeCouponId) {
+        try {
+          await this.stripe.coupons.del(stripeCouponId);
+          console.log(`Rolled back Stripe coupon: ${stripeCouponId}`);
+        } catch (rollbackError) {
+          console.error(
+            'Failed to rollback Stripe coupon:',
+            rollbackError.message,
+          );
+        }
+      }
+
+      // Throw the original error instead of returning a string
+      throw new Error(`Error creating coupon: ${error.message}`);
     }
   }
 
@@ -74,7 +121,11 @@ export class CouponService {
     }
   }
 
-  update(id: string, updateCouponDto: UpdateCouponDto) {}
+  update(id: string, updateCouponDto: UpdateCouponDto) {
+    // Update logic for the coupon can be implemented here
+    // For now, we will just return a placeholder message
+    return `This action updates a #${id} coupon with data: ${JSON.stringify(updateCouponDto)}`;
+  }
 
   removeCoupon(id: string) {
     const deletedCoupon = this.stripe.coupons.del(id);
