@@ -8,7 +8,6 @@ import { Cache } from 'cache-manager';
 import { MailService } from 'src/utils/mail/mail.service';
 import { OtpDto } from '../auth/dto/signin.dto';
 import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
-import { VerificationStatusType } from '@prisma/client';
 
 @Injectable()
 export class SellerService {
@@ -87,8 +86,8 @@ export class SellerService {
   }
 
   async findAll(filters: {
-    verificationStatus?: VerificationStatusType;
-    subscriptionStatus?: string;
+    verificationStatus?: 'PENDING' | 'VERIFIED' | 'REJECTED';
+    subscriptionStatus?: 'ACTIVE' | 'INACTIVE';
     search?: string;
   }) {
     try {
@@ -135,11 +134,3 @@ export class SellerService {
     return `This action removes a #${id} seller`;
   }
 }
-// try {
-//
-
-//   return result;
-// } catch (error) {
-//   Logger.error('Upsert Seller Error:', error);
-//   throw new InternalServerErrorException('Failed to create seller.');
-// }
