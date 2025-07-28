@@ -9,10 +9,9 @@ export class CouponService {
 
   constructor() {
     // Initialize Stripe with your secret key
-    this.stripe = new Stripe(
-      'sk_test_51R5NAuFl8CziaLNQUMjQuhbOKbnrQmhRtqEwQP6ac8FpzjApNQLiGH2IbbuoM473ge7JZO91Fhi1YGnsMHZeHlKD00TSUsE8AX',
-      { apiVersion: '2025-06-30.basil' },
-    );
+    this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
+      apiVersion: '2025-06-30.basil',
+    });
   }
 
   async createCoupon() {
@@ -34,8 +33,20 @@ export class CouponService {
     }
   }
 
-  findAll() {
-    return `This action returns all coupon`;
+  async findAll() {
+    const couponsList = await this.stripe.coupons.list({
+      limit: 10,
+    });
+    const coupons = couponsList.data.map((coupon) => ({
+      id: coupon.id,
+      duration: coupon.duration,
+      percent_off: coupon.percent_off,
+      redeem_by: coupon.redeem_by ? new Date(coupon.redeem_by * 1000) : null,
+      duration_in_months: coupon.duration_in_months,
+      name: coupon.name,
+      metadata: coupon.metadata,
+    }));
+    return coupons;
   }
 
   findOne(id: number) {
