@@ -74,7 +74,8 @@ export class CouponService {
           data: couponData,
         });
 
-        return dbCoupon;
+        return;
+        ApiResponse.success(dbCoupon, 'Coupon created successfully');
       });
 
       console.log('Coupon created successfully:', result);
@@ -128,7 +129,12 @@ export class CouponService {
   }
 
   removeCoupon(id: string) {
-    const deletedCoupon = this.stripe.coupons.del(id);
-    return deletedCoupon;
+    try {
+      const deletedCoupon = this.stripe.coupons.del(id);
+      return ApiResponse.success(deletedCoupon, 'Coupon deleted successfully');
+    } catch (error) {
+      console.error('Error deleting coupon:', error.message);
+      throw new Error(`Error deleting coupon: ${error.message}`);
+    }
   }
 }
