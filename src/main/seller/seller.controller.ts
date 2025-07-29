@@ -26,7 +26,7 @@ import { VerificationStatusType } from '@prisma/client';
 @UseGuards(AuthGuard)
 @Controller('seller')
 export class SellerController {
-  constructor(private readonly sellerService: SellerService) {}
+  constructor(private readonly sellerService: SellerService) { }
 
   @Post('create-seller')
   sendOtpAndCacheInfo(
@@ -89,6 +89,14 @@ export class SellerController {
   update(@Param('id') id: string, @Body() updateSellerDto: UpdateSellerDto) {
     return this.sellerService.update(+id, updateSellerDto);
   }
+
+  @Patch('verified-seller/:id')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  async verifiedSeller(@Param('id') id: string) {
+    return await this.sellerService.verifiedSeller(id);
+  }
+
 
   @Delete(':id')
   remove(@Param('id') id: string) {

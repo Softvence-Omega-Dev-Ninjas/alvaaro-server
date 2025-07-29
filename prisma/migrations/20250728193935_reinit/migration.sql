@@ -7,6 +7,9 @@ CREATE TYPE "CategoryType" AS ENUM ('CAR', 'WATCH', 'JEWELLERY', 'REAL_ESTATE', 
 -- CreateEnum
 CREATE TYPE "SubscriptionPlanType" AS ENUM ('BASIC', 'BUSINESS', 'ENTERPRISE');
 
+-- CreateEnum
+CREATE TYPE "VerificationStatusType" AS ENUM ('PENDING', 'VERIFIED', 'REJECTED');
+
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
@@ -31,7 +34,7 @@ CREATE TABLE "Seller" (
     "state" TEXT NOT NULL,
     "city" TEXT NOT NULL,
     "zip" TEXT NOT NULL,
-    "isVerified" BOOLEAN NOT NULL DEFAULT false,
+    "verificationStatus" "VerificationStatusType" NOT NULL DEFAULT 'PENDING',
     "subscriptionStatus" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL
