@@ -56,7 +56,7 @@ export class CouponService {
 
       try {
         // Step 4: Create record in database using Prisma transaction
-        const result = await this.prisma.$transaction(async (prisma) => {
+        await this.prisma.$transaction(async (prisma) => {
           const couponData = {
             couponCode: stripeCoupon.name ?? '',
             percent_off: (stripeCoupon.percent_off ?? 0).toString(),
@@ -102,6 +102,16 @@ export class CouponService {
     try {
       const coupons = await this.prisma.coupon.findMany({
         orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          stripeCouponId: false,
+          couponCode: true,
+          percent_off: true,
+          redeem_by: true,
+          start_date: true,
+          createdAt: false,
+          updatedAt: false,
+        },
       });
       return ApiResponse.success(coupons, 'Coupons fetched successfully');
     } catch (error) {
