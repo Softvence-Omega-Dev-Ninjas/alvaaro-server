@@ -1,0 +1,12 @@
+model SubscriptionPlan {
+    id                String                    @id @default(uuid())
+    type              SubscriptionPlanType      @unique
+    length            String
+    price             String
+    features          String[]
+    stripeProductId   String
+    stripePriceId     String
+    createdAt         DateTime                  @default(now())
+    updatedAt         DateTime                  @updatedAt
+    UserSubscriptions UserSubscriptionValidity?
+}
