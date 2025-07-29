@@ -14,21 +14,21 @@ export class SubscriptionplanController {
     return await this.subscriptionplanService.createSubscription(dto);
   }
 
-  @Get('all-plan')
-  async findAll() {
-    const result = await this.subscriptionplanService.findAll();
-    return result;
-  }
+  // @Get('all-plan')
+  // async findAll() {
+  //   const result = await this.subscriptionplanService.findAll();
+  //   return result;
+  // }
 
-  @Patch('update-plan/:id')
-  async updatePlanById(
-    @Param('id') id: string,
-    @Body() dto: UpdateSubscriptionplanDto,
-  ) {
-    const result = await this.subscriptionplanService.updatePlanByAdmin(
-      id,
-      dto,
-    );
-    return result;
-  }
+  // @Patch('update-plan/:id')
+  // async updatePlanById(
+  //   @Param('id') id: string,
+  //   @Body() dto: UpdateSubscriptionplanDto,
+  // ) {
+  //   const result = await this.subscriptionplanService.updatePlanByAdmin(
+  //     id,
+  //     dto,
+  //   );
+  //   return result;
+  // }
 }
