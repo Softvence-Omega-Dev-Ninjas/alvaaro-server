@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateSubscriptionPlanDto } from './dto/create-subscriptionplan.dto';
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
@@ -20,7 +21,6 @@ export class SubscriptionplanService {
       const result = await this.prisma.subscriptionPlan.upsert({
         where: { type: dto.type },
         update: data,
-        // status er beparta bjte pari nai
         create: { ...dto },
       });
 
@@ -29,18 +29,19 @@ export class SubscriptionplanService {
         'Subscription plan created successfully',
       );
     } catch (err) {
-      // aikhane vol process error handle kora hoyeche
-      return ApiResponse.error(err, 'Subscription faild');
+      return ApiResponse.error('Subscription failed', err.message);
     }
   }
 
   async findAll() {
     try {
       const result = await this.prisma.subscriptionPlan.findMany();
-      return result;
+      return ApiResponse.success(
+        result,
+        'Subscription plans fetched successfully',
+      );
     } catch (err) {
-      // aikhane vol process error handle kora hoyeche
-      return ApiResponse.error(err, 'Subscription does not fetches');
+      return ApiResponse.error('Subscription does not fetches', err.message);
     }
   }
 
