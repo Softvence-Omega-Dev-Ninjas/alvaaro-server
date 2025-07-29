@@ -1,80 +1,145 @@
-import {  Injectable } from '@nestjs/common';
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+import { Injectable } from '@nestjs/common';
 import { CreateSubscriptionPlanDto } from './dto/create-subscriptionplan.dto';
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
 import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
-import { UpdateSubscriptionplanDto } from './dto/update-subscriptionplan.dto';
-import { SubscriptionStatusType } from '@prisma/client';
+import Stripe from 'stripe';
 
 @Injectable()
 export class SubscriptionplanService {
-  constructor(private prisma: PrismaService) {}
+  private stripe: Stripe;
+
+  constructor(private prisma: PrismaService) {
+    this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {});
+  }
 
   async createSubscription(dto: CreateSubscriptionPlanDto) {
-    try {
-      const data = {
-        type: dto.type,
-        price: dto.price,
-        length: dto.length,
-        features: dto.features,
-      };
+    console.log('Creating subscription plan:', dto);
 
-      const result = await this.prisma.subscriptionPlan.upsert({
+    try {
+      // Step 1: Check if plan already exists
+      const existingPlan = await this.prisma.subscriptionPlan.findUnique({
         where: { type: dto.type },
-        update: data,
-        // status er beparta bjte pari nai
-        create: { ...dto, status: SubscriptionStatusType.ACTIVE },
+      });
+
+      if (existingPlan) {
+        return ApiResponse.error(
+          `Subscription plan with this ${dto.type} type already exists`,
+        );
+      }
+
+      // Step 2: Create Stripe product
+      const stripeProduct = await this.stripe.products.create({
+        name: dto.type,
+        description: `${dto.type} subscription plan`,
+        metadata: {
+          planType: dto.type,
+          features: dto.features?.join(',') || '',
+        },
+      });
+
+      // Step 3: Create Stripe price
+      const stripePrice = await this.stripe.prices.create({
+        currency: 'usd',
+        unit_amount: dto.price ? Math.floor(parseFloat(dto.price) * 100) : 0,
+        product: stripeProduct.id,
+        recurring: {
+          interval: 'month',
+          interval_count: 1,
+        },
+        metadata: {
+          planType: dto.type,
+        },
+      });
+
+      // Step 4: Use Prisma transaction to create DB record
+      const subscriptionPlan = await this.prisma.$transaction(async (tx) => {
+        return await tx.subscriptionPlan.create({
+          data: {
+            type: dto.type,
+            price: dto.price,
+            length: dto.length,
+            features: dto.features || [],
+            stripeProductId: stripeProduct.id,
+            stripePriceId: stripePrice.id,
+          },
+        });
       });
 
       return ApiResponse.success(
-        result,
+        subscriptionPlan,
         'Subscription plan created successfully',
       );
-    } catch (err) {
-      // aikhane vol process error handle kora hoyeche
-      return ApiResponse.error(err, 'Subscription faild');
+    } catch (error) {
+      console.error('Error creating subscription plan:', error.message);
+
+      return ApiResponse.error(
+        'Failed to create subscription plan',
+        error.message,
+      );
     }
   }
 
   async findAll() {
     try {
-      const result = await this.prisma.subscriptionPlan.findMany();
-      return result;
-    } catch (err) {
-      // aikhane vol process error handle kora hoyeche
-      return ApiResponse.error(err, 'Subscription does not fetches');
+      const plans = await this.prisma.subscriptionPlan.findMany({
+        orderBy: { price: 'asc' },
+        select: {
+          id: true,
+          type: true,
+          price: true,
+          length: true,
+          features: true,
+          stripeProductId: false,
+          stripePriceId: false,
+          createdAt: false,
+          updatedAt: false,
+        },
+      });
+
+      return ApiResponse.success(
+        plans,
+        'Subscription plans fetched successfully',
+      );
+    } catch (error) {
+      console.error('Error fetching subscription plans:', error.message);
+      return ApiResponse.error(
+        'Failed to fetch subscription plans',
+        error.message,
+      );
     }
   }
 
-  async updatePlanByAdmin(planId: string, dto: UpdateSubscriptionplanDto) {
+  async deletePlan(planId: string) {
     try {
-      const { length, price, type } = dto;
+      return await this.prisma.$transaction(async (prisma) => {
+        const plan = await prisma.subscriptionPlan.findUnique({
+          where: { id: planId },
+        });
+        if (!plan) {
+          return ApiResponse.error('Subscription plan not found');
+        }
+        await this.stripe.prices.update(plan.stripePriceId, {
+          active: false,
+        });
+        await this.stripe.products.update(plan.stripeProductId, {
+          active: false,
+        });
 
-      const isPlanExists = await this.prisma.subscriptionPlan.findUnique({
-        where: {
-          id: planId,
-        },
+        const deletedPlan = await prisma.subscriptionPlan.delete({
+          where: { id: planId },
+        });
+
+        return ApiResponse.success(
+          deletedPlan,
+          'Subscription plan deleted successfully',
+        );
       });
-
-      if (!isPlanExists) {
-        // amader to response banano hoise, oita use korei error throw kora hobe
-        return ApiResponse.error('Plan can not found');
-      }
-
-      const result = await this.prisma.subscriptionPlan.update({
-        where: {
-          type,
-        },
-        data: {
-          length,
-          price,
-          type,
-        },
-      });
-      // console.log(result, 'res');
-      return ApiResponse.success(result, 'Plan Update successfully');
-    } catch (err) {
-      // aikhane vol process error handle kora hoyeche
-      return ApiResponse.error(err, 'Plan Update failed');
+    } catch (error) {
+      return ApiResponse.error(
+        'Failed to delete subscription plan',
+        error.message,
+      );
     }
   }
 }

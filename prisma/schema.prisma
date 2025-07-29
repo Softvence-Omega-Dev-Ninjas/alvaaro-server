@@ -155,17 +155,6 @@ model Yacht {
 }
 
 // Subscription Plans
-model SubscriptionPlan {
-  id                String                    @id @default(uuid())
-  type              SubscriptionPlanType      @unique
-  length            String
-  price             String
-  features          String[]
-  status            SubscriptionStatusType   
-  createdAt         DateTime                  @default(now())
-  updatedAt         DateTime                  @updatedAt
-  UserSubscriptions UserSubscriptionValidity?
-}
 
 model Contact {
   id        String   @unique @default(uuid())
@@ -196,12 +185,6 @@ enum CategoryType {
   JEWELLERY
   REAL_ESTATE
   YACHT
-}
-
-enum SubscriptionPlanType {
-  BASIC
-  BUSINESS
-  ENTERPRISE
 }
 
 enum VerificationStatusType {
