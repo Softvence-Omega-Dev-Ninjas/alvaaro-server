@@ -23,15 +23,4 @@ export class SubscriptionplanController {
     const result = await this.subscriptionplanService.deletePlan(id);
     return result;
   }
-  // @Patch('update-plan/:id')
-  // async updatePlanById(
-  //   @Param('id') id: string,
-  //   @Body() dto: UpdateSubscriptionplanDto,
-  // ) {
-  //   const result = await this.subscriptionplanService.updatePlanByAdmin(
-  //     id,
-  //     dto,
-  //   );
-  //   return result;
-  // }
 }
