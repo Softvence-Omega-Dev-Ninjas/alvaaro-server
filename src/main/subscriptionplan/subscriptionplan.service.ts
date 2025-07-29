@@ -119,11 +119,9 @@ export class SubscriptionplanService {
         if (!plan) {
           return ApiResponse.error('Subscription plan not found');
         }
-        console.log('Deleting subscription plan:', plan);
-        const data = await this.stripe.prices.update(plan.stripePriceId, {
+        await this.stripe.prices.update(plan.stripePriceId, {
           active: false,
         });
-        console.log('Stripe price deactivated:', data);
         await this.stripe.products.update(plan.stripeProductId, {
           active: false,
         });
