@@ -144,6 +144,7 @@ export class SellerService {
       const result = await this.prisma.seller.update({
         where: { userId: userId },
         data: {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
           verificationStatus: VerificationStatusType.VERIFIED,
         },
       });

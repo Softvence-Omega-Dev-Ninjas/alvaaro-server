@@ -25,7 +25,7 @@ import { ApiQuery } from '@nestjs/swagger';
 @UseGuards(AuthGuard)
 @Controller('seller')
 export class SellerController {
-  constructor(private readonly sellerService: SellerService) { }
+  constructor(private readonly sellerService: SellerService) {}
 
   @Post('create-seller')
   sendOtpAndCacheInfo(
@@ -95,7 +95,6 @@ export class SellerController {
   async verifiedSeller(@Param('id') id: string) {
     return await this.sellerService.verifiedSeller(id);
   }
-
 
   @Delete(':id')
   remove(@Param('id') id: string) {
