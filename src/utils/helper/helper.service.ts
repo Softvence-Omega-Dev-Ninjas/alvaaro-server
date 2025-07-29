@@ -37,6 +37,6 @@ export class HelperService {
         ],
       },
     });
-    console.log('Existing coupons found:', existingCoupon);
+    return existingCoupon;
   }
 }

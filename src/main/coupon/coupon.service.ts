@@ -20,13 +20,19 @@ export class CouponService {
   }
 
   async createCoupon(createCouponDto: CreateCouponDto): Promise<any> {
-    console.log('Creating coupon with data:', createCouponDto);
-
     try {
+      // Step 1: Validation
       const existingCoupon = await this.helperService.couponExists(
         createCouponDto.couponCode,
         createCouponDto.percent_off,
       );
+      if (existingCoupon) {
+        return ApiResponse.error(
+          'Coupon already exists with the same code and discount percentage',
+        );
+      }
+
+      // Step 2: Prepare Stripe params
       const couponParams: Stripe.CouponCreateParams = {
         name: createCouponDto.couponCode,
         duration: 'once',
@@ -45,37 +51,50 @@ export class CouponService {
         },
       };
 
-      if (Array.isArray(existingCoupon) && existingCoupon.length > 0) {
-        return ApiResponse.error(
-          'Coupon already exists with the same start date or redeem by date and coupon code ',
-        );
-      }
+      // Step 3: Create coupon in Stripe
       const stripeCoupon = await this.stripe.coupons.create(couponParams);
 
-      // Use Prisma transaction to create database record
-      const result = await this.prisma.$transaction(async (prisma) => {
-        const couponData = {
-          couponCode: stripeCoupon.name ?? '',
-          percent_off: (stripeCoupon.percent_off ?? 0).toString(),
-          redeem_by: stripeCoupon.metadata?.end_date ?? '',
-          start_date: stripeCoupon.metadata?.start_date ?? '',
-          couponName: stripeCoupon.metadata?.couponName ?? '',
-        };
+      try {
+        // Step 4: Create record in database using Prisma transaction
+        const result = await this.prisma.$transaction(async (prisma) => {
+          const couponData = {
+            couponCode: stripeCoupon.name ?? '',
+            percent_off: (stripeCoupon.percent_off ?? 0).toString(),
+            redeem_by: stripeCoupon.metadata?.end_date ?? '',
+            start_date: stripeCoupon.metadata?.start_date ?? '',
+            couponName: stripeCoupon.name ?? '', // or from metadata
+          };
 
-        const dbCoupon = await prisma.coupon.create({
-          data: {
-            ...couponData,
-            stripeCouponId: stripeCoupon.id,
-          },
+          const dbCoupon = await prisma.coupon.create({
+            data: {
+              ...couponData,
+              stripeCouponId: stripeCoupon.id,
+            },
+          });
+
+          return ApiResponse.success(dbCoupon, 'Coupon created successfully');
         });
+      } catch (dbError) {
+        console.error(
+          'Database transaction failed. Rolling back Stripe coupon.',
+        );
 
-        return ApiResponse.success(dbCoupon, 'Coupon created successfully');
-      });
+        // Attempt to delete the coupon from Stripe to mimic rollback
+        try {
+          await this.stripe.coupons.del(stripeCoupon.id);
+          console.log('Stripe coupon rolled back successfully.');
+        } catch (stripeRollbackError) {
+          console.error(
+            'Failed to rollback Stripe coupon:',
+            stripeRollbackError.message,
+          );
+        }
 
-      console.log('Coupon created successfully:', result);
-      return result;
+        throw dbError;
+      }
     } catch (error) {
       console.error('Error creating coupon:', error.message);
+      return ApiResponse.error('Failed to create coupon');
     }
   }
 
@@ -86,8 +105,7 @@ export class CouponService {
       });
       return ApiResponse.success(coupons, 'Coupons fetched successfully');
     } catch (error) {
-      console.error('Error fetching coupons:', error.message);
-      throw new Error(`Error fetching coupons: ${error.message}`);
+      return ApiResponse.error('Failed to fetch coupons', error.message);
     }
   }
 
