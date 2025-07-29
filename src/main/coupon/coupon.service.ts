@@ -38,7 +38,7 @@ export class CouponService {
         },
       };
 
-      const existingCoupon = await this.prisma.coupon.findMany({
+      const existingCoupon = (await this.prisma.coupon.findMany({
         where: {
           couponCode: createCouponDto.couponCode,
           OR: [
@@ -50,9 +50,11 @@ export class CouponService {
             },
           ],
         },
-      });
+      })) as unknown;
+
       console.log('Existing coupons found:', existingCoupon);
-      if (existingCoupon.length > 0) {
+
+      if (Array.isArray(existingCoupon) && existingCoupon.length > 0) {
         return ApiResponse.error(
           'Coupon already exists with the same start date or redeem by date and coupon code ',
         );
@@ -127,9 +129,17 @@ export class CouponService {
     return `This action updates a #${id} coupon with data: ${JSON.stringify(updateCouponDto)}`;
   }
 
-  removeCoupon(id: string) {
+  async removeCoupon(id: string) {
     try {
-      const deletedCoupon = this.stripe.coupons.del(id);
+      // Delete the coupon from Stripe
+
+      const deletedCoupon = await this.stripe.coupons.del(id);
+      // remove from database
+      await this.prisma.coupon.delete({
+        where: {
+          id: id,
+        },
+      });
       return ApiResponse.success(deletedCoupon, 'Coupon deleted successfully');
     } catch (error) {
       console.error('Error deleting coupon:', error.message);
