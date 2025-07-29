@@ -12,8 +12,9 @@ export class PaymentService {
 
   async createCheckoutSession(userId?: string, email?: string) {
     try {
-      const customerById =
-        await this.stripe.customers.retrieve(process.env.STRIPE_CUSTOMER_ID as string);
+      const customerById = await this.stripe.customers.retrieve(
+        process.env.STRIPE_CUSTOMER_ID as string,
+      );
       // console.log('costomerId:', await this.stripe.customers.retrieve(process.env.STRIPE_CUSTOMER_ID as string));
 
       const session = await this.stripe.checkout.sessions.create({
@@ -47,7 +48,7 @@ export class PaymentService {
     }
   }
   async handleWebhook(payload: Buffer, sig: string) {
-    const event =await this.stripe.webhooks.constructEvent(
+    const event = await this.stripe.webhooks.constructEvent(
       payload,
       sig,
       process.env.STRIPE_WEBHOOK_SECRET as string,
@@ -59,9 +60,12 @@ export class PaymentService {
         const subscription = event.data.object as Stripe.Subscription;
         console.log('Subscription created or updated:', subscription);
 
-        const metaData = subscription.metadata as { userId: string; email: string };
+        const metaData = subscription.metadata as {
+          userId: string;
+          email: string;
+        };
         console.log('Metadata:', metaData);
-        
+
         break;
       }
 
