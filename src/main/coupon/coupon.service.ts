@@ -52,7 +52,7 @@ export class CouponService {
         },
       });
       console.log('Existing coupons found:', existingCoupon);
-      if (existingCoupon) {
+      if (existingCoupon.length > 0) {
         return ApiResponse.error(
           'Coupon already exists with the same start date or redeem by date and coupon code ',
         );
