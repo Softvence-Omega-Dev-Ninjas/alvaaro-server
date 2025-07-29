@@ -3,11 +3,6 @@ import { Type } from 'class-transformer';
 import { IsDate, IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateCouponDto {
-  @ApiProperty({ example: 'Basic', description: 'Coupon name' })
-  @IsString()
-  @IsNotEmpty()
-  couponName: string;
-
   @ApiProperty({ example: 'DISCOUNT2025', description: 'Coupon code' })
   @IsString()
   @IsNotEmpty()

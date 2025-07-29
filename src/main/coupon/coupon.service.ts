@@ -37,7 +37,6 @@ export class CouponService {
           end_date: createCouponDto.redeem_by
             ? new Date(createCouponDto.redeem_by).toISOString()
             : '',
-          couponName: createCouponDto.couponName,
         },
       };
 
@@ -76,7 +75,10 @@ export class CouponService {
         };
 
         const dbCoupon = await prisma.coupon.create({
-          data: couponData,
+          data: {
+            ...couponData,
+            stripeCouponId: stripeCoupon.id,
+          },
         });
 
         return ApiResponse.success(dbCoupon, 'Coupon created successfully');
@@ -105,19 +107,23 @@ export class CouponService {
 
   async findAll() {
     try {
-      const couponsList = await this.stripe.coupons.list();
-      const formattedCoupons = couponsList.data.map((coupon) => ({
-        id: coupon.id,
-        couponCode: coupon.name,
-        percent_off: coupon.percent_off?.toString() || '0',
-        redeem_by: coupon.metadata?.end_date || '',
-        start_date: coupon.metadata?.start_date || '',
-        couponName: coupon.metadata?.couponName || '',
-      }));
-      return ApiResponse.success(
-        formattedCoupons,
-        'Coupons fetched successfully',
-      );
+      // const couponsList = await this.stripe.coupons.list();
+      // const formattedCoupons = couponsList.data.map((coupon) => ({
+      //   couponCode: coupon.name,
+      //   stripeCouponId: coupon.id,
+      //   percent_off: coupon.percent_off?.toString() || '0',
+      //   redeem_by: coupon.metadata?.end_date || '',
+      //   start_date: coupon.metadata?.start_date || '',
+      //   couponName: coupon.metadata?.couponName || '',
+      // }));
+      // return ApiResponse.success(
+      //   formattedCoupons,
+      //   'Coupons fetched successfully',
+      // );
+      const coupons = await this.prisma.coupon.findMany({
+        orderBy: { createdAt: 'desc' },
+      });
+      return ApiResponse.success(coupons, 'Coupons fetched successfully');
     } catch (error) {
       console.error('Error fetching coupons:', error.message);
       throw new Error(`Error fetching coupons: ${error.message}`);
@@ -125,14 +131,10 @@ export class CouponService {
   }
 
   update(id: string, updateCouponDto: UpdateCouponDto) {
-    // Update logic for the coupon can be implemented here
-    // For now, we will just return a placeholder message
     return `This action updates a #${id} coupon with data: ${JSON.stringify(updateCouponDto)}`;
   }
 
   async removeCoupon(id: string) {
-    let dbCouponData: any = null;
-
     try {
       // Use transaction to ensure both operations succeed or fail together
       return await this.prisma.$transaction(async (prisma) => {
@@ -145,9 +147,6 @@ export class CouponService {
           throw new Error('Coupon not found in database');
         }
 
-        // Store data for potential rollback
-        dbCouponData = dbCoupon;
-
         // Delete from database first
         const deletedDbCoupon = await prisma.coupon.delete({
           where: { id },
@@ -155,7 +154,7 @@ export class CouponService {
 
         // Then delete from Stripe
         const deletedStripeCoupon = await this.stripe.coupons.del(
-          dbCoupon.couponCode,
+          dbCoupon.stripeCouponId,
         );
 
         return ApiResponse.success(
@@ -168,30 +167,6 @@ export class CouponService {
       });
     } catch (error) {
       console.error('Error deleting coupon:', error.message);
-      if (dbCouponData && error.message.includes('Stripe')) {
-        try {
-          await this.prisma.coupon.create({
-            data: {
-              couponCode: dbCouponData.couponCode,
-              percent_off: dbCouponData.percent_off,
-              redeem_by: dbCouponData.redeem_by,
-              start_date: dbCouponData.start_date,
-              couponName: dbCouponData.couponName,
-            },
-          });
-          console.log('Successfully rolled back database coupon deletion');
-        } catch (rollbackError) {
-          console.error(
-            'Failed to rollback database coupon deletion:',
-            rollbackError.message,
-          );
-          console.error(
-            'Manual intervention required - database record was deleted but Stripe deletion failed',
-          );
-        }
-      }
-
-      throw new Error(`Error deleting coupon: ${error.message}`);
     }
   }
 }

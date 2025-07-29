@@ -1,6 +1,5 @@
 model Coupon {
     id             String   @unique @default(uuid())
-    couponName     String
     stripeCouponId String   @unique
     couponCode     String
     percent_off    String
