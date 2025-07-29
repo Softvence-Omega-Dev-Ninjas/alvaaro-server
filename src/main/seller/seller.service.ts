@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Inject, Injectable } from '@nestjs/common';
 import { CreateSellerDto } from './dto/create-seller.dto';
 import { UpdateSellerDto } from './dto/update-seller.dto';
@@ -8,8 +7,11 @@ import { Cache } from 'cache-manager';
 import { MailService } from 'src/utils/mail/mail.service';
 import { OtpDto } from '../auth/dto/signin.dto';
 import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
+ 
+ 
 import { VerificationStatusType } from '@prisma/client';
 import e from 'express';
+ 
 
 @Injectable()
 export class SellerService {
@@ -88,8 +90,8 @@ export class SellerService {
   }
 
   async findAll(filters: {
-    verificationStatus?: VerificationStatusType;
-    subscriptionStatus?: string;
+    verificationStatus?: 'PENDING' | 'VERIFIED' | 'REJECTED';
+    subscriptionStatus?: 'ACTIVE' | 'INACTIVE';
     search?: string;
   }) {
     try {
@@ -161,11 +163,3 @@ export class SellerService {
     return `This action removes a #${id} seller`;
   }
 }
-// try {
-//
-
-//   return result;
-// } catch (error) {
-//   Logger.error('Upsert Seller Error:', error);
-//   throw new InternalServerErrorException('Failed to create seller.');
-// }

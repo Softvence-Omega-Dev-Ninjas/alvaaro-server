@@ -21,7 +21,6 @@ import { Roles } from 'src/guards/roles.decorator';
 import { RolesGuard } from 'src/guards/role.guard';
 import { UserRole } from 'src/utils/common/enum/userEnum';
 import { ApiQuery } from '@nestjs/swagger';
-import { VerificationStatusType } from '@prisma/client';
 
 @UseGuards(AuthGuard)
 @Controller('seller')
@@ -67,8 +66,8 @@ export class SellerController {
   })
   async findAll(
     @Query('verificationStatus')
-    verificationStatus?: VerificationStatusType,
-    @Query('subscriptionStatus') subscriptionStatus?: string,
+    verificationStatus?: 'PENDING' | 'VERIFIED' | 'REJECTED',
+    @Query('subscriptionStatus') subscriptionStatus?: 'ACTIVE' | 'INACTIVE',
     @Query('search') search?: string,
   ) {
     // console.log(verificationStatus, subscriptionStatus, search);

@@ -18,6 +18,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './guards/auth.guard';
 import { HelperModule } from './utils/helper/helper.module';
 import { PaymentModule } from './main/payment/payment.module';
+import { CouponModule } from './main/coupon/coupon.module';
 
 @Module({
   imports: [
@@ -41,6 +42,8 @@ import { PaymentModule } from './main/payment/payment.module';
     HelperModule,
 
     PaymentModule,
+
+    CouponModule,
   ],
   // providers: [
   //   {
