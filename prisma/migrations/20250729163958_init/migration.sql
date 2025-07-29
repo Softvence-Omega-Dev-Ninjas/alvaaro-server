@@ -13,6 +13,7 @@ CREATE TYPE "VerificationStatusType" AS ENUM ('PENDING', 'VERIFIED', 'REJECTED')
 -- CreateTable
 CREATE TABLE "Coupon" (
     "id" TEXT NOT NULL,
+    "couponName" TEXT NOT NULL,
     "couponCode" TEXT NOT NULL,
     "percent_off" TEXT NOT NULL,
     "start_date" TIMESTAMP(3) NOT NULL,

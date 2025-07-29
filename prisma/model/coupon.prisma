@@ -1,10 +1,11 @@
 model Coupon {
-    id          String   @unique @default(uuid())
-    couponName  String
-    couponCode  String
-    percent_off String
-    start_date  DateTime
-    redeem_by   DateTime
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @updatedAt
+    id             String   @unique @default(uuid())
+    couponName     String
+    stripeCouponId String   @unique
+    couponCode     String
+    percent_off    String
+    start_date     DateTime
+    redeem_by      DateTime
+    createdAt      DateTime @default(now())
+    updatedAt      DateTime @updatedAt
 }
