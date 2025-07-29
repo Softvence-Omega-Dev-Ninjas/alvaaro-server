@@ -21,7 +21,7 @@ export class CouponService {
       // First create the Stripe coupon
       const couponParams: Stripe.CouponCreateParams = {
         name: createCouponDto.couponCode,
-        duration: 'once', // Add required duration field
+        duration: 'once',
         percent_off: parseFloat(createCouponDto.percent_off),
         currency: 'usd',
         redeem_by: createCouponDto.redeem_by
@@ -96,8 +96,6 @@ export class CouponService {
           );
         }
       }
-
-      // Throw the original error instead of returning a string
       throw new Error(`Error creating coupon: ${error.message}`);
     }
   }
@@ -130,19 +128,66 @@ export class CouponService {
   }
 
   async removeCoupon(id: string) {
-    try {
-      // Delete the coupon from Stripe
+    let dbCouponData: any = null;
 
-      const deletedCoupon = await this.stripe.coupons.del(id);
-      // remove from database
-      const result = await this.prisma.coupon.delete({
-        where: {
-          id: id,
-        },
+    try {
+      // Use transaction to ensure both operations succeed or fail together
+      return await this.prisma.$transaction(async (prisma) => {
+        // First get the coupon from database
+        const dbCoupon = await prisma.coupon.findUnique({
+          where: { id },
+        });
+
+        if (!dbCoupon) {
+          throw new Error('Coupon not found in database');
+        }
+
+        // Store data for potential rollback
+        dbCouponData = dbCoupon;
+
+        // Delete from database first
+        const deletedDbCoupon = await prisma.coupon.delete({
+          where: { id },
+        });
+
+        // Then delete from Stripe
+        const deletedStripeCoupon = await this.stripe.coupons.del(
+          dbCoupon.couponCode,
+        );
+
+        return ApiResponse.success(
+          {
+            stripe: deletedStripeCoupon,
+            database: deletedDbCoupon,
+          },
+          'Coupon deleted successfully',
+        );
       });
-      return ApiResponse.success(deletedCoupon, 'Coupon deleted successfully');
     } catch (error) {
       console.error('Error deleting coupon:', error.message);
+      if (dbCouponData && error.message.includes('Stripe')) {
+        try {
+          await this.prisma.coupon.create({
+            data: {
+              couponCode: dbCouponData.couponCode,
+              percent_off: dbCouponData.percent_off,
+              redeem_by: dbCouponData.redeem_by,
+              start_date: dbCouponData.start_date,
+              couponName: dbCouponData.couponName,
+            },
+          });
+          console.log('Successfully rolled back database coupon deletion');
+        } catch (rollbackError) {
+          console.error(
+            'Failed to rollback database coupon deletion:',
+            rollbackError.message,
+          );
+          console.error(
+            'Manual intervention required - database record was deleted but Stripe deletion failed',
+          );
+        }
+      }
+
       throw new Error(`Error deleting coupon: ${error.message}`);
     }
   }
