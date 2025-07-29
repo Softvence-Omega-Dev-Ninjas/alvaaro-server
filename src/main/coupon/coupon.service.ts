@@ -135,7 +135,7 @@ export class CouponService {
 
       const deletedCoupon = await this.stripe.coupons.del(id);
       // remove from database
-      await this.prisma.coupon.delete({
+      const result = await this.prisma.coupon.delete({
         where: {
           id: id,
         },
