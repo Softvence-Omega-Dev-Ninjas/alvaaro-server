@@ -104,9 +104,16 @@ export class CouponService {
   async findAll() {
     try {
       const couponsList = await this.stripe.coupons.list();
-
+      const formattedCoupons = couponsList.data.map((coupon) => ({
+        id: coupon.id,
+        couponCode: coupon.name,
+        percent_off: coupon.percent_off?.toString() || '0',
+        redeem_by: coupon.metadata?.end_date || '',
+        start_date: coupon.metadata?.start_date || '',
+        couponName: coupon.metadata?.couponName || '',
+      }));
       return ApiResponse.success(
-        couponsList.data,
+        formattedCoupons,
         'Coupons fetched successfully',
       );
     } catch (error) {
