@@ -1,18 +1,20 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from 'src/prisma-service/prisma-service.service';
 import Stripe from 'stripe';
 
 @Injectable()
 export class PaymentService {
   private stripe: Stripe;
 
-  constructor() {
+  constructor(private readonly prismaService: PrismaService) {
     this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {});
   }
 
   async createCheckoutSession(userId?: string, email?: string) {
     try {
       const customerById =
-        await this.stripe.customers.retrieve('cus_SkmMJK7QaFEpnA');
+        await this.stripe.customers.retrieve(process.env.STRIPE_CUSTOMER_ID as string);
+      // console.log('costomerId:', await this.stripe.customers.retrieve(process.env.STRIPE_CUSTOMER_ID as string));
 
       const session = await this.stripe.checkout.sessions.create({
         payment_method_types: ['card'],
@@ -37,31 +39,35 @@ export class PaymentService {
         success_url: 'http://localhost:3000/stripe/payment-success',
         cancel_url: 'http://localhost:3000/stripe/payment-cancel',
       });
-      console.log('Session created:', session);
+      // console.log('Session created:', session);
       return { url: session.url };
     } catch (error) {
       console.error('Error creating checkout session:', error);
       throw error;
     }
   }
-  handleWebhook(payload: Buffer, sig: string) {
-    const event = this.stripe.webhooks.constructEvent(
+  async handleWebhook(payload: Buffer, sig: string) {
+    const event =await this.stripe.webhooks.constructEvent(
       payload,
       sig,
       process.env.STRIPE_WEBHOOK_SECRET as string,
     );
     console.log('Webhook event received:', event.data.object);
-    // switch (event.type) {
-    //   case 'customer.subscription.created':
-    //   case 'customer.subscription.updated': {
-    //     const subscription = event.data.object as Stripe.Subscription;
-    //     console.log('Subscription created or updated:', subscription);
-    //     break;
-    //   }
+    switch (event.type) {
+      case 'customer.subscription.created':
+      case 'customer.subscription.updated': {
+        const subscription = event.data.object as Stripe.Subscription;
+        console.log('Subscription created or updated:', subscription);
 
-    //   case 'customer.subscription.deleted': {
-    //     break;
-    //   }
-    // }
+        const metaData = subscription.metadata as { userId: string; email: string };
+        console.log('Metadata:', metaData);
+        
+        break;
+      }
+
+      case 'customer.subscription.deleted': {
+        break;
+      }
+    }
   }
 }
