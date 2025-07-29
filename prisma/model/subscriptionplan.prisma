@@ -10,3 +10,9 @@ model SubscriptionPlan {
     updatedAt         DateTime                  @updatedAt
     UserSubscriptions UserSubscriptionValidity?
 }
+
+enum SubscriptionPlanType {
+    BASIC
+    BUSINESS
+    ENTERPRISE
+}

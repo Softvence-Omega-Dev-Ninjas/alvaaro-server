@@ -187,12 +187,6 @@ enum CategoryType {
   YACHT
 }
 
-enum SubscriptionPlanType {
-  BASIC
-  BUSINESS
-  ENTERPRISE
-}
-
 enum VerificationStatusType {
   PENDING
   VERIFIED
