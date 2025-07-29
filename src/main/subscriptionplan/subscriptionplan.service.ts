@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateSubscriptionPlanDto } from './dto/create-subscriptionplan.dto';
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
 import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
-import { UpdateSubscriptionplanDto } from './dto/update-subscriptionplan.dto';
 import Stripe from 'stripe';
 
 @Injectable()
@@ -17,89 +16,62 @@ export class SubscriptionplanService {
   async createSubscription(dto: CreateSubscriptionPlanDto) {
     console.log('Creating subscription plan:', dto);
 
-    let stripeProductId: string | null = null;
-    let stripePriceId: string | null = null;
-
     try {
-      // Use Prisma transaction for database operations
-      const result = await this.prisma.$transaction(async (prisma) => {
-        // Check if subscription plan already exists
-        const existingPlan = await prisma.subscriptionPlan.findUnique({
-          where: { type: dto.type },
-        });
+      // Step 1: Check if plan already exists
+      const existingPlan = await this.prisma.subscriptionPlan.findUnique({
+        where: { type: dto.type },
+      });
 
-        if (existingPlan) {
-          throw new Error('Subscription plan with this type already exists');
-        }
+      if (existingPlan) {
+        return ApiResponse.error(
+          `Subscription plan with this ${dto.type} type already exists`,
+        );
+      }
 
-        // Step 1: Create Stripe product
-        const product = await this.stripe.products.create({
-          name: dto.type,
-          description: `${dto.type} subscription plan`,
-          metadata: {
-            planType: dto.type,
-            features: dto.features?.join(',') || '',
-          },
-        });
-        stripeProductId = product.id;
+      // Step 2: Create Stripe product
+      const stripeProduct = await this.stripe.products.create({
+        name: dto.type,
+        description: `${dto.type} subscription plan`,
+        metadata: {
+          planType: dto.type,
+          features: dto.features?.join(',') || '',
+        },
+      });
 
-        // Step 2: Create Stripe price
-        const price = await this.stripe.prices.create({
-          currency: 'usd',
-          unit_amount: dto.price ? parseFloat(dto.price) * 100 : 0,
-          product: product.id,
-          recurring: {
-            interval: 'month',
-            interval_count: 1,
-          },
-          metadata: {
-            planType: dto.type,
-          },
-        });
-        stripePriceId = price.id;
+      // Step 3: Create Stripe price
+      const stripePrice = await this.stripe.prices.create({
+        currency: 'usd',
+        unit_amount: dto.price ? Math.floor(parseFloat(dto.price) * 100) : 0,
+        product: stripeProduct.id,
+        recurring: {
+          interval: 'month',
+          interval_count: 1,
+        },
+        metadata: {
+          planType: dto.type,
+        },
+      });
 
-        // Step 3: Create database record
-        const subscriptionPlan = await prisma.subscriptionPlan.create({
+      // Step 4: Use Prisma transaction to create DB record
+      const subscriptionPlan = await this.prisma.$transaction(async (tx) => {
+        return await tx.subscriptionPlan.create({
           data: {
             type: dto.type,
             price: dto.price,
-            length: dto.length, // Ensure dto.length is provided in CreateSubscriptionPlanDto
+            length: dto.length,
             features: dto.features || [],
-            stripeProductId: product.id,
-            stripePriceId: price.id,
+            stripeProductId: stripeProduct.id,
+            stripePriceId: stripePrice.id,
           },
         });
-
-        return {
-          subscriptionPlan,
-          stripeProduct: product,
-          stripePrice: price,
-        };
       });
 
       return ApiResponse.success(
-        result.subscriptionPlan,
+        subscriptionPlan,
         'Subscription plan created successfully',
       );
     } catch (error) {
       console.error('Error creating subscription plan:', error.message);
-
-      // Rollback Stripe resources if created
-      try {
-        if (stripePriceId) {
-          await this.stripe.prices.update(stripePriceId, { active: false });
-          console.log(`Deactivated Stripe price: ${stripePriceId}`);
-        }
-        if (stripeProductId) {
-          await this.stripe.products.update(stripeProductId, { active: false });
-          console.log(`Deactivated Stripe product: ${stripeProductId}`);
-        }
-      } catch (rollbackError) {
-        console.error(
-          'Failed to rollback Stripe resources:',
-          rollbackError.message,
-        );
-      }
 
       return ApiResponse.error(
         'Failed to create subscription plan',
@@ -108,187 +80,68 @@ export class SubscriptionplanService {
     }
   }
 
-  // async findAll() {
-  //   try {
-  //     const plans = await this.prisma.subscriptionPlan.findMany({
-  //       where: { isActive: true },
-  //       orderBy: { createdAt: 'desc' },
-  //     });
+  async findAll() {
+    try {
+      const plans = await this.prisma.subscriptionPlan.findMany({
+        orderBy: { price: 'asc' },
+        select: {
+          id: true,
+          type: true,
+          price: true,
+          length: true,
+          features: true,
+          stripeProductId: false,
+          stripePriceId: false,
+          createdAt: false,
+          updatedAt: false,
+        },
+      });
 
-  //     // Enrich with Stripe data
-  //     const enrichedPlans = await Promise.all(
-  //       plans.map(async (plan) => {
-  //         try {
-  //           const [product, price] = await Promise.all([
-  //             this.stripe.products.retrieve(plan.stripeProductId),
-  //             this.stripe.prices.retrieve(plan.stripePriceId),
-  //           ]);
+      return ApiResponse.success(
+        plans,
+        'Subscription plans fetched successfully',
+      );
+    } catch (error) {
+      console.error('Error fetching subscription plans:', error.message);
+      return ApiResponse.error(
+        'Failed to fetch subscription plans',
+        error.message,
+      );
+    }
+  }
 
-  //           return {
-  //             ...plan,
-  //             stripeProduct: product,
-  //             stripePrice: price,
-  //           };
-  //         } catch (stripeError) {
-  //           console.error(
-  //             `Error fetching Stripe data for plan ${plan.id}:`,
-  //             stripeError.message,
-  //           );
-  //           return plan; // Return plan without Stripe data if error
-  //         }
-  //       }),
-  //     );
+  async deletePlan(planId: string) {
+    try {
+      return await this.prisma.$transaction(async (prisma) => {
+        const plan = await prisma.subscriptionPlan.findUnique({
+          where: { id: planId },
+        });
+        if (!plan) {
+          return ApiResponse.error('Subscription plan not found');
+        }
+        console.log('Deleting subscription plan:', plan);
+        const data = await this.stripe.prices.update(plan.stripePriceId, {
+          active: false,
+        });
+        console.log('Stripe price deactivated:', data);
+        await this.stripe.products.update(plan.stripeProductId, {
+          active: false,
+        });
 
-  //     return ApiResponse.success(
-  //       enrichedPlans,
-  //       'Subscription plans fetched successfully',
-  //     );
-  //   } catch (error) {
-  //     console.error('Error fetching subscription plans:', error.message);
-  //     return ApiResponse.error(
-  //       'Failed to fetch subscription plans',
-  //       error.message,
-  //     );
-  //   }
-  // }
+        const deletedPlan = await prisma.subscriptionPlan.delete({
+          where: { id: planId },
+        });
 
-  // async updatePlanByAdmin(planId: string, dto: UpdateSubscriptionplanDto) {
-  //   let originalPlan: any = null;
-
-  //   try {
-  //     return await this.prisma.$transaction(async (prisma) => {
-  //       // Get existing plan
-  //       const existingPlan = await prisma.subscriptionPlan.findUnique({
-  //         where: { id: planId },
-  //       });
-
-  //       if (!existingPlan) {
-  //         throw new BadRequestException('Subscription plan not found');
-  //       }
-
-  //       originalPlan = existingPlan;
-
-  //       // Update Stripe product if name changed
-  //       if (dto.type && dto.type !== existingPlan.type) {
-  //         await this.stripe.products.update(existingPlan.stripeProductId, {
-  //           name: dto.type,
-  //           description: `${dto.type} subscription plan`,
-  //         });
-  //       }
-
-  //       // Create new price if price changed (Stripe prices are immutable)
-  //       let newStripePriceId = existingPlan.stripePriceId;
-  //       if (
-  //         dto.price &&
-  //         parseFloat(dto.price) !== parseFloat(existingPlan.price)
-  //       ) {
-  //         const newPrice = await this.stripe.prices.create({
-  //           currency: 'usd',
-  //           unit_amount: parseFloat(dto.price) * 100,
-  //           product: existingPlan.stripeProductId,
-  //           recurring: {
-  //             interval: dto.interval || 'month',
-  //             interval_count: dto.intervalCount || 1,
-  //           },
-  //         });
-
-  //         // Deactivate old price
-  //         await this.stripe.prices.update(existingPlan.stripePriceId, {
-  //           active: false,
-  //         });
-
-  //         newStripePriceId = newPrice.id;
-  //       }
-
-  //       // Update database record
-  //       const updatedPlan = await prisma.subscriptionPlan.update({
-  //         where: { id: planId },
-  //         data: {
-  //           type: dto.type || existingPlan.type,
-  //           price: dto.price || existingPlan.price,
-  //           length: dto.length || existingPlan.length,
-  //           features: dto.features || existingPlan.features,
-  //           stripePriceId: newStripePriceId,
-  //           updatedAt: new Date(),
-  //         },
-  //       });
-
-  //       return updatedPlan;
-  //     });
-  //   } catch (error) {
-  //     console.error('Error updating subscription plan:', error.message);
-
-  //     // Rollback logic if needed
-  //     if (originalPlan && error.message.includes('Stripe')) {
-  //       console.log('Attempting to rollback Stripe changes...');
-  //       // Additional rollback logic can be added here
-  //     }
-
-  //     if (error instanceof BadRequestException) {
-  //       throw error;
-  //     }
-
-  //     return ApiResponse.error(
-  //       'Failed to update subscription plan',
-  //       error.message,
-  //     );
-  //   }
-  // }
-
-  // async deletePlan(planId: string) {
-  //   try {
-  //     return await this.prisma.$transaction(async (prisma) => {
-  //       const plan = await prisma.subscriptionPlan.findUnique({
-  //         where: { id: planId },
-  //       });
-
-  //       if (!plan) {
-  //         throw new BadRequestException('Subscription plan not found');
-  //       }
-
-  //       // Deactivate Stripe resources instead of deleting
-  //       await Promise.all([
-  //         this.stripe.prices.update(plan.stripePriceId, { active: false }),
-  //         this.stripe.products.update(plan.stripeProductId, { active: false }),
-  //       ]);
-
-  //       // Soft delete in database
-  //       const deletedPlan = await prisma.subscriptionPlan.update({
-  //         where: { id: planId },
-  //         data: { isActive: false, deletedAt: new Date() },
-  //       });
-
-  //       return ApiResponse.success(
-  //         deletedPlan,
-  //         'Subscription plan deleted successfully',
-  //       );
-  //     });
-  //   } catch (error) {
-  //     console.error('Error deleting subscription plan:', error.message);
-  //     return ApiResponse.error(
-  //       'Failed to delete subscription plan',
-  //       error.message,
-  //     );
-  //   }
-  // }
-
-  // async createSubscriptionForCustomer(customerId: string, priceId: string) {
-  //   try {
-  //     const subscription = await this.stripe.subscriptions.create({
-  //       customer: customerId,
-  //       items: [{ price: priceId }],
-  //       payment_behavior: 'default_incomplete',
-  //       payment_settings: { save_default_payment_method: 'on_subscription' },
-  //       expand: ['latest_invoice.payment_intent'],
-  //     });
-
-  //     return ApiResponse.success(
-  //       subscription,
-  //       'Subscription created successfully',
-  //     );
-  //   } catch (error) {
-  //     console.error('Error creating subscription:', error.message);
-  //     return ApiResponse.error('Failed to create subscription', error.message);
-  //   }
-  // }
+        return ApiResponse.success(
+          deletedPlan,
+          'Subscription plan deleted successfully',
+        );
+      });
+    } catch (error) {
+      return ApiResponse.error(
+        'Failed to delete subscription plan',
+        error.message,
+      );
+    }
+  }
 }

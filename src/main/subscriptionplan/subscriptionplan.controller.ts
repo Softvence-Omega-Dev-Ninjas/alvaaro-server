@@ -1,7 +1,6 @@
-import { Controller, Get, Post, Body, Patch, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param } from '@nestjs/common';
 import { CreateSubscriptionPlanDto } from './dto/create-subscriptionplan.dto';
 import { SubscriptionplanService } from './subscriptionplan.service';
-import { UpdateSubscriptionplanDto } from './dto/update-subscriptionplan.dto';
 
 @Controller('subscriptionplan')
 export class SubscriptionplanController {
@@ -14,12 +13,16 @@ export class SubscriptionplanController {
     return await this.subscriptionplanService.createSubscription(dto);
   }
 
-  // @Get('all-plan')
-  // async findAll() {
-  //   const result = await this.subscriptionplanService.findAll();
-  //   return result;
-  // }
-
+  @Get('all-plan')
+  async findAll() {
+    const result = await this.subscriptionplanService.findAll();
+    return result;
+  }
+  @Post('delete-plan/:id')
+  async deletePlan(@Param('id') id: string) {
+    const result = await this.subscriptionplanService.deletePlan(id);
+    return result;
+  }
   // @Patch('update-plan/:id')
   // async updatePlanById(
   //   @Param('id') id: string,
