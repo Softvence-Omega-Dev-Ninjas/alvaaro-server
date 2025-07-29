@@ -3,7 +3,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { Injectable } from '@nestjs/common';
 import { CreateCouponDto } from './dto/create-coupon.dto';
-import { UpdateCouponDto } from './dto/update-coupon.dto';
 import Stripe from 'stripe';
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
 import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
@@ -117,10 +116,6 @@ export class CouponService {
     } catch (error) {
       return ApiResponse.error('Failed to fetch coupons', error.message);
     }
-  }
-
-  update(id: string, updateCouponDto: UpdateCouponDto) {
-    return `This action updates a #${id} coupon with data: ${JSON.stringify(updateCouponDto)}`;
   }
 
   async removeCoupon(id: string) {
