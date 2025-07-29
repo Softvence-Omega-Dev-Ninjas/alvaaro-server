@@ -103,19 +103,12 @@ export class CouponService {
 
   async findAll() {
     try {
-      const couponsList = await this.stripe.coupons.list({
-        limit: 10,
-      });
-      const coupons = couponsList.data.map((coupon) => ({
-        id: coupon.id,
-        duration: coupon.duration,
-        percent_off: coupon.percent_off,
-        redeem_by: coupon.redeem_by ? new Date(coupon.redeem_by * 1000) : null,
-        duration_in_months: coupon.duration_in_months,
-        name: coupon.name,
-        start_date: coupon.metadata?.start_date,
-      }));
-      return coupons;
+      const couponsList = await this.stripe.coupons.list();
+
+      return ApiResponse.success(
+        couponsList.data,
+        'Coupons fetched successfully',
+      );
     } catch (error) {
       console.error('Error fetching coupons:', error.message);
       throw new Error(`Error fetching coupons: ${error.message}`);
