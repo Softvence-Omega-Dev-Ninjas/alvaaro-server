@@ -74,8 +74,7 @@ export class CouponService {
           data: couponData,
         });
 
-        return;
-        ApiResponse.success(dbCoupon, 'Coupon created successfully');
+        return ApiResponse.success(dbCoupon, 'Coupon created successfully');
       });
 
       console.log('Coupon created successfully:', result);
