@@ -1,8 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {  Injectable } from '@nestjs/common';
 import { CreateSubscriptionPlanDto } from './dto/create-subscriptionplan.dto';
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
 import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 import { UpdateSubscriptionplanDto } from './dto/update-subscriptionplan.dto';
+import { SubscriptionStatusType } from '@prisma/client';
 
 @Injectable()
 export class SubscriptionplanService {
@@ -21,7 +22,7 @@ export class SubscriptionplanService {
         where: { type: dto.type },
         update: data,
         // status er beparta bjte pari nai
-        create: { ...dto },
+        create: { ...dto, status: SubscriptionStatusType.ACTIVE },
       });
 
       return ApiResponse.success(
@@ -56,7 +57,7 @@ export class SubscriptionplanService {
 
       if (!isPlanExists) {
         // amader to response banano hoise, oita use korei error throw kora hobe
-        throw new BadRequestException('Plan can not found');
+        return ApiResponse.error('Plan can not found');
       }
 
       const result = await this.prisma.subscriptionPlan.update({
@@ -69,7 +70,7 @@ export class SubscriptionplanService {
           type,
         },
       });
-      console.log(result, 'res');
+      // console.log(result, 'res');
       return ApiResponse.success(result, 'Plan Update successfully');
     } catch (err) {
       // aikhane vol process error handle kora hoyeche

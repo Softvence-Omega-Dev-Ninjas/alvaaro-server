@@ -10,9 +10,13 @@ CREATE TYPE "SubscriptionPlanType" AS ENUM ('BASIC', 'BUSINESS', 'ENTERPRISE');
 -- CreateEnum
 CREATE TYPE "VerificationStatusType" AS ENUM ('PENDING', 'VERIFIED', 'REJECTED');
 
+-- CreateEnum
+CREATE TYPE "SubscriptionStatusType" AS ENUM ('ACTIVE', 'EXPIRED');
+
 -- CreateTable
 CREATE TABLE "Coupon" (
     "id" TEXT NOT NULL,
+    "couponName" TEXT NOT NULL,
     "couponCode" TEXT NOT NULL,
     "percent_off" TEXT NOT NULL,
     "start_date" TIMESTAMP(3) NOT NULL,
@@ -162,7 +166,7 @@ CREATE TABLE "SubscriptionPlan" (
     "length" TEXT NOT NULL,
     "price" TEXT NOT NULL,
     "features" TEXT[],
-    "status" BOOLEAN NOT NULL DEFAULT false,
+    "status" "SubscriptionStatusType" NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 

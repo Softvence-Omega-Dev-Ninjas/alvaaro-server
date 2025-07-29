@@ -59,7 +59,7 @@ export class ProductController {
     @UploadedFiles() images: Express.Multer.File[],
     @Body() createProductDto: CreateCarDto,
   ) {
-    const sellerId = '44908e21-48f5-449d-8d2b-a60df3f9f7b4';
+    const sellerId = 'ea21ead8-f5c7-4df7-9062-31d85023519d';
     return await this.productService.handleProductCreation(
       createProductDto,
       images,
@@ -75,7 +75,7 @@ export class ProductController {
     @UploadedFiles() images: Express.Multer.File[],
     @Body() createProductDto: CreateWatchDto,
   ) {
-    const sellerId = '44908e21-48f5-449d-8d2b-a60df3f9f7b4';
+    const sellerId = 'ea21ead8-f5c7-4df7-9062-31d85023519d';
     return await this.productService.handleProductCreation(
       createProductDto,
       images,
@@ -91,7 +91,7 @@ export class ProductController {
     @UploadedFiles() images: Express.Multer.File[],
     @Body() createProductDto: CreateYachtDto,
   ) {
-    const sellerId = '44908e21-48f5-449d-8d2b-a60df3f9f7b4';
+    const sellerId = 'ea21ead8-f5c7-4df7-9062-31d85023519d';
     return await this.productService.handleProductCreation(
       createProductDto,
       images,
@@ -107,7 +107,7 @@ export class ProductController {
     @UploadedFiles() images: Express.Multer.File[],
     @Body() createProductDto: CreateJewelleryDto,
   ) {
-    const sellerId = '44908e21-48f5-449d-8d2b-a60df3f9f7b4';
+    const sellerId = 'ea21ead8-f5c7-4df7-9062-31d85023519d';
     return this.productService.handleProductCreation(
       createProductDto,
       images,

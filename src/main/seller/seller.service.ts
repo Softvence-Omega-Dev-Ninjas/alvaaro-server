@@ -7,11 +7,11 @@ import { Cache } from 'cache-manager';
 import { MailService } from 'src/utils/mail/mail.service';
 import { OtpDto } from '../auth/dto/signin.dto';
 import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
- 
- 
+
+
 import { VerificationStatusType } from '@prisma/client';
-import e from 'express';
- 
+
+
 
 @Injectable()
 export class SellerService {
@@ -39,6 +39,7 @@ export class SellerService {
     );
     return { message: 'OTP sent successfully. Please check your email.' };
   }
+
   async verifyOtpAndCreate(otp: OtpDto, userId: string, userEmail: string) {
     // seller info check in database
     const sellerInfo = await this.prisma.seller.findUnique({
@@ -134,6 +135,7 @@ export class SellerService {
     return `This action updates a #${id} seller`;
   }
 
+  // Seller verified by admin
   async verifiedSeller(userId: string) {
     const seller = await this.prisma.seller.findUnique({
       where: { userId },
@@ -141,7 +143,7 @@ export class SellerService {
     if (!seller) {
       return ApiResponse.error('Seller does not exist');
     }
-    
+
     if (seller.subscriptionStatus) {
       const result = await this.prisma.seller.update({
         where: { userId: userId },
@@ -153,10 +155,6 @@ export class SellerService {
 
       return ApiResponse.success(result, 'Seller verified successfully');
     }
-   
-      
-    
-
   }
 
   remove(id: number) {
