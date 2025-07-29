@@ -7,21 +7,26 @@ import { UpdateCouponDto } from './dto/update-coupon.dto';
 import Stripe from 'stripe';
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
 import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
+import { HelperService } from 'src/utils/helper/helper.service';
 
 @Injectable()
 export class CouponService {
   private readonly stripe: Stripe;
-  constructor(private readonly prisma: PrismaService) {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly helperService: HelperService,
+  ) {
     this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
   }
 
   async createCoupon(createCouponDto: CreateCouponDto): Promise<any> {
     console.log('Creating coupon with data:', createCouponDto);
 
-    let stripeCouponId: string | null = null;
-
     try {
-      // First create the Stripe coupon
+      const existingCoupon = await this.helperService.couponExists(
+        createCouponDto.couponCode,
+        createCouponDto.percent_off,
+      );
       const couponParams: Stripe.CouponCreateParams = {
         name: createCouponDto.couponCode,
         duration: 'once',
@@ -40,29 +45,12 @@ export class CouponService {
         },
       };
 
-      const existingCoupon = (await this.prisma.coupon.findMany({
-        where: {
-          couponCode: createCouponDto.couponCode,
-          OR: [
-            {
-              start_date: createCouponDto.start_date,
-            },
-            {
-              redeem_by: createCouponDto.redeem_by,
-            },
-          ],
-        },
-      })) as unknown;
-
-      console.log('Existing coupons found:', existingCoupon);
-
       if (Array.isArray(existingCoupon) && existingCoupon.length > 0) {
         return ApiResponse.error(
           'Coupon already exists with the same start date or redeem by date and coupon code ',
         );
       }
       const stripeCoupon = await this.stripe.coupons.create(couponParams);
-      stripeCouponId = stripeCoupon.id;
 
       // Use Prisma transaction to create database record
       const result = await this.prisma.$transaction(async (prisma) => {
@@ -88,38 +76,11 @@ export class CouponService {
       return result;
     } catch (error) {
       console.error('Error creating coupon:', error.message);
-
-      // Rollback: Delete the Stripe coupon if it was created
-      if (stripeCouponId) {
-        try {
-          await this.stripe.coupons.del(stripeCouponId);
-          console.log(`Rolled back Stripe coupon: ${stripeCouponId}`);
-        } catch (rollbackError) {
-          console.error(
-            'Failed to rollback Stripe coupon:',
-            rollbackError.message,
-          );
-        }
-      }
-      throw new Error(`Error creating coupon: ${error.message}`);
     }
   }
 
   async findAll() {
     try {
-      // const couponsList = await this.stripe.coupons.list();
-      // const formattedCoupons = couponsList.data.map((coupon) => ({
-      //   couponCode: coupon.name,
-      //   stripeCouponId: coupon.id,
-      //   percent_off: coupon.percent_off?.toString() || '0',
-      //   redeem_by: coupon.metadata?.end_date || '',
-      //   start_date: coupon.metadata?.start_date || '',
-      //   couponName: coupon.metadata?.couponName || '',
-      // }));
-      // return ApiResponse.success(
-      //   formattedCoupons,
-      //   'Coupons fetched successfully',
-      // );
       const coupons = await this.prisma.coupon.findMany({
         orderBy: { createdAt: 'desc' },
       });
