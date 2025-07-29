@@ -29,7 +29,7 @@ export class ProductService {
     userid: string,
   ) {
     const sellerId = await this.helperService.sellerExists(userid);
-    console.log(sellerId);
+    // console.log(sellerId);
     const imageUrls = images?.length
       ? (await uploadMultipleToCloudinary(images)).map(
           (res: { secure_url: string }) => res.secure_url,

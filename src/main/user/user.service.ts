@@ -10,7 +10,8 @@ export class UserService {
   constructor(private readonly prisma: PrismaService) {}
   async findAll() {
     const users = await this.prisma.user.findMany();
-    // console.log('Users:', users);
+    users.map((user) => console.log(user));
+    console.log('Users:', users);
     return users;
   }
 

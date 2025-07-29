@@ -44,7 +44,7 @@ export class ProductController {
     @Req() req: { userid: string },
   ) {
     console.log(req.userid);
-    return this.productService.handleProductCreation(
+    return await this.productService.handleProductCreation(
       createProductDto,
       images,
       req.userid,
@@ -59,8 +59,8 @@ export class ProductController {
     @UploadedFiles() images: Express.Multer.File[],
     @Body() createProductDto: CreateCarDto,
   ) {
-    const sellerId = '36c77915-cd87-486d-af89-90b94bf9b453';
-    return this.productService.handleProductCreation(
+    const sellerId = '44908e21-48f5-449d-8d2b-a60df3f9f7b4';
+    return await this.productService.handleProductCreation(
       createProductDto,
       images,
       sellerId,
@@ -75,8 +75,8 @@ export class ProductController {
     @UploadedFiles() images: Express.Multer.File[],
     @Body() createProductDto: CreateWatchDto,
   ) {
-    const sellerId = '36c77915-cd87-486d-af89-90b94bf9b453';
-    return this.productService.handleProductCreation(
+    const sellerId = '44908e21-48f5-449d-8d2b-a60df3f9f7b4';
+    return await this.productService.handleProductCreation(
       createProductDto,
       images,
       sellerId,
@@ -91,8 +91,8 @@ export class ProductController {
     @UploadedFiles() images: Express.Multer.File[],
     @Body() createProductDto: CreateYachtDto,
   ) {
-    const sellerId = '36c77915-cd87-486d-af89-90b94bf9b453';
-    return this.productService.handleProductCreation(
+    const sellerId = '44908e21-48f5-449d-8d2b-a60df3f9f7b4';
+    return await this.productService.handleProductCreation(
       createProductDto,
       images,
       sellerId,
@@ -107,7 +107,7 @@ export class ProductController {
     @UploadedFiles() images: Express.Multer.File[],
     @Body() createProductDto: CreateJewelleryDto,
   ) {
-    const sellerId = '36c77915-cd87-486d-af89-90b94bf9b453';
+    const sellerId = '44908e21-48f5-449d-8d2b-a60df3f9f7b4';
     return this.productService.handleProductCreation(
       createProductDto,
       images,
@@ -118,7 +118,7 @@ export class ProductController {
   @Get()
   @ApiQuery({ name: 'category', enum: CategoryType, required: false })
   async findAllProducts(@Query('category') category?: CategoryType) {
-    return this.productService.findAllProducts(category);
+    return await this.productService.findAllProducts(category);
   }
 
   @Get('/real-estate/search')

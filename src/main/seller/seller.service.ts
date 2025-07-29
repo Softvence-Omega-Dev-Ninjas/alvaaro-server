@@ -7,6 +7,11 @@ import { Cache } from 'cache-manager';
 import { MailService } from 'src/utils/mail/mail.service';
 import { OtpDto } from '../auth/dto/signin.dto';
 import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
+ 
+ 
+import { VerificationStatusType } from '@prisma/client';
+import e from 'express';
+ 
 
 @Injectable()
 export class SellerService {
@@ -14,7 +19,7 @@ export class SellerService {
     private readonly prisma: PrismaService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private mail: MailService,
-  ) {}
+  ) { }
 
   async sendOtpAndCacheInfo(
     createSellerDto: CreateSellerDto,
@@ -127,6 +132,31 @@ export class SellerService {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   update(id: number, updateSellerDto: UpdateSellerDto) {
     return `This action updates a #${id} seller`;
+  }
+
+  async verifiedSeller(userId: string) {
+    const seller = await this.prisma.seller.findUnique({
+      where: { userId },
+    })
+    if (!seller) {
+      return ApiResponse.error('Seller does not exist');
+    }
+    
+    if (seller.subscriptionStatus) {
+      const result = await this.prisma.seller.update({
+        where: { userId: userId },
+        data: {
+          verificationStatus: VerificationStatusType.VERIFIED,
+        }
+      })
+      console.log(result, 'result');
+
+      return ApiResponse.success(result, 'Seller verified successfully');
+    }
+   
+      
+    
+
   }
 
   remove(id: number) {
