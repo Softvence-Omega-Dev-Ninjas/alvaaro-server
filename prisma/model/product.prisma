@@ -7,18 +7,18 @@ model Product {
   price       String
   images      String[]
   category    CategoryType
-  premium     Boolean? 
+  premium     Boolean?
+  views       Int
   trending    Int          @default(0)
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
-  
-  Car         Car?
-  Watch       Watch?
-  RealEstate  RealEstate?
-  Yacht       Yacht?
-  Jewellery   Jewellery?
-}
 
+  Car        Car?
+  Watch      Watch?
+  RealEstate RealEstate?
+  Yacht      Yacht?
+  Jewellery  Jewellery?
+}
 
 enum CategoryType {
   CAR

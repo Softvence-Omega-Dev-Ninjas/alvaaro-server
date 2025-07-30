@@ -34,7 +34,8 @@ CREATE TABLE "Product" (
     "price" TEXT NOT NULL,
     "images" TEXT[],
     "category" "CategoryType" NOT NULL,
-    "premium" BOOLEAN NOT NULL DEFAULT false,
+    "premium" BOOLEAN,
+    "views" INTEGER NOT NULL,
     "trending" INTEGER NOT NULL DEFAULT 0,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL
