@@ -59,6 +59,7 @@ model Product {
   price       String
   images      String[]
   category    CategoryType
+  views       Int
   trending    Int          @default(0)
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
