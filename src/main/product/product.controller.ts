@@ -43,7 +43,7 @@ export class ProductController {
     @Body() createProductDto: CreateRealEstateDto,
     @Req() req: { userid: string },
   ) {
-    console.log({createProductDto});
+    // console.log({createProductDto});
     return await this.productService.handleProductCreation(
       createProductDto,
       images,
@@ -135,6 +135,11 @@ export class ProductController {
   searchRealEstate(@Query() query?: RealEstateSearchQueryDto) {
     console.log(query);
     return this.productService.searchRealEstate(query);
+  }
+
+  @Get(':id')
+  findProductById(@Param('id') id: string) {
+    return this.productService.findProductById(id);
   }
 
   @Delete(':id')
