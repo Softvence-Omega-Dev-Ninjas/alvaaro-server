@@ -1,11 +1,11 @@
 -- CreateEnum
+CREATE TYPE "SubscriptionPlanType" AS ENUM ('BASIC', 'BUSINESS', 'ENTERPRISE');
+
+-- CreateEnum
 CREATE TYPE "UserRole" AS ENUM ('USER', 'SELLER', 'ADMIN');
 
 -- CreateEnum
 CREATE TYPE "CategoryType" AS ENUM ('CAR', 'WATCH', 'JEWELLERY', 'REAL_ESTATE', 'YACHT');
-
--- CreateEnum
-CREATE TYPE "SubscriptionPlanType" AS ENUM ('BASIC', 'BUSINESS', 'ENTERPRISE');
 
 -- CreateEnum
 CREATE TYPE "VerificationStatusType" AS ENUM ('PENDING', 'VERIFIED', 'REJECTED');
@@ -13,13 +13,28 @@ CREATE TYPE "VerificationStatusType" AS ENUM ('PENDING', 'VERIFIED', 'REJECTED')
 -- CreateTable
 CREATE TABLE "Coupon" (
     "id" TEXT NOT NULL,
-    "couponName" TEXT NOT NULL,
+    "stripeCouponId" TEXT NOT NULL,
     "couponCode" TEXT NOT NULL,
     "percent_off" TEXT NOT NULL,
     "start_date" TIMESTAMP(3) NOT NULL,
     "redeem_by" TIMESTAMP(3) NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "SubscriptionPlan" (
+    "id" TEXT NOT NULL,
+    "type" "SubscriptionPlanType" NOT NULL,
+    "length" TEXT NOT NULL,
+    "price" TEXT NOT NULL,
+    "features" TEXT[],
+    "stripeProductId" TEXT NOT NULL,
+    "stripePriceId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "SubscriptionPlan_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -157,20 +172,6 @@ CREATE TABLE "Yacht" (
 );
 
 -- CreateTable
-CREATE TABLE "SubscriptionPlan" (
-    "id" TEXT NOT NULL,
-    "type" "SubscriptionPlanType" NOT NULL,
-    "length" TEXT NOT NULL,
-    "price" TEXT NOT NULL,
-    "features" TEXT[],
-    "status" BOOLEAN NOT NULL DEFAULT false,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "SubscriptionPlan_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "Contact" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
@@ -191,6 +192,12 @@ CREATE TABLE "Newsletter" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Coupon_id_key" ON "Coupon"("id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Coupon_stripeCouponId_key" ON "Coupon"("stripeCouponId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "SubscriptionPlan_type_key" ON "SubscriptionPlan"("type");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_id_key" ON "User"("id");
@@ -245,9 +252,6 @@ CREATE UNIQUE INDEX "Yacht_id_key" ON "Yacht"("id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Yacht_productId_key" ON "Yacht"("productId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "SubscriptionPlan_type_key" ON "SubscriptionPlan"("type");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Contact_id_key" ON "Contact"("id");

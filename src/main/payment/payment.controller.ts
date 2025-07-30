@@ -5,6 +5,7 @@ import {
   Get,
   Headers,
   Post,
+  RawBodyRequest,
   Req,
   Res,
   UseGuards,
@@ -48,14 +49,16 @@ export class PaymentController {
   // * Webhook
   @Post('webhook')
   async handleWebhook(
-    @Req() req: Request,
-    @Res() res: Response,
+    @Req() req: RawBodyRequest<Request>,
     @Headers('stripe-signature') sig: string,
   ) {
     try {
+      console.log('Received webhook event:', sig);
       await this.stripeService.handleWebhook(req.body, sig);
+      return { received: true };
     } catch (err) {
       console.error('Webhook error:', err);
+      return { error: 'Webhook Error' };
     }
   }
 }

@@ -28,10 +28,14 @@ export class PaymentService {
       const customerinStripe = await this.stripe.customers.search({
         query: `email:'${userExists.email}'`,
       });
+      let customerId: string;
       if (customerinStripe.data.length === 0) {
         const stripeNewCustomer = await this.stripe.customers.create({
           email: userExists.email,
         });
+        customerId = stripeNewCustomer.id;
+      } else {
+        customerId = customerinStripe.data[0].id;
       }
       // 2. Check if the package exists in the database
       const packageExists = await this.helperService.packageExists(packageId);
@@ -39,30 +43,30 @@ export class PaymentService {
       if (!packageExists) {
         return ApiResponse.error('Package does not exist');
       }
-      // const session = await this.stripe.checkout.sessions.create({
-      //   payment_method_types: ['card'],
-      //   mode: 'subscription',
-      //   customer: customerid.data[0].id,
-      //   metadata: {
-      //     email: userExists.email,
-      //   },
-      //   subscription_data: {
-      //     metadata: {
-      //       userId: userId,
-      //       email: userExists.email,
-      //     },
-      //   },
-      //   line_items: [
-      //     {
-      //       price: process.env.STRIPE_PRICE_ID as string,
-      //       quantity: 1,
-      //     },
-      //   ],
-      //   success_url: 'http://localhost:3000/stripe/payment-success',
-      //   cancel_url: 'http://localhost:3000/stripe/payment-cancel',
-      // });
-      // console.log('Session created:', session);
-      // return { url: session.url };
+      const session = await this.stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        mode: 'subscription',
+        customer: customerId,
+        metadata: {
+          email: userExists.email,
+        },
+        subscription_data: {
+          metadata: {
+            userId: userId,
+            email: userExists.email,
+          },
+        },
+        line_items: [
+          {
+            price: packageExists.stripePriceId,
+            quantity: 1,
+          },
+        ],
+        success_url: 'http://localhost:3000/stripe/payment-success',
+        cancel_url: 'http://localhost:3000/stripe/payment-cancel',
+      });
+      console.log('Session created:', session);
+      return { url: session.url };
     } catch (error) {
       console.error('Error creating checkout session:', error);
     }
@@ -75,24 +79,5 @@ export class PaymentService {
       process.env.STRIPE_WEBHOOK_SECRET as string,
     );
     console.log('Webhook event received:', event.data.object);
-    switch (event.type) {
-      case 'customer.subscription.created':
-      case 'customer.subscription.updated': {
-        const subscription = event.data.object as Stripe.Subscription;
-        console.log('Subscription created or updated:', subscription);
-
-        const metaData = subscription.metadata as {
-          userId: string;
-          email: string;
-        };
-        console.log('Metadata:', metaData);
-
-        break;
-      }
-
-      case 'customer.subscription.deleted': {
-        break;
-      }
-    }
   }
 }
