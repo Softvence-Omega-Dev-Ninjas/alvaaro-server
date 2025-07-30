@@ -43,7 +43,7 @@ export class ProductController {
     @Body() createProductDto: CreateRealEstateDto,
     @Req() req: { userid: string },
   ) {
-    console.log(req.userid);
+    console.log({createProductDto});
     return await this.productService.handleProductCreation(
       createProductDto,
       images,
@@ -59,7 +59,7 @@ export class ProductController {
     @UploadedFiles() images: Express.Multer.File[],
     @Body() createProductDto: CreateCarDto,
   ) {
-    const sellerId = 'ea21ead8-f5c7-4df7-9062-31d85023519d';
+    const sellerId = 'a6a26360-1529-4eed-9cd9-baec4f0640a0';
     return await this.productService.handleProductCreation(
       createProductDto,
       images,
@@ -75,7 +75,7 @@ export class ProductController {
     @UploadedFiles() images: Express.Multer.File[],
     @Body() createProductDto: CreateWatchDto,
   ) {
-    const sellerId = 'ea21ead8-f5c7-4df7-9062-31d85023519d';
+    const sellerId = 'a6a26360-1529-4eed-9cd9-baec4f0640a0';
     return await this.productService.handleProductCreation(
       createProductDto,
       images,
@@ -91,7 +91,7 @@ export class ProductController {
     @UploadedFiles() images: Express.Multer.File[],
     @Body() createProductDto: CreateYachtDto,
   ) {
-    const sellerId = 'ea21ead8-f5c7-4df7-9062-31d85023519d';
+    const sellerId = 'a6a26360-1529-4eed-9cd9-baec4f0640a0';
     return await this.productService.handleProductCreation(
       createProductDto,
       images,
@@ -107,7 +107,7 @@ export class ProductController {
     @UploadedFiles() images: Express.Multer.File[],
     @Body() createProductDto: CreateJewelleryDto,
   ) {
-    const sellerId = 'ea21ead8-f5c7-4df7-9062-31d85023519d';
+    const sellerId = 'a6a26360-1529-4eed-9cd9-baec4f0640a0';
     return this.productService.handleProductCreation(
       createProductDto,
       images,
@@ -119,6 +119,12 @@ export class ProductController {
   @ApiQuery({ name: 'category', enum: CategoryType, required: false })
   async findAllProducts(@Query('category') category?: CategoryType) {
     return await this.productService.findAllProducts(category);
+  }
+
+  @Get('/premium')
+  @ApiQuery({ name: 'category', enum: CategoryType, required: false })
+  async findAllPremiumProducts(@Query('category') category?: CategoryType) {
+    return await this.productService.findAllPremiumProducts(category);
   }
 
   @Get('/real-estate/search')

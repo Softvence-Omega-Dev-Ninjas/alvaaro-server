@@ -1,11 +1,11 @@
 -- CreateEnum
-CREATE TYPE "UserRole" AS ENUM ('USER', 'SELLER', 'ADMIN');
-
--- CreateEnum
 CREATE TYPE "CategoryType" AS ENUM ('CAR', 'WATCH', 'JEWELLERY', 'REAL_ESTATE', 'YACHT');
 
 -- CreateEnum
 CREATE TYPE "SubscriptionPlanType" AS ENUM ('BASIC', 'BUSINESS', 'ENTERPRISE');
+
+-- CreateEnum
+CREATE TYPE "UserRole" AS ENUM ('USER', 'SELLER', 'ADMIN');
 
 -- CreateEnum
 CREATE TYPE "VerificationStatusType" AS ENUM ('PENDING', 'VERIFIED', 'REJECTED');
@@ -16,13 +16,43 @@ CREATE TYPE "SubscriptionStatusType" AS ENUM ('ACTIVE', 'EXPIRED');
 -- CreateTable
 CREATE TABLE "Coupon" (
     "id" TEXT NOT NULL,
-    "couponName" TEXT NOT NULL,
+    "stripeCouponId" TEXT NOT NULL,
     "couponCode" TEXT NOT NULL,
     "percent_off" TEXT NOT NULL,
     "start_date" TIMESTAMP(3) NOT NULL,
     "redeem_by" TIMESTAMP(3) NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "Product" (
+    "id" TEXT NOT NULL,
+    "sellerId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
+    "price" TEXT NOT NULL,
+    "images" TEXT[],
+    "category" "CategoryType" NOT NULL,
+    "premium" BOOLEAN NOT NULL DEFAULT false,
+    "trending" INTEGER NOT NULL DEFAULT 0,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "SubscriptionPlan" (
+    "id" TEXT NOT NULL,
+    "type" "SubscriptionPlanType" NOT NULL,
+    "length" TEXT NOT NULL,
+    "price" TEXT NOT NULL,
+    "features" TEXT[],
+    "stripeProductId" TEXT NOT NULL,
+    "stripePriceId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "SubscriptionPlan_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -61,20 +91,6 @@ CREATE TABLE "UserSubscriptionValidity" (
     "sellerId" TEXT NOT NULL,
     "subscribedPlan" TEXT NOT NULL,
     "expiryTime" TIMESTAMP(3) NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL
-);
-
--- CreateTable
-CREATE TABLE "Product" (
-    "id" TEXT NOT NULL,
-    "sellerId" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "description" TEXT NOT NULL,
-    "price" TEXT NOT NULL,
-    "images" TEXT[],
-    "category" "CategoryType" NOT NULL,
-    "trending" INTEGER NOT NULL DEFAULT 0,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL
 );
@@ -160,20 +176,6 @@ CREATE TABLE "Yacht" (
 );
 
 -- CreateTable
-CREATE TABLE "SubscriptionPlan" (
-    "id" TEXT NOT NULL,
-    "type" "SubscriptionPlanType" NOT NULL,
-    "length" TEXT NOT NULL,
-    "price" TEXT NOT NULL,
-    "features" TEXT[],
-    "status" "SubscriptionStatusType" NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "SubscriptionPlan_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "Contact" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
@@ -196,6 +198,15 @@ CREATE TABLE "Newsletter" (
 CREATE UNIQUE INDEX "Coupon_id_key" ON "Coupon"("id");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Coupon_stripeCouponId_key" ON "Coupon"("stripeCouponId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Product_id_key" ON "Product"("id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "SubscriptionPlan_type_key" ON "SubscriptionPlan"("type");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "User_id_key" ON "User"("id");
 
 -- CreateIndex
@@ -215,9 +226,6 @@ CREATE UNIQUE INDEX "UserSubscriptionValidity_sellerId_key" ON "UserSubscription
 
 -- CreateIndex
 CREATE UNIQUE INDEX "UserSubscriptionValidity_subscribedPlan_key" ON "UserSubscriptionValidity"("subscribedPlan");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Product_id_key" ON "Product"("id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Car_id_key" ON "Car"("id");
@@ -250,9 +258,6 @@ CREATE UNIQUE INDEX "Yacht_id_key" ON "Yacht"("id");
 CREATE UNIQUE INDEX "Yacht_productId_key" ON "Yacht"("productId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "SubscriptionPlan_type_key" ON "SubscriptionPlan"("type");
-
--- CreateIndex
 CREATE UNIQUE INDEX "Contact_id_key" ON "Contact"("id");
 
 -- CreateIndex
@@ -262,6 +267,9 @@ CREATE UNIQUE INDEX "Newsletter_id_key" ON "Newsletter"("id");
 CREATE UNIQUE INDEX "Newsletter_email_key" ON "Newsletter"("email");
 
 -- AddForeignKey
+ALTER TABLE "Product" ADD CONSTRAINT "Product_sellerId_fkey" FOREIGN KEY ("sellerId") REFERENCES "Seller"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "Seller" ADD CONSTRAINT "Seller_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -269,9 +277,6 @@ ALTER TABLE "UserSubscriptionValidity" ADD CONSTRAINT "UserSubscriptionValidity_
 
 -- AddForeignKey
 ALTER TABLE "UserSubscriptionValidity" ADD CONSTRAINT "UserSubscriptionValidity_subscribedPlan_fkey" FOREIGN KEY ("subscribedPlan") REFERENCES "SubscriptionPlan"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Product" ADD CONSTRAINT "Product_sellerId_fkey" FOREIGN KEY ("sellerId") REFERENCES "Seller"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Car" ADD CONSTRAINT "Car_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE CASCADE ON UPDATE CASCADE;
