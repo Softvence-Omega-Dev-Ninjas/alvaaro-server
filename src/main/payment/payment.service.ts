@@ -25,15 +25,20 @@ export class PaymentService {
         return ApiResponse.error('User does not exist');
       }
       //  1. customer find in stripe
-      const customerid = await this.stripe.customers.list({
-        email: userExists.email,
+      const customerinStripe = await this.stripe.customers.search({
+        query: `email:'${userExists.email}'`,
       });
-      if (customerid.data.length === 0) {
+      if (customerinStripe.data.length === 0) {
         const stripeNewCustomer = await this.stripe.customers.create({
           email: userExists.email,
         });
       }
-
+      // 2. Check if the package exists in the database
+      const packageExists = await this.helperService.packageExists(packageId);
+      console.log('Package Exists:', packageExists);
+      if (!packageExists) {
+        return ApiResponse.error('Package does not exist');
+      }
       // const session = await this.stripe.checkout.sessions.create({
       //   payment_method_types: ['card'],
       //   mode: 'subscription',
