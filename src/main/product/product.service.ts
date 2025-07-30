@@ -21,114 +21,121 @@ export class ProductService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly helperService: HelperService,
-  ) {}
+  ) { }
 
   async handleProductCreation(
     dto: CreateProductDto,
     images: Express.Multer.File[],
     userid: string,
   ) {
-    const sellerId = await this.helperService.sellerExists(userid);
-    // console.log(sellerId);
-    const imageUrls = images?.length
-      ? (await uploadMultipleToCloudinary(images)).map(
+    try {
+      console.log({dto})
+      const sellerId = await this.helperService.sellerExists(userid);
+      console.log(sellerId);
+      const imageUrls = images?.length
+        ? (await uploadMultipleToCloudinary(images)).map(
           (res: { secure_url: string }) => res.secure_url,
         )
-      : [];
+        : [];
 
-    const product = await this.prisma.product.create({
-      data: {
-        name: dto.name,
-        description: dto.description,
-        price: dto.price,
-        images: imageUrls,
-        category: dto.category,
-        sellerId,
-      },
-    });
-    if (isRealEstateDto(dto)) {
-      await this.prisma.realEstate.create({
+      const product = await this.prisma.product.create({
         data: {
-          productId: product.id,
-          beds: dto.beds,
-          address: dto.address,
-          city: dto.city,
-          state: dto.state,
-          zip: dto.zip,
-          size: dto.size,
-          washroom: dto.washroom,
-          text: Array.isArray(dto.text) ? dto.text : [dto.text],
-          feature: Array.isArray(dto.feature) ? dto.feature : [dto.feature],
+          name: dto.name,
+          description: dto.description,
+          price: dto.price,
+          images: imageUrls,
+          category: dto.category,
+          premium:Boolean( dto.premium),
+          sellerId,
         },
       });
-    } else if (isCarDto(dto)) {
-      await this.prisma.car.create({
-        data: {
-          productId: product.id,
-          carBodyStyle: dto.carBodyStyle,
-          model: dto.model,
-          year: dto.year,
-          mileage: dto.mileage,
-          condition: dto.condition,
-          transmission: dto.transmission,
-          cylinders: dto.cylinders,
-          tractionType: dto.tractionType,
-          fuelType: dto.fuelType,
-          manufacture: dto.manufacture,
-        },
-      });
-    } else if (isYachtDto(dto)) {
-      await this.prisma.yacht.create({
-        data: {
-          productId: product.id,
-          beds: dto.beds,
-          address: dto.address,
-          city: dto.city,
-          state: dto.state,
-          zip: dto.zip,
-          size: dto.size,
-          washroom: dto.washroom,
-          text: Array.isArray(dto.text) ? dto.text : [dto.text],
-          feature: Array.isArray(dto.feature) ? dto.feature : [dto.feature],
-        },
-      });
-    } else if (isWatchDto(dto)) {
-      await this.prisma.watch.create({
-        data: {
-          productId: product.id,
-          displayType: dto.displayType,
-          waterResistance: dto.waterResistance,
-          warranty: dto.warranty,
-          manufacture: dto.manufacture,
-          condition: dto.condition,
-          model: dto.model,
-          movement: dto.movement,
-          strapMaterial: dto.strapMaterial,
-          tractionType: dto.tractionType,
-          size: dto.size,
-          features: Array.isArray(dto.features) ? dto.features : [dto.features],
-        },
-      });
-    } else if (isJewelleryDto(dto)) {
-      await this.prisma.jewellery.create({
-        data: {
-          productId: product.id,
-          condition: dto.condition,
-          size: dto.size,
-          tractionType: dto.tractionType,
-          features: Array.isArray(dto.features) ? dto.features : [dto.features],
-          displayType: dto.displayType,
-          manufacture: dto.manufacture,
-          warranty: dto.warranty,
-          model: dto.model,
-          waterResistance: dto.waterResistance,
-          strapMaterial: dto.strapMaterial,
-          movement: dto.movement,
-        },
-      });
+      if (isRealEstateDto(dto)) {
+        await this.prisma.realEstate.create({
+          data: {
+            productId: product.id,
+            beds: dto.beds,
+            address: dto.address,
+            city: dto.city,
+            state: dto.state,
+            zip: dto.zip,
+            size: dto.size,
+            washroom: dto.washroom,
+            text: Array.isArray(dto.text) ? dto.text : [dto.text],
+            feature: Array.isArray(dto.feature) ? dto.feature : [dto.feature],
+          },
+        });
+      } else if (isCarDto(dto)) {
+        await this.prisma.car.create({
+          data: {
+            productId: product.id,
+            carBodyStyle: dto.carBodyStyle,
+            model: dto.model,
+            year: dto.year,
+            mileage: dto.mileage,
+            condition: dto.condition,
+            transmission: dto.transmission,
+            cylinders: dto.cylinders,
+            tractionType: dto.tractionType,
+            fuelType: dto.fuelType,
+            manufacture: dto.manufacture,
+          },
+        });
+      } else if (isYachtDto(dto)) {
+        await this.prisma.yacht.create({
+          data: {
+            productId: product.id,
+            beds: dto.beds,
+            address: dto.address,
+            city: dto.city,
+            state: dto.state,
+            zip: dto.zip,
+            size: dto.size,
+            washroom: dto.washroom,
+            text: Array.isArray(dto.text) ? dto.text : [dto.text],
+            feature: Array.isArray(dto.feature) ? dto.feature : [dto.feature],
+          },
+        });
+      } else if (isWatchDto(dto)) {
+        await this.prisma.watch.create({
+          data: {
+            productId: product.id,
+            displayType: dto.displayType,
+            waterResistance: dto.waterResistance,
+            warranty: dto.warranty,
+            manufacture: dto.manufacture,
+            condition: dto.condition,
+            model: dto.model,
+            movement: dto.movement,
+            strapMaterial: dto.strapMaterial,
+            tractionType: dto.tractionType,
+            size: dto.size,
+            features: Array.isArray(dto.features) ? dto.features : [dto.features],
+          },
+        });
+      } else if (isJewelleryDto(dto)) {
+        await this.prisma.jewellery.create({
+          data: {
+            productId: product.id,
+            condition: dto.condition,
+            size: dto.size,
+            tractionType: dto.tractionType,
+            features: Array.isArray(dto.features) ? dto.features : [dto.features],
+            displayType: dto.displayType,
+            manufacture: dto.manufacture,
+            warranty: dto.warranty,
+            model: dto.model,
+            waterResistance: dto.waterResistance,
+            strapMaterial: dto.strapMaterial,
+            movement: dto.movement,
+          },
+        });
+      }
+      console.log('Product created successfully:', { product });
+      return ApiResponse.success(product, 'Product created successfully');
+    } catch (error) {
+      console.error('Error creating product:', error);
+      return ApiResponse.error('Failed to create product, please try again later', error);
     }
-    console.log('Product created successfully:', { product });
-    return ApiResponse.success(product, 'Product created successfully');
   }
 
   async findAllProducts(category?: CategoryType) {
@@ -157,6 +164,31 @@ export class ProductService {
     return ApiResponse.success(products, 'Products fetched successfully');
   }
 
+  async findAllPremiumProducts(category?: CategoryType) {
+    const products = await this.prisma.product.findMany({
+      where: { category, premium: true },
+      include: {
+        seller: {
+          select: {
+            id: true,
+            phone: true,
+            address: true,
+            companyName: true,
+            companyWebsite: true,
+          },
+        },
+        RealEstate: true,
+        Car: true,
+        Yacht: true,
+        Watch: true,
+        Jewellery: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+    return ApiResponse.success(products, 'Premium products fetched successfully');
+  }
   async searchRealEstate(query?: {
     location?: string;
     minPrice?: string;
@@ -175,29 +207,29 @@ export class ProductService {
         AND: [
           location
             ? {
-                RealEstate: {
-                  is: {
-                    OR: [
-                      { address: { contains: location, mode: 'insensitive' } },
-                      { city: { contains: location, mode: 'insensitive' } },
-                      { state: { contains: location, mode: 'insensitive' } },
-                      { zip: { contains: location, mode: 'insensitive' } },
-                    ],
-                  },
+              RealEstate: {
+                is: {
+                  OR: [
+                    { address: { contains: location, mode: 'insensitive' } },
+                    { city: { contains: location, mode: 'insensitive' } },
+                    { state: { contains: location, mode: 'insensitive' } },
+                    { zip: { contains: location, mode: 'insensitive' } },
+                  ],
                 },
-              }
+              },
+            }
             : {},
 
           type
             ? {
-                RealEstate: {
-                  is: {
-                    feature: {
-                      has: type,
-                    },
+              RealEstate: {
+                is: {
+                  feature: {
+                    has: type,
                   },
                 },
-              }
+              },
+            }
             : {},
         ],
       },

@@ -50,25 +50,24 @@ model UserSubscriptionValidity {
   updatedAt      DateTime         @updatedAt
 }
 
-model Product {
-  id          String       @unique @default(uuid())
-  sellerId    String
-  seller      Seller       @relation(fields: [sellerId], references: [id])
-  name        String
-  description String
-  price       String
-  images      String[]
-  category    CategoryType
-  views       Int
-  trending    Int          @default(0)
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  Car         Car?
-  Watch       Watch?
-  RealEstate  RealEstate?
-  Yacht       Yacht?
-  Jewellery   Jewellery?
-}
+// model Product {
+//   id          String       @unique @default(uuid())
+//   sellerId    String
+//   seller      Seller       @relation(fields: [sellerId], references: [id])
+//   name        String
+//   description String
+//   price       String
+//   images      String[]
+//   category    CategoryType
+//   trending    Int          @default(0)
+//   createdAt   DateTime     @default(now())
+//   updatedAt   DateTime     @updatedAt
+//   Car         Car?
+//   Watch       Watch?
+//   RealEstate  RealEstate?
+//   Yacht       Yacht?
+//   Jewellery   Jewellery?
+// }
 
 // Cars
 model Car {
@@ -178,14 +177,6 @@ enum UserRole {
   USER
   SELLER
   ADMIN
-}
-
-enum CategoryType {
-  CAR
-  WATCH
-  JEWELLERY
-  REAL_ESTATE
-  YACHT
 }
 
 enum VerificationStatusType {
