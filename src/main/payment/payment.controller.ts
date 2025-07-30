@@ -12,6 +12,7 @@ import {
 import { PaymentService } from './payment.service';
 import { Request, Response } from 'express';
 import { AuthGuard } from 'src/guards/auth.guard';
+import { CreatePaymentDto } from './dto/create-payment.dto';
 
 @Controller('stripe')
 export class PaymentController {
@@ -21,10 +22,11 @@ export class PaymentController {
   @UseGuards(AuthGuard)
   @Post('checkout')
   async checkout(
-    @Req() req: { userid: string } & { body: { packageId: string } },
-    @Body('packageId') packageId: string,
+    @Req() req: { userid: string },
+    @Body() createPaymentDto: CreatePaymentDto,
   ) {
     const userId = req.userid;
+    const packageId = createPaymentDto.packageId;
     console.log('User ID:', userId);
     return this.stripeService.createCheckoutSession(userId, packageId);
   }
