@@ -1,19 +1,32 @@
 // src/stripe/stripe.controller.ts
-import { Controller, Get, Headers, Post, Req, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Headers,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import { Request, Response } from 'express';
-import { use } from 'passport';
+import { AuthGuard } from 'src/guards/auth.guard';
 
 @Controller('stripe')
 export class PaymentController {
   constructor(private readonly stripeService: PaymentService) {}
 
   // * Routes for Stripe Checkout
-
-  @Get('checkout')
-  async checkout(@Req() req: Request) {
-    const userId = req.query.userId as string;
-    return this.stripeService.createCheckoutSession(userId);
+  @UseGuards(AuthGuard)
+  @Post('checkout')
+  async checkout(
+    @Req() req: { userid: string } & { body: { packageId: string } },
+    @Body('packageId') packageId: string,
+  ) {
+    const userId = req.userid;
+    console.log('User ID:', userId);
+    return this.stripeService.createCheckoutSession(userId, packageId);
   }
 
   @Get('payment-success')

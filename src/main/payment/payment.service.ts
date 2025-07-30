@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
+import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 import { HelperService } from 'src/utils/helper/helper.service';
 import Stripe from 'stripe';
 
@@ -15,42 +16,35 @@ export class PaymentService {
     this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {});
   }
 
-  async createCheckoutSession(userId: string) {
+  async createCheckoutSession(userId: string, packageId: string) {
     try {
       //
       // 1. Check if the user exists in the database
-      // const userExists = await this.helperService.userExists(userId);
-      // if (!userExists) {
-      //   throw new Error('User does not exist');
-      // }
+      const userExists = await this.helperService.userExists(userId);
+      if (!userExists) {
+        return ApiResponse.error('User does not exist');
+      }
       //  1. customer find in stripe
-      // const customer = await this.stripe.customers.list({
-      //   email: email || 'shanto@example.com',
-      // });
-      // if (customer.data.length === 0) {
-      //   // 2. if customer not found then create a new customer
-      //   const newCustomer = await this.stripe.customers.create({
-      //     email: email || 'shanto@example.com',
-      //   });
-      //   console.log('New customer created:', newCustomer);
-      // }
-      // 3. create a checkout session with the customer id
-      // const customerById = await this.stripe.customers.retrieve(
-      //   process.env.STRIPE_CUSTOMER_ID as string,
-      // );
-      // console.log('costomerId:', await this.stripe.customers.retrieve(process.env.STRIPE_CUSTOMER_ID as string));
+      const customerid = await this.stripe.customers.list({
+        email: userExists.email,
+      });
+      if (customerid.data.length === 0) {
+        const stripeNewCustomer = await this.stripe.customers.create({
+          email: userExists.email,
+        });
+      }
+
       // const session = await this.stripe.checkout.sessions.create({
       //   payment_method_types: ['card'],
       //   mode: 'subscription',
-      //   customer: customerById.id,
+      //   customer: customerid.data[0].id,
       //   metadata: {
-      //     userId: userId || '12345',
-      //     email: email || 'shanto@example.com',
+      //     email: userExists.email,
       //   },
       //   subscription_data: {
       //     metadata: {
-      //       userId: userId || '12345',
-      //       email: email || 'shanto@example.com',
+      //       userId: userId,
+      //       email: userExists.email,
       //     },
       //   },
       //   line_items: [

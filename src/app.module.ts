@@ -45,15 +45,15 @@ import { UserSubscriptionPlanModule } from './main/user-subscription-plan/user-s
 
     UserSubscriptionPlanModule,
   ],
-  // providers: [
-  //   {
-  //     provide: APP_GUARD,
-  //     useClass: AuthGuard,
-  //   },
-  //   {
-  //     provide: APP_GUARD,
-  //     useClass: RolesGuard,
-  //   },
-  // ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
+  ],
 })
 export class AppModule {}

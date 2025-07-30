@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
+import { ApiResponse } from '../common/apiresponse/apiresponse';
 
 @Injectable()
 export class HelperService {
@@ -22,6 +23,15 @@ export class HelperService {
       throw new Error('Seller does not exist');
     }
     return seller.id;
+  }
+  async packageExists(packageId: string) {
+    const packageExists = await this.prismaService.subscriptionPlan.findUnique({
+      where: { id: packageId },
+    });
+    if (!packageExists) {
+      ApiResponse.error('Package does not exist');
+    }
+    return packageExists;
   }
   async couponExists(couponCode: string, percent_off: string) {
     const existingCoupon = await this.prismaService.coupon.findMany({
