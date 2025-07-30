@@ -5,11 +5,11 @@ import { PrismaService } from 'src/prisma-service/prisma-service.service';
 export class HelperService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async userExists(userId: string): Promise<boolean> {
+  async userExists(userId: string) {
     const user = await this.prismaService.user.findUnique({
       where: { id: userId },
     });
-    return !!user;
+    return user;
   }
 
   async sellerExists(userId: string) {
