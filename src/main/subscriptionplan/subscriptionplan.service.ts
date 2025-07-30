@@ -14,9 +14,8 @@ export class SubscriptionplanService {
   }
 
   async createSubscription(dto: CreateSubscriptionPlanDto) {
-    console.log('Creating subscription plan:', dto);
-
     try {
+      console.log('Creating subscription plan with data:', dto);
       // Step 1: Check if plan already exists
       const existingPlan = await this.prisma.subscriptionPlan.findUnique({
         where: { type: dto.type },
@@ -41,7 +40,7 @@ export class SubscriptionplanService {
       // Step 3: Create Stripe price
       const stripePrice = await this.stripe.prices.create({
         currency: 'usd',
-        unit_amount: dto.price ? Math.floor(parseFloat(dto.price) * 100) : 0,
+        unit_amount: Number(dto.price) * 100,
         product: stripeProduct.id,
         recurring: {
           interval: 'month',
@@ -71,8 +70,6 @@ export class SubscriptionplanService {
         'Subscription plan created successfully',
       );
     } catch (error) {
-      console.error('Error creating subscription plan:', error.message);
-
       return ApiResponse.error(
         'Failed to create subscription plan',
         error.message,
