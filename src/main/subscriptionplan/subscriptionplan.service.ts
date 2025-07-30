@@ -14,8 +14,6 @@ export class SubscriptionplanService {
   }
 
   async createSubscription(dto: CreateSubscriptionPlanDto) {
-    console.log('Creating subscription plan:', dto);
-
     try {
       // Step 1: Check if plan already exists
       const existingPlan = await this.prisma.subscriptionPlan.findUnique({
@@ -71,8 +69,6 @@ export class SubscriptionplanService {
         'Subscription plan created successfully',
       );
     } catch (error) {
-      console.error('Error creating subscription plan:', error.message);
-
       return ApiResponse.error(
         'Failed to create subscription plan',
         error.message,
