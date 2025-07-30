@@ -123,8 +123,9 @@ export class ProductController {
 
   @Get('/premium')
   @ApiQuery({ name: 'category', enum: CategoryType, required: false })
-  async findAllPremiumProducts(@Query('category') category?: CategoryType) {
-    return await this.productService.findAllPremiumProducts(category);
+  @ApiQuery({name: "search", required:false , description:'Search by product name'})
+  async findAllPremiumProducts(@Query('category') category?: CategoryType , @Query('search') search?:string) {
+    return await this.productService.findAllPremiumProducts(category, search);
   }
 
   @Get('/real-estate/search')

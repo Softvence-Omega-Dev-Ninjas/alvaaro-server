@@ -29,7 +29,7 @@ export class ProductService {
     userid: string,
   ) {
     try {
-      console.log({dto})
+      console.log({ dto })
       const sellerId = await this.helperService.sellerExists(userid);
       console.log(sellerId);
       const imageUrls = images?.length
@@ -45,7 +45,7 @@ export class ProductService {
           price: dto.price,
           images: imageUrls,
           category: dto.category,
-          premium:Boolean( dto.premium),
+          premium: Boolean(dto.premium),
           sellerId,
         },
       });
@@ -164,9 +164,18 @@ export class ProductService {
     return ApiResponse.success(products, 'Products fetched successfully');
   }
 
-  async findAllPremiumProducts(category?: CategoryType) {
-    const products = await this.prisma.product.findMany({
-      where: { category, premium: true },
+  async findAllPremiumProducts(category?: CategoryType, search?: string) {
+    const premiumProducts = await this.prisma.product.findMany({
+      where: {
+        premium: true,
+        ...(category && { category }),
+        ...(search && {
+          name: {
+            contains: search,
+            mode: 'insensitive', 
+          },
+        }),
+      },
       include: {
         seller: {
           select: {
@@ -182,13 +191,17 @@ export class ProductService {
         Yacht: true,
         Watch: true,
         Jewellery: true,
+
       },
       orderBy: {
         createdAt: 'desc',
       },
     });
-    return ApiResponse.success(products, 'Premium products fetched successfully');
+
+    return ApiResponse.success(premiumProducts, 'Premium products fetched successfully');
   }
+
+
   async searchRealEstate(query?: {
     location?: string;
     minPrice?: string;
