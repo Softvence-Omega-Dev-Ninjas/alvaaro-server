@@ -6,7 +6,6 @@ import {
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
 import { CreateWatchDto } from './dto/create-watch.dto';
 import { UpdateWatchDto } from './dto/update-watch.dto';
-import { CategoryType } from '@prisma/client';
 import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 
 @Injectable()
@@ -21,7 +20,8 @@ export class WatchService {
         description: createWatchDto.description,
         price: String(createWatchDto.price ?? ''),
         images,
-        category: createWatchDto.category as CategoryType,
+        category: createWatchDto.category,
+        views: 0,
       };
 
       const createdProduct = await this.prisma.product.create({
@@ -63,7 +63,7 @@ export class WatchService {
 
   async findAll() {
     try {
-      const allWatch=  await this.prisma.watch.findMany({
+      const allWatch = await this.prisma.watch.findMany({
         include: { product: true },
       });
       return ApiResponse.success(allWatch, 'Watches fetched successfully');

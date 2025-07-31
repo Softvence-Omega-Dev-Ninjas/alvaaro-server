@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateCarDto } from './dto/create-car.dto';
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
-import { CategoryType } from '@prisma/client';
 import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 
 @Injectable()
@@ -17,7 +16,8 @@ export class CarService {
             description: createCarDto.description,
             price: createCarDto.price,
             images,
-            category: createCarDto.category as CategoryType,
+            category: createCarDto.category,
+            views: 0, // Initialize views to 0
           },
         });
 
