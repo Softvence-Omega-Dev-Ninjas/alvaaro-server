@@ -1,51 +1,51 @@
 import { Injectable } from '@nestjs/common';
-import { CreateCarDto } from './dto/create-car.dto';
+// import { CreateCarDto } from './dto/create-car.dto';
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
-import { CategoryType } from '@prisma/client';
+// import { CategoryType } from '@prisma/client';
 import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 
 @Injectable()
 export class CarService {
   constructor(private prisma: PrismaService) {}
-  async create(createCarDto: CreateCarDto, images: string[]) {
-    try {
-      const result = await this.prisma.$transaction(async (tx) => {
-        const product = await tx.product.create({
-          data: {
-            sellerId: '88b6b5fe-6d9a-45f0-a03b-c5bcb2e6cce3',
-            name: createCarDto.name,
-            description: createCarDto.description,
-            price: createCarDto.price,
-            images,
-            category: createCarDto.category as CategoryType,
-          },
-        });
+  // async create(createCarDto: CreateCarDto, images: string[]) {
+  //   try {
+  //     const result = await this.prisma.$transaction(async (tx) => {
+  //       const product = await tx.product.create({
+  //         data: {
+  //           sellerId: '88b6b5fe-6d9a-45f0-a03b-c5bcb2e6cce3',
+  //           name: createCarDto.name,
+  //           description: createCarDto.description,
+  //           price: createCarDto.price,
+  //           images,
+  //           category: createCarDto.category as CategoryType,
+  //         },
+  //       });
 
-        const car = await tx.car.create({
-          data: {
-            condition: createCarDto.condition,
-            manufacture: createCarDto.manufacture,
-            year: createCarDto.year,
-            model: createCarDto.model,
-            carBodyStyle: createCarDto.carBodyStyle,
-            transmission: createCarDto.transmission,
-            mileage: createCarDto.mileage,
-            cylinders: createCarDto.cylinders,
-            tractionType: createCarDto.tractionType,
-            fuelType: createCarDto.fuelType,
-            productId: product.id,
-          },
-        });
+  //       const car = await tx.car.create({
+  //         data: {
+  //           condition: createCarDto.condition,
+  //           manufacture: createCarDto.manufacture,
+  //           year: createCarDto.year,
+  //           model: createCarDto.model,
+  //           carBodyStyle: createCarDto.carBodyStyle,
+  //           transmission: createCarDto.transmission,
+  //           mileage: createCarDto.mileage,
+  //           cylinders: createCarDto.cylinders,
+  //           tractionType: createCarDto.tractionType,
+  //           fuelType: createCarDto.fuelType,
+  //           productId: product.id,
+  //         },
+  //       });
 
-        return { ...product, ...car };
-      });
+  //       return { ...product, ...car };
+  //     });
 
-      return ApiResponse.success(result, 'Car created successfully.');
-    } catch (error) {
-      console.error('Transaction Error:', error);
-      return ApiResponse.error('Failed to create car with transaction.', error);
-    }
-  }
+  //     return ApiResponse.success(result, 'Car created successfully.');
+  //   } catch (error) {
+  //     console.error('Transaction Error:', error);
+  //     return ApiResponse.error('Failed to create car with transaction.', error);
+  //   }
+  // }
 
   async findAll() {
     try {

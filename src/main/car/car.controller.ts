@@ -1,41 +1,47 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
 import {
   Controller,
   Get,
-  Post,
-  Body,
   Param,
   Delete,
+  UseGuards,
   UseInterceptors,
   UploadedFiles,
+  Req,
+  Post,
+  Body,
 } from '@nestjs/common';
 import { CarService } from './car.service';
-import { CreateCarDto } from './dto/create-car.dto';
+import { ProductService } from '../product/product.service';
+import { AuthGuard } from 'src/guards/auth.guard';
+import { Roles } from 'src/guards/roles.decorator';
+import { UserRole } from 'src/utils/common/enum/userEnum';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes } from '@nestjs/swagger';
-import { uploadMultipleToCloudinary } from 'src/utils/common/cloudinary/cloudinary';
+import { CreateCarDto } from './dto/create-car.dto';
 
 @Controller('car')
 export class CarController {
-  constructor(private readonly carService: CarService) {}
+  constructor(
+    private readonly carService: CarService,
+    private readonly productService: ProductService,
+  ) {}
 
-  @Post()
+  @UseGuards(AuthGuard)
+  @Roles(UserRole.SELLER)
+  @Post('car')
   @UseInterceptors(FilesInterceptor('images'))
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: CreateCarDto })
-  async create(
-    @Body() createCarDto: CreateCarDto,
-    @UploadedFiles() files: Express.Multer.File[],
+  async createCarProduct(
+    @UploadedFiles() images: Express.Multer.File[],
+    @Body() createProductDto: CreateCarDto,
+    @Req() req: { userid: string },
   ) {
-    let images: string[] = [];
-    if (files && files.length > 0) {
-      const uploadResults = await uploadMultipleToCloudinary(files);
-      images = uploadResults.map((res: any) => res.secure_url);
-    }
-
-    return this.carService.create(createCarDto, images);
+    return await this.productService.handleProductCreation(
+      createProductDto,
+      images,
+      req.userid,
+    );
   }
 
   @Get()

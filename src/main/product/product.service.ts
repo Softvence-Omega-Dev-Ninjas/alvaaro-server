@@ -55,6 +55,7 @@ export class ProductService {
           category: dto.category,
           premium: isPremium,
           sellerId,
+          views: 0, // Initialize views as required by the model
         },
       });
       if (isRealEstateDto(dto)) {
@@ -179,6 +180,42 @@ export class ProductService {
     return ApiResponse.success(products, 'Products fetched successfully');
   }
 
+  async findProductById(id: string) {
+    const product = await this.prisma.product.findUnique({
+      where: { id },
+      include: {
+        seller: {
+          select: {
+            id: true,
+            phone: true,
+            address: true,
+            companyName: true,
+            companyWebsite: true,
+          },
+        },
+        RealEstate: true,
+        Car: true,
+        Yacht: true,
+        Watch: true,
+        Jewellery: true,
+      },
+    });
+    if (!product) {
+      return ApiResponse.error('Product not found', null);
+    }
+    // Increment views count
+    await this.prisma.product.update({
+      where: { id },
+      data: {
+        views: { increment: 1 },
+      },
+    });
+    return ApiResponse.success(product, 'Product fetched successfully');
+  }
+
+  // async findAllPremiumProducts(category?: CategoryType) {
+  //   const products = await this.prisma.product.findMany({
+  //     where: { category, premium: true },
   async findAllPremiumProducts(category?: CategoryType, search?: string) {
     const premiumProducts = await this.prisma.product.findMany({
       where: {
