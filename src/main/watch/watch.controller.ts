@@ -21,7 +21,7 @@ import { AuthGuard } from 'src/guards/auth.guard';
 import { Roles } from 'src/guards/roles.decorator';
 import { UserRole } from 'src/utils/common/enum/userEnum';
 
-@ApiTags('watch')
+@ApiTags('Watch')
 @Controller('watch')
 export class WatchController {
   constructor(
