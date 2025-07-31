@@ -29,14 +29,22 @@ export class ProductService {
     userid: string,
   ) {
     try {
-      console.log({ dto });
+      // console.log({ dto })
       const sellerId = await this.helperService.sellerExists(userid);
-      console.log(sellerId);
+      // console.log(sellerId);
       const imageUrls = images?.length
         ? (await uploadMultipleToCloudinary(images)).map(
             (res: { secure_url: string }) => res.secure_url,
           )
         : [];
+
+      let isPremium;
+
+      if (dto.premium === 'true') {
+        isPremium = true;
+      } else if (dto.premium === 'false') {
+        isPremium = false;
+      }
 
       const product = await this.prisma.product.create({
         data: {
@@ -45,7 +53,7 @@ export class ProductService {
           price: dto.price,
           images: imageUrls,
           category: dto.category,
-          premium: Boolean(dto.premium),
+          premium: isPremium,
           sellerId,
           views: 0, // Initialize views as required by the model
         },
@@ -205,9 +213,21 @@ export class ProductService {
     return ApiResponse.success(product, 'Product fetched successfully');
   }
 
-  async findAllPremiumProducts(category?: CategoryType) {
-    const products = await this.prisma.product.findMany({
-      where: { category, premium: true },
+  // async findAllPremiumProducts(category?: CategoryType) {
+  //   const products = await this.prisma.product.findMany({
+  //     where: { category, premium: true },
+  async findAllPremiumProducts(category?: CategoryType, search?: string) {
+    const premiumProducts = await this.prisma.product.findMany({
+      where: {
+        premium: true,
+        ...(category && { category }),
+        ...(search && {
+          name: {
+            contains: search,
+            mode: 'insensitive',
+          },
+        }),
+      },
       include: {
         seller: {
           select: {
@@ -228,11 +248,13 @@ export class ProductService {
         createdAt: 'desc',
       },
     });
+
     return ApiResponse.success(
-      products,
+      premiumProducts,
       'Premium products fetched successfully',
     );
   }
+
   async searchRealEstate(query?: {
     location?: string;
     minPrice?: string;

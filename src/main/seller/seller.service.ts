@@ -9,7 +9,6 @@ import { OtpDto } from '../auth/dto/signin.dto';
 import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 
 import { VerificationStatusType } from '@prisma/client';
-import e from 'express';
 
 @Injectable()
 export class SellerService {

@@ -1,15 +1,35 @@
 // src/stripe/stripe.controller.ts
-import { Controller, Get, Headers, Post, Req, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Headers,
+  Post,
+  RawBodyRequest,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import { Request, Response } from 'express';
+import { AuthGuard } from 'src/guards/auth.guard';
+import { CreatePaymentDto } from './dto/create-payment.dto';
 
 @Controller('stripe')
 export class PaymentController {
   constructor(private readonly stripeService: PaymentService) {}
 
-  @Get('checkout')
-  async checkout() {
-    return this.stripeService.createCheckoutSession();
+  // * Routes for Stripe Checkout
+  @UseGuards(AuthGuard)
+  @Post('checkout')
+  async checkout(
+    @Req() req: { userid: string },
+    @Body() createPaymentDto: CreatePaymentDto,
+  ) {
+    const userId = req.userid;
+    const packageId = createPaymentDto.packageId;
+    console.log('User ID:', userId);
+    return this.stripeService.createCheckoutSession(userId, packageId);
   }
 
   @Get('payment-success')
@@ -29,15 +49,16 @@ export class PaymentController {
   // * Webhook
   @Post('webhook')
   async handleWebhook(
-    @Req() req: Request,
-    @Res() res: Response,
+    @Req() req: RawBodyRequest<Request>,
     @Headers('stripe-signature') sig: string,
   ) {
     try {
+      console.log('Received webhook event:', sig);
       await this.stripeService.handleWebhook(req.body, sig);
+      return { received: true };
     } catch (err) {
       console.error('Webhook error:', err);
-      res.status(400).send(`Webhook Error: ${err.message}`);
+      return { error: 'Webhook Error' };
     }
   }
 }
