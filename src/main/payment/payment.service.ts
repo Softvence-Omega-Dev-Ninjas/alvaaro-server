@@ -15,7 +15,6 @@ export class PaymentService {
 
   constructor(
     private readonly prismaService: PrismaService,
-
     private readonly helperService: HelperService,
   ) {
     this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {});
@@ -70,7 +69,6 @@ export class PaymentService {
         success_url: 'http://localhost:3000/stripe/payment-success',
         cancel_url: 'http://localhost:3000/stripe/payment-cancel',
       });
-      console.log('Session created:', session);
       return { url: session.url };
     } catch (error) {
       console.error('Error creating checkout session:', error);
@@ -78,8 +76,6 @@ export class PaymentService {
   }
   // Handle Stripe webhook events
   async handleWebhook(payload: Buffer, sig: string) {
-    console.log('Handling webhook event...');
-
     try {
       const event = this.stripe.webhooks.constructEvent(
         payload,
@@ -87,7 +83,6 @@ export class PaymentService {
         process.env.STRIPE_WEBHOOK_SECRET as string,
       );
 
-      // Handle subscription events
       if (
         event.type === 'customer.subscription.created' ||
         event.type === 'customer.subscription.updated' ||
@@ -114,9 +109,6 @@ export class PaymentService {
           return ApiResponse.error('Subscribed plan not found');
         }
 
-        console.log('Subscribed Plan:', subscribedPlan);
-        console.log('Plan Length:', subscribedPlan.length);
-
         // Calculate start and expiry times
         const startTime = new Date(); // Current time
         const expiryTime = this.calculateExpiryTime(
@@ -140,7 +132,6 @@ export class PaymentService {
           return ApiResponse.error('Seller not found');
         }
 
-        // Update or create user subscription validity
         await this.prismaService.userSubscriptionValidity.upsert({
           where: { sellerId: sellerExistsid },
           update: {

@@ -19,6 +19,7 @@ import { AuthGuard } from './guards/auth.guard';
 import { PaymentModule } from './main/payment/payment.module';
 import { CouponModule } from './main/coupon/coupon.module';
 import { UserSubscriptionPlanModule } from './main/user-subscription-plan/user-subscription-plan.module';
+import { AdminModule } from './main/admin/admin.module';
 
 @Module({
   imports: [
@@ -44,6 +45,8 @@ import { UserSubscriptionPlanModule } from './main/user-subscription-plan/user-s
     CouponModule,
 
     UserSubscriptionPlanModule,
+
+    AdminModule,
   ],
   // providers: [
   //   {
