@@ -30,7 +30,7 @@ import { AuthGuard } from 'src/guards/auth.guard';
 
 @Controller('product')
 export class ProductController {
-  constructor(private readonly productService: ProductService) {}
+  constructor(private readonly productService: ProductService) { }
 
   @UseGuards(AuthGuard)
   @Roles(UserRole.SELLER)
@@ -43,7 +43,7 @@ export class ProductController {
     @Body() createProductDto: CreateRealEstateDto,
     @Req() req: { userid: string },
   ) {
-    console.log({createProductDto});
+    console.log({ createProductDto });
     return await this.productService.handleProductCreation(
       createProductDto,
       images,
@@ -123,8 +123,10 @@ export class ProductController {
 
   @Get('/premium')
   @ApiQuery({ name: 'category', enum: CategoryType, required: false })
-  @ApiQuery({name: "search", required:false , description:'Search by product name'})
-  async findAllPremiumProducts(@Query('category') category?: CategoryType , @Query('search') search?:string) {
+  @ApiQuery({ name: "search", required: false, description: 'Search by product name' })
+  async findAllPremiumProducts(
+    @Query('category') category?: CategoryType,
+    @Query('search') search?: string) {
     return await this.productService.findAllPremiumProducts(category, search);
   }
 

@@ -21,7 +21,7 @@ export class ProductService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly helperService: HelperService,
-  ) { }
+  ) {}
 
   async handleProductCreation(
     dto: CreateProductDto,
@@ -29,14 +29,22 @@ export class ProductService {
     userid: string,
   ) {
     try {
-      console.log({ dto })
+      // console.log({ dto })
       const sellerId = await this.helperService.sellerExists(userid);
-      console.log(sellerId);
+      // console.log(sellerId);
       const imageUrls = images?.length
         ? (await uploadMultipleToCloudinary(images)).map(
-          (res: { secure_url: string }) => res.secure_url,
-        )
+            (res: { secure_url: string }) => res.secure_url,
+          )
         : [];
+
+      let isPremium;
+
+      if (dto.premium === 'true') {
+        isPremium = true;
+      } else if (dto.premium === 'false') {
+        isPremium = false;
+      }
 
       const product = await this.prisma.product.create({
         data: {
@@ -45,7 +53,7 @@ export class ProductService {
           price: dto.price,
           images: imageUrls,
           category: dto.category,
-          premium: Boolean(dto.premium),
+          premium: isPremium,
           sellerId,
         },
       });
@@ -109,7 +117,9 @@ export class ProductService {
             strapMaterial: dto.strapMaterial,
             tractionType: dto.tractionType,
             size: dto.size,
-            features: Array.isArray(dto.features) ? dto.features : [dto.features],
+            features: Array.isArray(dto.features)
+              ? dto.features
+              : [dto.features],
           },
         });
       } else if (isJewelleryDto(dto)) {
@@ -119,7 +129,9 @@ export class ProductService {
             condition: dto.condition,
             size: dto.size,
             tractionType: dto.tractionType,
-            features: Array.isArray(dto.features) ? dto.features : [dto.features],
+            features: Array.isArray(dto.features)
+              ? dto.features
+              : [dto.features],
             displayType: dto.displayType,
             manufacture: dto.manufacture,
             warranty: dto.warranty,
@@ -134,7 +146,10 @@ export class ProductService {
       return ApiResponse.success(product, 'Product created successfully');
     } catch (error) {
       console.error('Error creating product:', error);
-      return ApiResponse.error('Failed to create product, please try again later', error);
+      return ApiResponse.error(
+        'Failed to create product, please try again later',
+        error,
+      );
     }
   }
 
@@ -172,7 +187,7 @@ export class ProductService {
         ...(search && {
           name: {
             contains: search,
-            mode: 'insensitive', 
+            mode: 'insensitive',
           },
         }),
       },
@@ -191,16 +206,17 @@ export class ProductService {
         Yacht: true,
         Watch: true,
         Jewellery: true,
-
       },
       orderBy: {
         createdAt: 'desc',
       },
     });
 
-    return ApiResponse.success(premiumProducts, 'Premium products fetched successfully');
+    return ApiResponse.success(
+      premiumProducts,
+      'Premium products fetched successfully',
+    );
   }
-
 
   async searchRealEstate(query?: {
     location?: string;
@@ -220,29 +236,29 @@ export class ProductService {
         AND: [
           location
             ? {
-              RealEstate: {
-                is: {
-                  OR: [
-                    { address: { contains: location, mode: 'insensitive' } },
-                    { city: { contains: location, mode: 'insensitive' } },
-                    { state: { contains: location, mode: 'insensitive' } },
-                    { zip: { contains: location, mode: 'insensitive' } },
-                  ],
+                RealEstate: {
+                  is: {
+                    OR: [
+                      { address: { contains: location, mode: 'insensitive' } },
+                      { city: { contains: location, mode: 'insensitive' } },
+                      { state: { contains: location, mode: 'insensitive' } },
+                      { zip: { contains: location, mode: 'insensitive' } },
+                    ],
+                  },
                 },
-              },
-            }
+              }
             : {},
 
           type
             ? {
-              RealEstate: {
-                is: {
-                  feature: {
-                    has: type,
+                RealEstate: {
+                  is: {
+                    feature: {
+                      has: type,
+                    },
                   },
                 },
-              },
-            }
+              }
             : {},
         ],
       },
