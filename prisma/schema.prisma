@@ -45,12 +45,12 @@ model UserSubscriptionValidity {
   seller         Seller           @relation(fields: [sellerId], references: [id])
   subscribedPlan String           @unique
   subscription   SubscriptionPlan @relation(fields: [subscribedPlan], references: [id])
+  startTime      DateTime
   expiryTime     DateTime
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
 }
 
- 
 // Cars
 model Car {
   id           String  @unique @default(uuid())
