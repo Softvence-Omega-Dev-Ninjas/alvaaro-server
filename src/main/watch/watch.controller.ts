@@ -6,39 +6,45 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
   UseInterceptors,
   UploadedFiles,
+  Req,
 } from '@nestjs/common';
 import { WatchService } from './watch.service';
 import { CreateWatchDto } from './dto/create-watch.dto';
-import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { uploadMultipleToCloudinary } from 'src/utils/common/cloudinary/cloudinary';
 import { UpdateWatchDto } from './dto/update-watch.dto';
+import { ProductService } from '../product/product.service';
+import { AuthGuard } from 'src/guards/auth.guard';
+import { Roles } from 'src/guards/roles.decorator';
+import { UserRole } from 'src/utils/common/enum/userEnum';
 
 @ApiTags('watch')
 @Controller('watch')
 export class WatchController {
-  constructor(private readonly watchService: WatchService) {}
+  constructor(
+    private readonly watchService: WatchService,
+    private readonly productService: ProductService,
+  ) {}
 
+  @UseGuards(AuthGuard)
+  @Roles(UserRole.SELLER)
   @Post()
-  @ApiOperation({ summary: 'Create a new watch with associated product' })
-  @ApiConsumes('multipart/form-data')
   @UseInterceptors(FilesInterceptor('images'))
-  @ApiBody({
-    description: 'Create Watch DTO with product details',
-    type: CreateWatchDto,
-  })
-  async create(
-    @Body() createWatchDto: CreateWatchDto,
-    @UploadedFiles() files: Express.Multer.File[],
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ type: CreateWatchDto })
+  async createWatchProduct(
+    @UploadedFiles() images: Express.Multer.File[],
+    @Body() createProductDto: CreateWatchDto,
+    @Req() req: { userid: string },
   ) {
-    let images: string[] = [];
-    if (files && files.length > 0) {
-      const uploadResults = await uploadMultipleToCloudinary(files);
-      images = uploadResults.map((res: any) => res.secure_url);
-    }
-    return this.watchService.create(createWatchDto, images);
+    return await this.productService.handleProductCreation(
+      createProductDto,
+      images,
+      req.userid,
+    );
   }
 
   @Get()
