@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { CategoryType } from '@prisma/client';
-import { Transform } from 'class-transformer';
 import { IsBoolean, IsEnum, IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateProductDto {
