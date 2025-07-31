@@ -12,7 +12,7 @@ export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
-  ) { }
+  ) {}
 
   async signup(createUserDto: CreateUserDto, imageUrl: string) {
     try {
@@ -39,17 +39,17 @@ export class AuthService {
       } else {
         imagesString = images ?? '';
       }
+      console.log(imagesString);
       const data = {
         ...rest,
         password: hashedPassword,
         images: imageUrl,
-
       };
 
       const result = await this.prisma.user.create({ data });
       return ApiResponse.success(result, 'User Created Successfully');
     } catch (error) {
-      return ApiResponse.error(error, 'User Created Failed!!');
+      return ApiResponse.error('User Creation Failed!!', error);
     }
   }
 
@@ -85,10 +85,8 @@ export class AuthService {
       const token = await this.jwtService.signAsync(payload);
       console.log(token);
       return ApiResponse.success({ accessToken: token }, 'Login successful');
-
-    }
-    catch (error: unknown) {
-      // console.error('Error signing in:', error);
+    } catch (error: unknown) {
+      console.error('Error signing in:', error);
       const message =
         error instanceof HttpException
           ? error.message

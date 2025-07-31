@@ -7,12 +7,16 @@ import {
   Query,
   Delete,
   NotFoundException,
+  Post,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { ApiConsumes, ApiQuery } from '@nestjs/swagger';
 import { CategoryType } from '@prisma/client';
 import { RealEstateSearchQueryDto } from './dto/real-estate-search.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { AuthGuard } from 'src/guards/auth.guard';
 
 @Controller('product')
 export class ProductController {
@@ -82,5 +86,16 @@ export class ProductController {
   @Patch('trending/:id')
   update(@Param('id') id: string) {
     return this.productService.update(id);
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('wishlist/:productId')
+  toggleWishlist(
+    @Param('productId') productId: string,
+    @Req() req: { userid: string },
+  ) {
+    const result = this.productService.toggleWishlist(productId, req.userid);
+
+    return result;
   }
 }
