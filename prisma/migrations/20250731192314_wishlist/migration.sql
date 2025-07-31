@@ -177,6 +177,14 @@ CREATE TABLE "Yacht" (
 );
 
 -- CreateTable
+CREATE TABLE "Wishlist" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "productId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- CreateTable
 CREATE TABLE "Contact" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
@@ -259,6 +267,9 @@ CREATE UNIQUE INDEX "Yacht_id_key" ON "Yacht"("id");
 CREATE UNIQUE INDEX "Yacht_productId_key" ON "Yacht"("productId");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Wishlist_id_key" ON "Wishlist"("id");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Contact_id_key" ON "Contact"("id");
 
 -- CreateIndex
@@ -293,3 +304,9 @@ ALTER TABLE "RealEstate" ADD CONSTRAINT "RealEstate_productId_fkey" FOREIGN KEY 
 
 -- AddForeignKey
 ALTER TABLE "Yacht" ADD CONSTRAINT "Yacht_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Wishlist" ADD CONSTRAINT "Wishlist_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Wishlist" ADD CONSTRAINT "Wishlist_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE CASCADE ON UPDATE CASCADE;

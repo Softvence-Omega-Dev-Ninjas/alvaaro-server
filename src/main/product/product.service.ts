@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { Injectable } from '@nestjs/common';
@@ -143,7 +144,7 @@ export class ProductService {
           },
         });
       }
-      console.log('Product created successfully:', { product });
+      // console.log('Product created successfully:', { product });
       return ApiResponse.success(product, 'Product created successfully');
     } catch (error) {
       console.error('Error creating product:', error);
@@ -172,6 +173,7 @@ export class ProductService {
         Yacht: true,
         Watch: true,
         Jewellery: true,
+        _count: { select: { Wishlist: true } },
       },
       orderBy: {
         createdAt: 'desc',
@@ -198,6 +200,7 @@ export class ProductService {
         Yacht: true,
         Watch: true,
         Jewellery: true,
+        _count: { select: { Wishlist: true } },
       },
     });
     if (!product) {
@@ -428,5 +431,26 @@ export class ProductService {
         },
       },
     });
+  }
+
+  async toggleWishlist(productId: string, userId: string) {
+    const existing = await this.prisma.wishlist.findUnique({
+      where: {
+        userId_productId: { userId, productId },
+      },
+    });
+
+    if (existing) {
+      await this.prisma.wishlist.delete({
+        where: { userId_productId: { userId, productId } },
+      });
+      return { message: 'Removed from wishlist' };
+    }
+
+    await this.prisma.wishlist.create({
+      data: { userId, productId },
+    });
+
+    return { message: 'Added to wishlist' };
   }
 }
