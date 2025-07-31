@@ -3,7 +3,7 @@ import { CategoryType } from '@prisma/client';
 import { IsArray, IsBoolean, IsString } from 'class-validator';
 import { CreateProductDto } from 'src/main/product/dto/create-product.dto';
 
-export class CreateJewelleryDto  {
+export class CreateJewelleryDto {
   @ApiProperty({ example: 'Elegant Gold Necklace' })
   name: string;
 
@@ -24,9 +24,9 @@ export class CreateJewelleryDto  {
   @ApiProperty({ enum: CategoryType, example: CategoryType.JEWELLERY })
   category: CategoryType;
 
-    @ApiProperty({ required: false })
+  @ApiProperty({ required: false })
   @IsBoolean()
-  premium: boolean;
+  premium: string;
 
   @ApiProperty({ example: 'New' })
   condition: string;
