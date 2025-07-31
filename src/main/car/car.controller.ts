@@ -28,7 +28,7 @@ export class CarController {
 
   @UseGuards(AuthGuard)
   @Roles(UserRole.SELLER)
-  @Post('car')
+  @Post()
   @UseInterceptors(FilesInterceptor('images'))
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: CreateCarDto })

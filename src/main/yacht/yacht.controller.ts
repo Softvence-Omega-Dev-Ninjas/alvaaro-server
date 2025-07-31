@@ -30,7 +30,7 @@ export class YachtController {
 
   @UseGuards(AuthGuard)
   @Roles(UserRole.SELLER)
-  @Post('yacht')
+  @Post()
   @UseInterceptors(FilesInterceptor('images'))
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: CreateYachtDto })
