@@ -94,6 +94,12 @@ export class AdminService {
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       const amounts = await this.prisma.amount.findMany({});
+      // total amount
+      const totalAmount = amounts.reduce(
+        (acc, curr) => acc + parseFloat(curr.amount),
+        0,
+      );
+      console.log(totalAmount);
       console.log(amounts);
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call
@@ -114,7 +120,7 @@ export class AdminService {
         totalAmount,
       }));
       return ApiResponse.success(
-        data,
+        { data, totalAmount },
         'Total amount monthwise fetched successfully',
       );
     } catch (error) {
