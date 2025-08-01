@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
 import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
@@ -174,6 +176,12 @@ export class PaymentService {
             startTime: startTime,
             expiryTime: expiryTime,
             payabeAmount: (Number(invoiceDetails.amount_paid) / 100).toString(),
+          },
+        });
+        await this.prismaService.amount.create({
+          data: {
+            sellerId: sellerExistsid,
+            amount: (Number(invoiceDetails.amount_paid) / 100).toString(),
           },
         });
 

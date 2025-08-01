@@ -9,4 +9,6 @@ model UserSubscriptionValidity {
     payabeAmount   String
     createdAt      DateTime         @default(now())
     updatedAt      DateTime         @updatedAt
+
+    @@unique([sellerId, subscribedPlan])
 }
