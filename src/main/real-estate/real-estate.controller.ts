@@ -19,7 +19,6 @@ import { Roles } from 'src/guards/roles.decorator';
 import { UserRole } from 'src/utils/common/enum/userEnum';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes } from '@nestjs/swagger';
-// import { UpdateRealEstateDto } from './dto/update-real-estate.dto';
 
 @Controller('real-estate')
 export class RealEstateController {

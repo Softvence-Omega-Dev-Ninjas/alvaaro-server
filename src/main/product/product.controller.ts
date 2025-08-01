@@ -98,4 +98,8 @@ export class ProductController {
 
     return result;
   }
+
+  // @UseGuards(AuthGuard)
+  // @Post('contact/:productId')
+  // contactSeller(@Param('productId') productId: string, @Req)
 }
