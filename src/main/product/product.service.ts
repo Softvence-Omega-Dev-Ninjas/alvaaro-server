@@ -10,7 +10,7 @@ import {
   isRealEstateDto,
   isWatchDto,
   isYachtDto,
-} from './guards';
+} from './matchers';
 import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 import { CategoryType } from '@prisma/client';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -29,14 +29,22 @@ export class ProductService {
     userid: string,
   ) {
     try {
-      console.log({ dto });
+      // console.log({ dto })
       const sellerId = await this.helperService.sellerExists(userid);
-      console.log(sellerId);
+      // console.log(sellerId);
       const imageUrls = images?.length
         ? (await uploadMultipleToCloudinary(images)).map(
             (res: { secure_url: string }) => res.secure_url,
           )
         : [];
+
+      let isPremium;
+
+      if (dto.premium === 'true') {
+        isPremium = true;
+      } else if (dto.premium === 'false') {
+        isPremium = false;
+      }
 
       const product = await this.prisma.product.create({
         data: {
@@ -45,7 +53,7 @@ export class ProductService {
           price: dto.price,
           images: imageUrls,
           category: dto.category,
-          premium: Boolean(dto.premium),
+          premium: isPremium,
           sellerId,
           views: 0,
         },
@@ -135,7 +143,7 @@ export class ProductService {
           },
         });
       }
-      console.log('Product created successfully:', { product });
+      // console.log('Product created successfully:', { product });
       return ApiResponse.success(product, 'Product created successfully');
     } catch (error) {
       console.error('Error creating product:', error);
@@ -164,6 +172,7 @@ export class ProductService {
         Yacht: true,
         Watch: true,
         Jewellery: true,
+        _count: { select: { Wishlist: true } },
       },
       orderBy: {
         createdAt: 'desc',
@@ -172,6 +181,43 @@ export class ProductService {
     return ApiResponse.success(products, 'Products fetched successfully');
   }
 
+  async findProductById(id: string) {
+    const product = await this.prisma.product.findUnique({
+      where: { id },
+      include: {
+        seller: {
+          select: {
+            id: true,
+            phone: true,
+            address: true,
+            companyName: true,
+            companyWebsite: true,
+          },
+        },
+        RealEstate: true,
+        Car: true,
+        Yacht: true,
+        Watch: true,
+        Jewellery: true,
+        _count: { select: { Wishlist: true } },
+      },
+    });
+    if (!product) {
+      return ApiResponse.error('Product not found', null);
+    }
+    // Increment views count
+    await this.prisma.product.update({
+      where: { id },
+      data: {
+        views: { increment: 1 },
+      },
+    });
+    return ApiResponse.success(product, 'Product fetched successfully');
+  }
+
+  // async findAllPremiumProducts(category?: CategoryType) {
+  //   const products = await this.prisma.product.findMany({
+  //     where: { category, premium: true },
   async findAllPremiumProducts(category?: CategoryType, search?: string) {
     const premiumProducts = await this.prisma.product.findMany({
       where: {
@@ -384,5 +430,26 @@ export class ProductService {
         },
       },
     });
+  }
+
+  async toggleWishlist(productId: string, userId: string) {
+    const existing = await this.prisma.wishlist.findUnique({
+      where: {
+        userId_productId: { userId, productId },
+      },
+    });
+
+    if (existing) {
+      await this.prisma.wishlist.delete({
+        where: { userId_productId: { userId, productId } },
+      });
+      return { message: 'Removed from wishlist' };
+    }
+
+    await this.prisma.wishlist.create({
+      data: { userId, productId },
+    });
+
+    return { message: 'Added to wishlist' };
   }
 }

@@ -18,6 +18,8 @@ model Product {
   RealEstate RealEstate?
   Yacht      Yacht?
   Jewellery  Jewellery?
+
+  Wishlist Wishlist[]
 }
 
 enum CategoryType {
