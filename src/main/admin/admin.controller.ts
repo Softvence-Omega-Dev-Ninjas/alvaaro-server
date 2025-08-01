@@ -7,7 +7,6 @@ export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
   // get query parameters for filtering sellers
-
   @Get('all-sellers')
   findAllSellers(@Query() payload: UserSearchPayload) {
     const normalizedPayload = {
@@ -29,13 +28,11 @@ export class AdminController {
   // get total amount monthwise
   @Get('total-amount')
   findTotalAmount() {
-    // This method is not implemented in the provided code
     return this.adminService.findTotalAmount();
   }
-  // find new sellers
+  // find new sellers of this month and total sellers
   @Get('new-sellers')
   findNewSellers() {
-    // This method is not implemented in the provided code
     return this.adminService.findNewSellers();
   }
 }
