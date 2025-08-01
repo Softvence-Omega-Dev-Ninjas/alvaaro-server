@@ -12,11 +12,12 @@ import {
   Req,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
-import { ApiConsumes, ApiQuery } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiQuery } from '@nestjs/swagger';
 import { CategoryType } from '@prisma/client';
 import { RealEstateSearchQueryDto } from './dto/real-estate-search.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { AuthGuard } from 'src/guards/auth.guard';
+import { ContactSellerDto } from './dto/contact-seller.dto';
 
 @Controller('product')
 export class ProductController {
@@ -99,7 +100,13 @@ export class ProductController {
     return result;
   }
 
-  // @UseGuards(AuthGuard)
-  // @Post('contact/:productId')
-  // contactSeller(@Param('productId') productId: string, @Req)
+  @UseGuards(AuthGuard)
+  @Post('contact/:productId')
+  @ApiBody({ type: ContactSellerDto })
+  contactSeller(
+    @Param('productId') productId: string,
+    @Body() contactSellerDto: ContactSellerDto,
+  ) {
+    return this.productService.contactSeller(productId, contactSellerDto);
+  }
 }

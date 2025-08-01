@@ -11,14 +11,13 @@ export class NewsletterService {
   ) {}
 
   async create(createNewsletterDto: CreateNewsletterDto) {
+    const existingEmail = await this.prisma.newsletter.findUnique({
+      where: { email: createNewsletterDto.email },
+    });
 
-      const existingEmail = await this.prisma.newsletter.findUnique({
-    where: { email: createNewsletterDto.email },
-  });
-
-  if (existingEmail) {
-    throw new BadRequestException('This email is already subscribed.');
-  }
+    if (existingEmail) {
+      throw new BadRequestException('This email is already subscribed.');
+    }
     const newsLetter = this.prisma.newsletter.create({
       data: createNewsletterDto,
     });
@@ -26,6 +25,7 @@ export class NewsletterService {
     // Send email confirmation
     await this.mailService.sendMail(
       createNewsletterDto.email,
+      'Thanks for subscribing to our newsletter!',
       'Thanks for subscribing to our newsletter!',
     );
 

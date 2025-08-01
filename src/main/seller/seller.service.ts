@@ -32,6 +32,7 @@ export class SellerService {
     await this.cacheManager.set(sellerInfoKey, createSellerDto);
     await this.mail.sendMail(
       userEmail,
+      'OTP',
       `Your otp is ${otp}. This otp valid for 5 minutes`,
     );
     return { message: 'OTP sent successfully. Please check your email.' };
@@ -145,7 +146,6 @@ export class SellerService {
       const result = await this.prisma.seller.update({
         where: { userId: userId },
         data: {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
           verificationStatus: VerificationStatusType.VERIFIED,
         },
       });
