@@ -19,7 +19,8 @@ import { OtpDto } from '../auth/dto/signin.dto';
 import { Roles } from 'src/guards/roles.decorator';
 import { RolesGuard } from 'src/guards/role.guard';
 import { UserRole } from 'src/utils/common/enum/userEnum';
-import { ApiQuery } from '@nestjs/swagger';
+import { ApiBody, ApiQuery } from '@nestjs/swagger';
+import { ContactSellerDto } from './dto/contact-seller.dto';
 
 @UseGuards(AuthGuard)
 @Controller('seller')
@@ -98,5 +99,15 @@ export class SellerController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.sellerService.remove(+id);
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('contact/:productId')
+  @ApiBody({ type: ContactSellerDto })
+  contactSeller(
+    @Param('productId') productId: string,
+    @Body() contactSellerDto: ContactSellerDto,
+  ) {
+    return this.sellerService.contactSeller(productId, contactSellerDto);
   }
 }

@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSellerDto } from './dto/create-seller.dto';
 import { UpdateSellerDto } from './dto/update-seller.dto';
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
@@ -9,6 +9,8 @@ import { OtpDto } from '../auth/dto/signin.dto';
 import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 
 import { VerificationStatusType } from '@prisma/client';
+import { contactSellerTemplate } from 'src/utils/mail/templates/contact-seller.template';
+import { ContactSellerDto } from './dto/contact-seller.dto';
 
 @Injectable()
 export class SellerService {
@@ -32,6 +34,7 @@ export class SellerService {
     await this.cacheManager.set(sellerInfoKey, createSellerDto);
     await this.mail.sendMail(
       userEmail,
+      'OTP',
       `Your otp is ${otp}. This otp valid for 5 minutes`,
     );
     return { message: 'OTP sent successfully. Please check your email.' };
@@ -145,7 +148,6 @@ export class SellerService {
       const result = await this.prisma.seller.update({
         where: { userId: userId },
         data: {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
           verificationStatus: VerificationStatusType.VERIFIED,
         },
       });
@@ -157,5 +159,48 @@ export class SellerService {
 
   remove(id: number) {
     return `This action removes a #${id} seller`;
+  }
+
+  async contactSeller(productId: string, contactSellerDto: ContactSellerDto) {
+    const { email, name, phone, message } = contactSellerDto;
+
+    try {
+      const product = await this.prisma.product.findFirst({
+        where: { id: productId },
+        include: {
+          seller: {
+            include: {
+              user: {
+                select: {
+                  email: true,
+                  fullName: true,
+                },
+              },
+            },
+          },
+        },
+      });
+      if (!product) {
+        throw new NotFoundException('Product not found!');
+      }
+
+      const html = contactSellerTemplate({
+        sellerName: product.seller.user.fullName,
+        buyerName: name,
+        buyerEmail: email,
+        buyerPhone: phone,
+        message,
+        productTitle: product.name,
+      });
+
+      const mailTo = product.seller.user.email;
+      const subject = `New inquiry for ${product.name}`;
+
+      await this.mail.sendMail(mailTo, subject, html);
+
+      return { message: 'Mail sent to the seller!' };
+    } catch (error) {
+      return ApiResponse.error('Failed to contact seller', error);
+    }
   }
 }
