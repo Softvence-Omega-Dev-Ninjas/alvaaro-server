@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
 import { uploadMultipleToCloudinary } from 'src/utils/common/cloudinary/cloudinary';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -15,16 +15,12 @@ import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 import { CategoryType } from '@prisma/client';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { HelperService } from 'src/utils/helper/helper.service';
-import { ContactSellerDto } from './dto/contact-seller.dto';
-import { MailService } from 'src/utils/mail/mail.service';
-import { contactSellerTemplate } from 'src/utils/mail/templates/contact-seller.template';
 
 @Injectable()
 export class ProductService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly helperService: HelperService,
-    private mail: MailService,
   ) {}
 
   async handleProductCreation(
@@ -455,48 +451,5 @@ export class ProductService {
     });
 
     return { message: 'Added to wishlist' };
-  }
-
-  async contactSeller(productId: string, contactSellerDto: ContactSellerDto) {
-    const { email, name, phone, message } = contactSellerDto;
-
-    try {
-      const product = await this.prisma.product.findFirst({
-        where: { id: productId },
-        include: {
-          seller: {
-            include: {
-              user: {
-                select: {
-                  email: true,
-                  fullName: true,
-                },
-              },
-            },
-          },
-        },
-      });
-      if (!product) {
-        throw new NotFoundException('Product not found!');
-      }
-
-      const html = contactSellerTemplate({
-        sellerName: product.seller.user.fullName,
-        buyerName: name,
-        buyerEmail: email,
-        buyerPhone: phone,
-        message,
-        productTitle: product.name,
-      });
-
-      const mailTo = product.seller.user.email;
-      const subject = `New inquiry for ${product.name}`;
-
-      await this.mail.sendMail(mailTo, subject, html);
-
-      return { message: 'Mail sent to the seller!' };
-    } catch (error) {
-      return ApiResponse.error('Failed to contact seller', error);
-    }
   }
 }
