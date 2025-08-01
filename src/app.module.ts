@@ -18,7 +18,6 @@ import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './guards/auth.guard';
 import { PaymentModule } from './main/payment/payment.module';
 import { CouponModule } from './main/coupon/coupon.module';
-import { UserSubscriptionPlanModule } from './main/user-subscription-plan/user-subscription-plan.module';
 import { AdminModule } from './main/admin/admin.module';
 
 @Module({
@@ -43,8 +42,6 @@ import { AdminModule } from './main/admin/admin.module';
     PaymentModule,
 
     CouponModule,
-
-    UserSubscriptionPlanModule,
 
     AdminModule,
   ],

@@ -28,8 +28,13 @@ export class PaymentController {
   ) {
     const userId = req.userid;
     const packageId = createPaymentDto.packageId;
+    const couponCode = createPaymentDto.couponCode;
     console.log('User ID:', userId);
-    return this.stripeService.createCheckoutSession(userId, packageId);
+    return this.stripeService.createCheckoutSession(
+      userId,
+      packageId,
+      couponCode,
+    );
   }
 
   @Get('payment-success')

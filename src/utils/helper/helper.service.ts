@@ -33,18 +33,10 @@ export class HelperService {
     }
     return packageExists;
   }
-  async couponExists(couponCode: string, percent_off: string) {
+  async couponExists(couponCode: string) {
     const existingCoupon = await this.prismaService.coupon.findMany({
       where: {
         couponCode: couponCode,
-        AND: [
-          {
-            couponCode: couponCode,
-          },
-          {
-            percent_off: percent_off,
-          },
-        ],
       },
     });
     return existingCoupon;

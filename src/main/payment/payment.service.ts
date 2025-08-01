@@ -3,12 +3,8 @@ import { PrismaService } from 'src/prisma-service/prisma-service.service';
 import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 import { HelperService } from 'src/utils/helper/helper.service';
 import Stripe from 'stripe';
+import { SubscriptionPlanType } from './type/subscriptionPlanType';
 
-enum SubscriptionPlanType {
-  BASIC = 'BASIC',
-  BUSINESS = 'BUSINESS',
-  ENTERPRISE = 'ENTERPRISE',
-}
 @Injectable()
 export class PaymentService {
   private stripe: Stripe;
@@ -20,7 +16,11 @@ export class PaymentService {
     this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {});
   }
 
-  async createCheckoutSession(userId: string, packageId: string) {
+  async createCheckoutSession(
+    userId: string,
+    packageId: string,
+    couponCode?: string,
+  ) {
     try {
       //
       // 1. Check if the user exists in the database
@@ -47,6 +47,16 @@ export class PaymentService {
       if (!packageExists) {
         return ApiResponse.error('Package does not exist');
       }
+      // 3. Check if the coupon exists in the database
+      console.log('Coupon Code:', couponCode);
+      type Coupon = { stripeCouponId: string };
+      let couponExists: Coupon[] = [];
+      if (couponCode) {
+        couponExists = (await this.helperService.couponExists(
+          couponCode,
+        )) as Coupon[];
+        console.log('Coupon Exists:', couponExists);
+      }
       const session = await this.stripe.checkout.sessions.create({
         payment_method_types: ['card'],
         mode: 'subscription',
@@ -66,9 +76,20 @@ export class PaymentService {
             quantity: 1,
           },
         ],
+        ...(couponExists.length > 0
+          ? {
+              discounts: [
+                {
+                  coupon: couponExists[0]?.stripeCouponId,
+                },
+              ],
+            }
+          : {}),
+
         success_url: 'http://localhost:3000/stripe/payment-success',
         cancel_url: 'http://localhost:3000/stripe/payment-cancel',
       });
+      console.log('session', session);
       return { url: session.url };
     } catch (error) {
       console.error('Error creating checkout session:', error);
@@ -82,14 +103,21 @@ export class PaymentService {
         sig,
         process.env.STRIPE_WEBHOOK_SECRET as string,
       );
-
+      console.log('Stripe Webhook Event:', event);
       if (
         event.type === 'customer.subscription.created' ||
         event.type === 'customer.subscription.updated' ||
         event.type === 'invoice.payment_succeeded'
       ) {
         const subscriptionEventData = event.data.object as Stripe.Subscription;
-
+        console.log(
+          'Subscription Event Data Invoice ID:',
+          subscriptionEventData.latest_invoice,
+        );
+        const invoiceDetails = await this.stripe.invoices.retrieve(
+          subscriptionEventData?.latest_invoice as string,
+        );
+        console.log('Invoice Details:', invoiceDetails.amount_paid);
         const planType = subscriptionEventData?.items?.data?.[0]?.price
           ?.metadata?.planType as string | undefined;
         console.log('Plan Type:', planType);
@@ -138,12 +166,14 @@ export class PaymentService {
             subscribedPlan: subscribedPlan.id,
             startTime: startTime,
             expiryTime: expiryTime,
+            payabeAmount: (Number(invoiceDetails.amount_paid) / 100).toString(),
           },
           create: {
             sellerId: sellerExistsid,
             subscribedPlan: subscribedPlan.id,
             startTime: startTime,
             expiryTime: expiryTime,
+            payabeAmount: (Number(invoiceDetails.amount_paid) / 100).toString(),
           },
         });
 
