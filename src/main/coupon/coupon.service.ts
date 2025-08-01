@@ -23,9 +23,9 @@ export class CouponService {
       // Step 1: Validation
       const existingCoupon = await this.helperService.couponExists(
         createCouponDto.couponCode,
-        createCouponDto.percent_off,
       );
-      if (existingCoupon) {
+      console.log('Existing Coupon:', existingCoupon);
+      if (existingCoupon.length > 0) {
         return ApiResponse.error(
           'Coupon already exists with the same code and discount percentage',
         );
@@ -52,25 +52,21 @@ export class CouponService {
 
       // Step 3: Create coupon in Stripe
       const stripeCoupon = await this.stripe.coupons.create(couponParams);
-
+      if (!stripeCoupon.id) {
+        return ApiResponse.error('Failed to create coupon in Stripe');
+      }
       try {
         // Step 4: Create record in database using Prisma transaction
         await this.prisma.$transaction(async (prisma) => {
-          const couponData = {
-            couponCode: stripeCoupon.name ?? '',
-            percent_off: (stripeCoupon.percent_off ?? 0).toString(),
-            redeem_by: stripeCoupon.metadata?.end_date ?? '',
-            start_date: stripeCoupon.metadata?.start_date ?? '',
-            couponName: stripeCoupon.name ?? '', // or from metadata
-          };
-
           const dbCoupon = await prisma.coupon.create({
             data: {
-              ...couponData,
+              percent_off: (stripeCoupon.percent_off ?? 0).toString(),
+              redeem_by: stripeCoupon.metadata?.end_date ?? '',
+              start_date: stripeCoupon.metadata?.start_date ?? '',
+              couponCode: stripeCoupon.name ?? '',
               stripeCouponId: stripeCoupon.id,
             },
           });
-
           return ApiResponse.success(dbCoupon, 'Coupon created successfully');
         });
       } catch (dbError) {

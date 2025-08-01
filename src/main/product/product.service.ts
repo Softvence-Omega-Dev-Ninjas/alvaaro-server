@@ -55,7 +55,7 @@ export class ProductService {
           category: dto.category,
           premium: isPremium,
           sellerId,
-          views: 0, // Initialize views as required by the model
+          views: 0,
         },
       });
       if (isRealEstateDto(dto)) {

@@ -6,7 +6,6 @@ import {
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
 import { CreateWatchDto } from './dto/create-watch.dto';
 import { UpdateWatchDto } from './dto/update-watch.dto';
-// import { CategoryType } from '@prisma/client';
 import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 
 @Injectable()

@@ -14,6 +14,17 @@ CREATE TYPE "VerificationStatusType" AS ENUM ('PENDING', 'VERIFIED', 'REJECTED')
 CREATE TYPE "SubscriptionStatusType" AS ENUM ('ACTIVE', 'EXPIRED');
 
 -- CreateTable
+CREATE TABLE "Amount" (
+    "id" TEXT NOT NULL,
+    "sellerId" TEXT NOT NULL,
+    "amount" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Amount_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "Coupon" (
     "id" TEXT NOT NULL,
     "stripeCouponId" TEXT NOT NULL,
@@ -57,6 +68,18 @@ CREATE TABLE "SubscriptionPlan" (
 );
 
 -- CreateTable
+CREATE TABLE "UserSubscriptionValidity" (
+    "id" TEXT NOT NULL,
+    "sellerId" TEXT NOT NULL,
+    "subscribedPlan" TEXT NOT NULL,
+    "startTime" TIMESTAMP(3) NOT NULL,
+    "expiryTime" TIMESTAMP(3) NOT NULL,
+    "payabeAmount" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL
+);
+
+-- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
     "fullName" TEXT NOT NULL,
@@ -82,16 +105,6 @@ CREATE TABLE "Seller" (
     "zip" TEXT NOT NULL,
     "verificationStatus" "VerificationStatusType" NOT NULL DEFAULT 'PENDING',
     "subscriptionStatus" BOOLEAN NOT NULL DEFAULT false,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL
-);
-
--- CreateTable
-CREATE TABLE "UserSubscriptionValidity" (
-    "id" TEXT NOT NULL,
-    "sellerId" TEXT NOT NULL,
-    "subscribedPlan" TEXT NOT NULL,
-    "expiryTime" TIMESTAMP(3) NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL
 );
@@ -216,6 +229,18 @@ CREATE UNIQUE INDEX "Product_id_key" ON "Product"("id");
 CREATE UNIQUE INDEX "SubscriptionPlan_type_key" ON "SubscriptionPlan"("type");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "UserSubscriptionValidity_id_key" ON "UserSubscriptionValidity"("id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "UserSubscriptionValidity_sellerId_key" ON "UserSubscriptionValidity"("sellerId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "UserSubscriptionValidity_subscribedPlan_key" ON "UserSubscriptionValidity"("subscribedPlan");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "UserSubscriptionValidity_sellerId_subscribedPlan_key" ON "UserSubscriptionValidity"("sellerId", "subscribedPlan");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "User_id_key" ON "User"("id");
 
 -- CreateIndex
@@ -226,15 +251,6 @@ CREATE UNIQUE INDEX "Seller_id_key" ON "Seller"("id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Seller_userId_key" ON "Seller"("userId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "UserSubscriptionValidity_id_key" ON "UserSubscriptionValidity"("id");
-
--- CreateIndex
-CREATE UNIQUE INDEX "UserSubscriptionValidity_sellerId_key" ON "UserSubscriptionValidity"("sellerId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "UserSubscriptionValidity_subscribedPlan_key" ON "UserSubscriptionValidity"("subscribedPlan");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Car_id_key" ON "Car"("id");
@@ -270,6 +286,9 @@ CREATE UNIQUE INDEX "Yacht_productId_key" ON "Yacht"("productId");
 CREATE UNIQUE INDEX "Wishlist_id_key" ON "Wishlist"("id");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Wishlist_userId_productId_key" ON "Wishlist"("userId", "productId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Contact_id_key" ON "Contact"("id");
 
 -- CreateIndex
@@ -279,16 +298,19 @@ CREATE UNIQUE INDEX "Newsletter_id_key" ON "Newsletter"("id");
 CREATE UNIQUE INDEX "Newsletter_email_key" ON "Newsletter"("email");
 
 -- AddForeignKey
-ALTER TABLE "Product" ADD CONSTRAINT "Product_sellerId_fkey" FOREIGN KEY ("sellerId") REFERENCES "Seller"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Amount" ADD CONSTRAINT "Amount_sellerId_fkey" FOREIGN KEY ("sellerId") REFERENCES "Seller"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Seller" ADD CONSTRAINT "Seller_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "Product" ADD CONSTRAINT "Product_sellerId_fkey" FOREIGN KEY ("sellerId") REFERENCES "Seller"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "UserSubscriptionValidity" ADD CONSTRAINT "UserSubscriptionValidity_sellerId_fkey" FOREIGN KEY ("sellerId") REFERENCES "Seller"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "UserSubscriptionValidity" ADD CONSTRAINT "UserSubscriptionValidity_subscribedPlan_fkey" FOREIGN KEY ("subscribedPlan") REFERENCES "SubscriptionPlan"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Seller" ADD CONSTRAINT "Seller_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Car" ADD CONSTRAINT "Car_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE CASCADE ON UPDATE CASCADE;

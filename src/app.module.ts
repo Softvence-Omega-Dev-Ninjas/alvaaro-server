@@ -15,7 +15,7 @@ import { RealEstateModule } from './main/real-estate/real-estate.module';
 import { YachtModule } from './main/yacht/yacht.module';
 import { PaymentModule } from './main/payment/payment.module';
 import { CouponModule } from './main/coupon/coupon.module';
-import { UserSubscriptionPlanModule } from './main/user-subscription-plan/user-subscription-plan.module';
+import { AdminModule } from './main/admin/admin.module';
 
 @Module({
   imports: [
@@ -37,7 +37,8 @@ import { UserSubscriptionPlanModule } from './main/user-subscription-plan/user-s
     YachtModule,
     PaymentModule,
     CouponModule,
-    UserSubscriptionPlanModule,
+
+    AdminModule,
   ],
 })
 export class AppModule {}

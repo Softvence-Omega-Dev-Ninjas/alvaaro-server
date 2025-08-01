@@ -15,13 +15,14 @@ export class HelperService {
 
   async sellerExists(userId: string) {
     const seller = await this.prismaService.seller.findUnique({
-      where: { userId },
+      where: { userId, verificationStatus: 'VERIFIED' },
       select: { id: true },
     });
-    console.log('sellerExists', seller);
+
     if (!seller) {
       throw new Error('Seller does not exist');
     }
+
     return seller.id;
   }
   async packageExists(packageId: string) {
@@ -33,18 +34,10 @@ export class HelperService {
     }
     return packageExists;
   }
-  async couponExists(couponCode: string, percent_off: string) {
+  async couponExists(couponCode: string) {
     const existingCoupon = await this.prismaService.coupon.findMany({
       where: {
         couponCode: couponCode,
-        AND: [
-          {
-            couponCode: couponCode,
-          },
-          {
-            percent_off: percent_off,
-          },
-        ],
       },
     });
     return existingCoupon;
