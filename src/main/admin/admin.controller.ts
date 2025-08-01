@@ -32,4 +32,10 @@ export class AdminController {
     // This method is not implemented in the provided code
     return this.adminService.findTotalAmount();
   }
+  // find new sellers
+  @Get('new-sellers')
+  findNewSellers() {
+    // This method is not implemented in the provided code
+    return this.adminService.findNewSellers();
+  }
 }

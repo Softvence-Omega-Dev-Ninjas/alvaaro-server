@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
@@ -125,6 +126,31 @@ export class AdminService {
       );
     } catch (error) {
       return ApiResponse.error('Total amount monthwise is not implemented yet');
+    }
+  }
+  // find new sellers
+  async findNewSellers() {
+    try {
+      // Fetch new sellers who have been added in the running month
+      const startOfMonth = new Date();
+      startOfMonth.setDate(1);
+
+      const newSellers = await this.prisma.seller.findMany({
+        where: {
+          createdAt: {
+            gte: startOfMonth,
+          },
+        },
+      });
+      //
+      // find total sellers
+      const totalSellers = await this.prisma.seller.count({});
+      return ApiResponse.success(
+        { newSellers: newSellers.length, totalSellers },
+        'New sellers fetched successfully',
+      );
+    } catch (error) {
+      return ApiResponse.error('Error fetching new sellers');
     }
   }
 }
