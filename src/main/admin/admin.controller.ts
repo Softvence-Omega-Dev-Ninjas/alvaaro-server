@@ -26,4 +26,10 @@ export class AdminController {
   findAllUsersAndSellers() {
     return this.adminService.findAllUsersAndSellers();
   }
+  // get total amount monthwise
+  @Get('total-amount')
+  findTotalAmount() {
+    // This method is not implemented in the provided code
+    return this.adminService.findTotalAmount();
+  }
 }
