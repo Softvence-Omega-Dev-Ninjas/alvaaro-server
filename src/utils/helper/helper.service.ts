@@ -15,13 +15,14 @@ export class HelperService {
 
   async sellerExists(userId: string) {
     const seller = await this.prismaService.seller.findUnique({
-      where: { userId },
+      where: { userId, verificationStatus: 'VERIFIED' },
       select: { id: true },
     });
-    console.log('sellerExists', seller);
+
     if (!seller) {
       throw new Error('Seller does not exist');
     }
+
     return seller.id;
   }
   async packageExists(packageId: string) {
