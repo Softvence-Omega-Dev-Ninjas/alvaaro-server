@@ -33,7 +33,7 @@ model Seller {
   zip                String
   verificationStatus VerificationStatusType    @default(PENDING)
   subscriptionStatus Boolean                   @default(false)
-  Subscriptions      UserSubscriptionValidity?
+  subscriptions      UserSubscriptionValidity?
   createdAt          DateTime                  @default(now())
   updatedAt          DateTime                  @updatedAt
   Product            Product[]

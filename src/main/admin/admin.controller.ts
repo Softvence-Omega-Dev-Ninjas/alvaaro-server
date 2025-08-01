@@ -1,34 +1,25 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { AdminService } from './admin.service';
-import { CreateAdminDto } from './dto/create-admin.dto';
-import { UpdateAdminDto } from './dto/update-admin.dto';
+import { UserSearchPayload } from './dto/create-admin.dto';
 
 @Controller('admin')
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
-  @Post()
-  create(@Body() createAdminDto: CreateAdminDto) {
-    return this.adminService.create(createAdminDto);
-  }
+  // get query parameters for filtering sellers
 
-  @Get()
-  findAll() {
-    return this.adminService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.adminService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAdminDto: UpdateAdminDto) {
-    return this.adminService.update(+id, updateAdminDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.adminService.remove(+id);
+  @Get('all-sellers')
+  findAllSellers(@Query() payload: UserSearchPayload) {
+    // Ensure s_status is a string ('active' or 'inactive') if present as boolean
+    const normalizedPayload = {
+      ...payload,
+      s_status:
+        typeof payload.s_status === 'boolean'
+          ? payload.s_status
+            ? 'active'
+            : 'inactive'
+          : payload.s_status,
+    };
+    return this.adminService.findAllSellers(normalizedPayload);
   }
 }

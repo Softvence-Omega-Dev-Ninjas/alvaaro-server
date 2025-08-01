@@ -1,26 +1,57 @@
 import { Injectable } from '@nestjs/common';
-import { CreateAdminDto } from './dto/create-admin.dto';
-import { UpdateAdminDto } from './dto/update-admin.dto';
+import { contains } from 'class-validator';
+import { PrismaService } from 'src/prisma-service/prisma-service.service';
+
+type UserSearchPayload = {
+  v_status?: 'PENDING' | 'VERIFIED' | 'REJECTED'; // optional if you want it flexible
+  s_status?: string; // also optional
+  fullName?: string;
+  email?: string;
+};
 
 @Injectable()
 export class AdminService {
-  create(createAdminDto: CreateAdminDto) {
-    return 'This action adds a new admin';
-  }
+  constructor(private readonly prisma: PrismaService) {}
 
-  findAll() {
-    return `This action returns all admin`;
-  }
+  async findAllSellers(payload: UserSearchPayload) {
+    try {
+      const userFilters: any[] = [];
 
-  findOne(id: number) {
-    return `This action returns a #${id} admin`;
-  }
+      if (payload.fullName) {
+        userFilters.push({
+          fullName: {
+            contains: payload.fullName,
+            mode: 'insensitive',
+          },
+        });
+      }
 
-  update(id: number, updateAdminDto: UpdateAdminDto) {
-    return `This action updates a #${id} admin`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} admin`;
+      if (payload.email) {
+        userFilters.push({
+          email: {
+            contains: payload.email,
+            mode: 'insensitive',
+          },
+        });
+      }
+      console.log(payload);
+      return await this.prisma.seller.findMany({
+        where: {
+          subscriptionStatus: payload.s_status === 'active',
+          verificationStatus: payload.v_status,
+          user: {
+            OR: userFilters,
+          },
+        },
+        include: {
+          user: {
+            select: {
+              fullName: true,
+              email: true,
+            },
+          },
+        },
+      });
+    } catch (error) {}
   }
 }
