@@ -53,7 +53,12 @@ export class AdminService {
           },
         },
       });
-    } catch (error) {}
+    } catch (error) {
+      ApiResponse.error(
+        'Error fetching sellers',
+        error.message || 'Internal Server Error',
+      );
+    }
   }
 
   // find all users and sellers
