@@ -10,7 +10,6 @@ export class AdminController {
 
   @Get('all-sellers')
   findAllSellers(@Query() payload: UserSearchPayload) {
-    // Ensure s_status is a string ('active' or 'inactive') if present as boolean
     const normalizedPayload = {
       ...payload,
       s_status:
@@ -21,5 +20,10 @@ export class AdminController {
           : payload.s_status,
     };
     return this.adminService.findAllSellers(normalizedPayload);
+  }
+  // get all users and sellers
+  @Get('all-users-sellers')
+  findAllUsersAndSellers() {
+    return this.adminService.findAllUsersAndSellers();
   }
 }
