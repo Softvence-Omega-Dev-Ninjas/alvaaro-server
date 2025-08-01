@@ -35,4 +35,10 @@ export class AdminController {
   findNewSellers() {
     return this.adminService.findNewSellers();
   }
+
+  // seller verification by admin
+  @Get('verify-seller')
+  async verifySeller(@Query('id') id: string) {
+    return this.adminService.verifySeller(id);
+  }
 }

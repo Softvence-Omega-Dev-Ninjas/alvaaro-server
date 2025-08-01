@@ -153,4 +153,17 @@ export class AdminService {
       return ApiResponse.error('Error fetching new sellers');
     }
   }
+  // seller verification by admin
+  async verifySeller(id: string) {
+    try {
+      // Verify seller by id
+      const updatedSeller = await this.prisma.seller.update({
+        where: { id },
+        data: { verificationStatus: 'VERIFIED' },
+      });
+      return ApiResponse.success(updatedSeller, 'Seller verified successfully');
+    } catch (error) {
+      return ApiResponse.error('Error verifying seller');
+    }
+  }
 }
