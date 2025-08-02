@@ -5,26 +5,20 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
   UseGuards,
   Req,
   Query,
-  UseInterceptors,
-  UploadedFiles,
 } from '@nestjs/common';
 import { SellerService } from './seller.service';
 import { CreateSellerDto } from './dto/create-seller.dto';
-import { UpdateSellerDto } from './dto/update-seller.dto';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { Request } from 'express';
 import { OtpDto } from '../auth/dto/signin.dto';
 import { Roles } from 'src/guards/roles.decorator';
 import { RolesGuard } from 'src/guards/role.guard';
 import { UserRole } from 'src/utils/common/enum/userEnum';
-import { ApiBody, ApiConsumes, ApiQuery } from '@nestjs/swagger';
+import { ApiBody, ApiQuery } from '@nestjs/swagger';
 import { ContactSellerDto } from './dto/contact-seller.dto';
-import { FilesInterceptor } from '@nestjs/platform-express';
-import { uploadMultipleToCloudinary } from 'src/utils/common/cloudinary/cloudinary';
 
 @UseGuards(AuthGuard)
 @Controller('seller')
@@ -93,6 +87,24 @@ export class SellerController {
     });
   }
 
+  @UseGuards(AuthGuard)
+  @Roles(UserRole.SELLER)
+  @Get('inquiry')
+  getInquiryBySellerId(@Req() req: { userid: string }) {
+    // console.log(req);
+    return this.sellerService.getInquiryBySellerId(req.userid);
+  }
+
+  // @Get(':id')
+  // findOne(@Param('id') id: string) {
+  //   return this.sellerService.findOne(+id);
+  // }
+
+  // @Patch(':id')
+  // update(@Param('id') id: string) {
+  //   return this.sellerService.update(+id);
+  // }
+
   @Patch('verified-seller/:id')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
@@ -115,5 +127,12 @@ export class SellerController {
   @Get('dashboard/stats')
   getDashboardStatistics(@Req() req: { userid: string }) {
     return this.sellerService.getDashboardStatistics(req.userid);
+  }
+
+  @UseGuards(AuthGuard)
+  @Roles(UserRole.SELLER)
+  @Get('dashboard/analysis')
+  getDashboardAnalysis(@Req() req: { userid: string }) {
+    return this.sellerService.getDashboardAnalysis(req.userid);
   }
 }
