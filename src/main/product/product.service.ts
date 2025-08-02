@@ -215,9 +215,6 @@ export class ProductService {
     return ApiResponse.success(product, 'Product fetched successfully');
   }
 
-  // async findAllPremiumProducts(category?: CategoryType) {
-  //   const products = await this.prisma.product.findMany({
-  //     where: { category, premium: true },
   async findAllPremiumProducts(category?: CategoryType, search?: string) {
     const premiumProducts = await this.prisma.product.findMany({
       where: {

@@ -11,6 +11,7 @@ import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 import { VerificationStatusType } from '@prisma/client';
 import { contactSellerTemplate } from 'src/utils/mail/templates/contact-seller.template';
 import { ContactSellerDto } from './dto/contact-seller.dto';
+import { HelperService } from 'src/utils/helper/helper.service';
 
 @Injectable()
 export class SellerService {
@@ -18,6 +19,7 @@ export class SellerService {
     private readonly prisma: PrismaService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private mail: MailService,
+    private readonly helper: HelperService,
   ) {}
 
   async sendOtpAndCacheInfo(
@@ -180,11 +182,12 @@ export class SellerService {
           },
         },
       });
+
       if (!product) {
         throw new NotFoundException('Product not found!');
       }
 
-      const html = contactSellerTemplate({
+      const htmlContent = contactSellerTemplate({
         sellerName: product.seller.user.fullName,
         buyerName: name,
         buyerEmail: email,
@@ -193,14 +196,55 @@ export class SellerService {
         productTitle: product.name,
       });
 
-      const mailTo = product.seller.user.email;
-      const subject = `New inquiry for ${product.name}`;
+      await this.mail.sendMail(
+        product.seller.user.email,
+        `New inquiry for ${product.name}`,
+        htmlContent,
+      );
 
-      await this.mail.sendMail(mailTo, subject, html);
+      const result = await this.prisma.inquiry.create({
+        data: {
+          buyerName: name,
+          buyerEmail: email,
+          buyerPhone: phone,
+          message,
+          productId,
+          sellerId: product.sellerId,
+        },
+      });
 
-      return { message: 'Mail sent to the seller!' };
+      return ApiResponse.success(
+        result,
+        'Inquiry sent successfully to the seller!',
+      );
     } catch (error) {
-      return ApiResponse.error('Failed to contact seller', error);
+      console.error('contactSeller error:', error);
+
+      if (error instanceof NotFoundException) {
+        return ApiResponse.error('Product not found');
+      }
+
+      return ApiResponse.error(
+        'Failed to contact seller',
+        error instanceof Error ? error.message : 'Unknown error occurred',
+      );
+    }
+  }
+
+  async getInquiryBySellerId(userId: string) {
+    try {
+      const sellerId = await this.helper.sellerExists(userId);
+
+      const result = await this.prisma.inquiry.findMany({
+        where: {
+          sellerId,
+        },
+      });
+
+      return ApiResponse.success(result, 'Inquiry retrieved successfully!');
+    } catch (error) {
+      console.log(error);
+      return ApiResponse.error('Failed to retrieve inquiry!');
     }
   }
 }

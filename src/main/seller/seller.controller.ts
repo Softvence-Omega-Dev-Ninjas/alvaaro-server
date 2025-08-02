@@ -79,6 +79,14 @@ export class SellerController {
     });
   }
 
+  @UseGuards(AuthGuard)
+  @Roles(UserRole.SELLER)
+  @Get('inquiry')
+  getInquiryBySellerId(@Req() req: { userid: string }) {
+    // console.log(req);
+    return this.sellerService.getInquiryBySellerId(req.userid);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.sellerService.findOne(+id);
