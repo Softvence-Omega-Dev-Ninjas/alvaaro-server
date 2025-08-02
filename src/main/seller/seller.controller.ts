@@ -5,7 +5,6 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
   UseGuards,
   Req,
   Query,
@@ -27,10 +26,20 @@ export class SellerController {
   constructor(private readonly sellerService: SellerService) {}
 
   @Post('create-seller')
-  sendOtpAndCacheInfo(
+  // @UseInterceptors(FilesInterceptor('documents'))
+  // @ApiConsumes('multipart/form-data')
+  async sendOtpAndCacheInfo(
     @Body() createSellerDto: CreateSellerDto,
     @Req() req: Request,
+    // @UploadedFiles() documents: Express.Multer.File[],
   ) {
+    // const cloudinaryUrls =
+    //   documents?.length > 0
+    //     ? (await uploadMultipleToCloudinary(documents)).map(
+    //         (res: { secure_url: string }) => res.secure_url,
+    //       )
+    //     : [];
+    // console.log('cloudinaryUrls from seller controller', cloudinaryUrls);
     return this.sellerService.sendOtpAndCacheInfo(
       createSellerDto,
       req['email'] as string,
@@ -86,26 +95,21 @@ export class SellerController {
     return this.sellerService.getInquiryBySellerId(req.userid);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.sellerService.findOne(+id);
-  }
+  // @Get(':id')
+  // findOne(@Param('id') id: string) {
+  //   return this.sellerService.findOne(+id);
+  // }
 
-  @Patch(':id')
-  update(@Param('id') id: string) {
-    return this.sellerService.update(+id);
-  }
+  // @Patch(':id')
+  // update(@Param('id') id: string) {
+  //   return this.sellerService.update(+id);
+  // }
 
   @Patch('verified-seller/:id')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   async verifiedSeller(@Param('id') id: string) {
     return await this.sellerService.verifiedSeller(id);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.sellerService.remove(+id);
   }
 
   @UseGuards(AuthGuard)

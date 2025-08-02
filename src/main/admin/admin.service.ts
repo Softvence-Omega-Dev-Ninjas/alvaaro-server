@@ -83,7 +83,11 @@ export class AdminService {
         'Users and Sellers fetched successfully',
       );
     } catch (error) {
-      throw new Error('Error fetching users and sellers');
+      return ApiResponse.error('Error fetching users and sellers');
+      // Optionally, you can log the error or handle it differently
+      // console.error(error);
+      // return ApiResponse.error('Failed to fetch users and sellers');
+      // throw new Error('Error fetching users and sellers');
     }
   }
   // get total amount monthwise
