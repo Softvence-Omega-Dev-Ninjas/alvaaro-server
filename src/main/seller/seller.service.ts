@@ -7,11 +7,11 @@ import { Cache } from 'cache-manager';
 import { MailService } from 'src/utils/mail/mail.service';
 import { OtpDto } from '../auth/dto/signin.dto';
 import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
-
 import { VerificationStatusType } from '@prisma/client';
 import { contactSellerTemplate } from 'src/utils/mail/templates/contact-seller.template';
 import { ContactSellerDto } from './dto/contact-seller.dto';
 import { HelperService } from 'src/utils/helper/helper.service';
+import { ProductService } from '../product/product.service';
 
 @Injectable()
 export class SellerService {
@@ -20,6 +20,7 @@ export class SellerService {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private mail: MailService,
     private readonly helper: HelperService,
+    private productService: ProductService,
   ) {}
 
   async sendOtpAndCacheInfo(
@@ -245,6 +246,37 @@ export class SellerService {
     } catch (error) {
       console.log(error);
       return ApiResponse.error('Failed to retrieve inquiry!');
+    }
+  }
+
+  async getDashboardStatistics(userId: string) {
+    const sellerId = await this.helper.sellerExists(userId);
+
+    try {
+      const [totalViews, totalListings, totalEngagement, totalSaves] =
+        await Promise.all([
+          this.productService.getTotalViews(sellerId),
+          this.prisma.product.count({
+            where: {
+              sellerId,
+            },
+          }),
+          this.prisma.inquiry.count({
+            where: { sellerId },
+          }),
+          this.prisma.wishlist.count({
+            where: { product: { sellerId } },
+          }),
+        ]);
+
+      return {
+        totalViews,
+        totalListings,
+        engagementRate: `${((totalEngagement / totalListings) * 100).toFixed(1)}%`,
+        totalSaves,
+      };
+    } catch (error) {
+      return ApiResponse.error('Something went wrong', error);
     }
   }
 }
