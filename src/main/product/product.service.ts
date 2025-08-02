@@ -167,6 +167,7 @@ export class ProductService {
             companyWebsite: true,
           },
         },
+        // views: true,
         RealEstate: true,
         Car: true,
         Yacht: true,
@@ -448,5 +449,14 @@ export class ProductService {
     });
 
     return { message: 'Added to wishlist' };
+  }
+
+  async getTotalViews(sellerId: string) {
+    const { data: products } = await this.findProductBySellerId(sellerId);
+    const totalViews = products.reduce(
+      (sum, product) => sum + product.views,
+      0,
+    );
+    return totalViews;
   }
 }
