@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSellerDto } from './dto/create-seller.dto';
 import { UpdateSellerDto } from './dto/update-seller.dto';
@@ -180,11 +182,12 @@ export class SellerService {
           },
         },
       });
+
       if (!product) {
         throw new NotFoundException('Product not found!');
       }
 
-      const html = contactSellerTemplate({
+      const htmlContent = contactSellerTemplate({
         sellerName: product.seller.user.fullName,
         buyerName: name,
         buyerEmail: email,
@@ -193,14 +196,38 @@ export class SellerService {
         productTitle: product.name,
       });
 
-      const mailTo = product.seller.user.email;
-      const subject = `New inquiry for ${product.name}`;
+      await this.mail.sendMail(
+        product.seller.user.email,
+        `New inquiry for ${product.name}`,
+        htmlContent,
+      );
 
-      await this.mail.sendMail(mailTo, subject, html);
+      await this.prisma.inquiry.create({
+        data: {
+          buyerName: name,
+          buyerEmail: email,
+          buyerPhone: phone,
+          message,
+          productId,
+          sellerId: product.sellerId,
+        },
+      });
 
-      return { message: 'Mail sent to the seller!' };
+      return ApiResponse.success(
+        null,
+        'Inquiry sent successfully to the seller!',
+      );
     } catch (error) {
-      return ApiResponse.error('Failed to contact seller', error);
+      console.error('contactSeller error:', error);
+
+      if (error instanceof NotFoundException) {
+        return ApiResponse.error('Product not found');
+      }
+
+      return ApiResponse.error(
+        'Failed to contact seller',
+        error instanceof Error ? error.message : 'Unknown error occurred',
+      );
     }
   }
 }
