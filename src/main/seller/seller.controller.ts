@@ -124,4 +124,11 @@ export class SellerController {
   getDashboardStatistics(@Req() req: { userid: string }) {
     return this.sellerService.getDashboardStatistics(req.userid);
   }
+
+  @UseGuards(AuthGuard)
+  @Roles(UserRole.SELLER)
+  @Get('dashboard/analysis')
+  getDashboardAnalysis(@Req() req: { userid: string }) {
+    return this.sellerService.getDashboardAnalysis(req.userid);
+  }
 }

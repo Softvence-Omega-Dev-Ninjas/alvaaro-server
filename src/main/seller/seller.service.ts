@@ -268,14 +268,76 @@ export class SellerService {
           }),
         ]);
 
-      return {
+      const result = {
         totalViews,
         totalListings,
         engagementRate: `${((totalEngagement / totalListings) * 100).toFixed(1)}%`,
         totalSaves,
       };
+
+      return ApiResponse.success(
+        result,
+        'Seller stats retrieved successfully!',
+      );
     } catch (error) {
       return ApiResponse.error('Something went wrong', error);
     }
+  }
+
+  async getDashboardAnalysis(userId: string) {
+    const sellerId = await this.helper.sellerExists(userId);
+
+    const products = await this.productService.findProductBySellerId(sellerId);
+    const views = products.data.map((product) => {
+      return {
+        views: product.views,
+        createdAt: product.createdAt,
+      };
+    });
+    const inquiries = await this.prisma.inquiry.findMany({
+      where: { sellerId },
+    });
+    const saves = await this.prisma.wishlist.findMany({
+      where: { product: { sellerId } },
+      include: { product: true },
+    });
+
+    const groupByMonth = <T extends { createdAt: Date }>(items: T[]) => {
+      return items.reduce(
+        (acc, item) => {
+          const month = item.createdAt.toISOString().slice(0, 7);
+
+          acc[month] = (acc[month] || 0) + 1;
+          return acc;
+        },
+        {} as Record<string, number>,
+      );
+    };
+
+    const productCounts = groupByMonth(products.data);
+    const inquiryCounts = groupByMonth(inquiries);
+    const saveCounts = groupByMonth(saves);
+    const viewsCounts = groupByMonth(views);
+
+    const allMonths = new Set([
+      ...Object.keys(productCounts),
+      ...Object.keys(inquiryCounts),
+      ...Object.keys(saveCounts),
+      ...Object.keys(viewsCounts),
+    ]);
+
+    // merge into final array
+    const result = Array.from(allMonths).map((month) => ({
+      month,
+      products: productCounts[month] || 0,
+      inquiries: inquiryCounts[month] || 0,
+      saves: saveCounts[month] || 0,
+      views: viewsCounts[month] || 0,
+    }));
+
+    return ApiResponse.success(
+      result,
+      'Seller dashboard analytics retrieved successfully!',
+    );
   }
 }
