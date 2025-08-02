@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
@@ -202,7 +203,7 @@ export class SellerService {
         htmlContent,
       );
 
-      await this.prisma.inquiry.create({
+      const result = await this.prisma.inquiry.create({
         data: {
           buyerName: name,
           buyerEmail: email,
@@ -214,7 +215,7 @@ export class SellerService {
       });
 
       return ApiResponse.success(
-        null,
+        result,
         'Inquiry sent successfully to the seller!',
       );
     } catch (error) {
@@ -228,6 +229,21 @@ export class SellerService {
         'Failed to contact seller',
         error instanceof Error ? error.message : 'Unknown error occurred',
       );
+    }
+  }
+
+  async getInquiryBySellerId(sellerId: string) {
+    try {
+      const result = await this.prisma.inquiry.findMany({
+        where: {
+          sellerId,
+        },
+      });
+
+      return ApiResponse.success(result, 'Inquiry retrieved successfully!');
+    } catch (error) {
+      console.log(error);
+      return ApiResponse.error('Failed to retrieve inquiry!');
     }
   }
 }
