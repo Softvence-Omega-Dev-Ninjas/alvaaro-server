@@ -40,7 +40,6 @@ async function bootstrap() {
   );
 
   SwaggerModule.setup('api', app, documentFactory);
-  // * add body parser
 
   app.use('/stripe/webhook', bodyParser.raw({ type: 'application/json' }));
   await app.listen(process.env.PORT ?? 3000);
