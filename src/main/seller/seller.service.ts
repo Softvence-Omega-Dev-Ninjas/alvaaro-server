@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSellerDto } from './dto/create-seller.dto';
 import { UpdateSellerDto } from './dto/update-seller.dto';
@@ -14,6 +11,7 @@ import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 import { VerificationStatusType } from '@prisma/client';
 import { contactSellerTemplate } from 'src/utils/mail/templates/contact-seller.template';
 import { ContactSellerDto } from './dto/contact-seller.dto';
+import { HelperService } from 'src/utils/helper/helper.service';
 
 @Injectable()
 export class SellerService {
@@ -21,6 +19,7 @@ export class SellerService {
     private readonly prisma: PrismaService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private mail: MailService,
+    private readonly helper: HelperService,
   ) {}
 
   async sendOtpAndCacheInfo(
@@ -232,8 +231,10 @@ export class SellerService {
     }
   }
 
-  async getInquiryBySellerId(sellerId: string) {
+  async getInquiryBySellerId(userId: string) {
     try {
+      const sellerId = await this.helper.sellerExists(userId);
+
       const result = await this.prisma.inquiry.findMany({
         where: {
           sellerId,
