@@ -93,26 +93,11 @@ export class SellerController {
     });
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.sellerService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSellerDto: UpdateSellerDto) {
-    return this.sellerService.update(+id, updateSellerDto);
-  }
-
   @Patch('verified-seller/:id')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   async verifiedSeller(@Param('id') id: string) {
     return await this.sellerService.verifiedSeller(id);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.sellerService.remove(+id);
   }
 
   @UseGuards(AuthGuard)
