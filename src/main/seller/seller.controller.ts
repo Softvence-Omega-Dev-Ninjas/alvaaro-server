@@ -12,7 +12,6 @@ import {
 } from '@nestjs/common';
 import { SellerService } from './seller.service';
 import { CreateSellerDto } from './dto/create-seller.dto';
-import { UpdateSellerDto } from './dto/update-seller.dto';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { Request } from 'express';
 import { OtpDto } from '../auth/dto/signin.dto';
@@ -93,8 +92,8 @@ export class SellerController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSellerDto: UpdateSellerDto) {
-    return this.sellerService.update(+id, updateSellerDto);
+  update(@Param('id') id: string) {
+    return this.sellerService.update(+id);
   }
 
   @Patch('verified-seller/:id')

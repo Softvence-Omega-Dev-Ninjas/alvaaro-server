@@ -1,6 +1,5 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSellerDto } from './dto/create-seller.dto';
-import { UpdateSellerDto } from './dto/update-seller.dto';
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
@@ -133,8 +132,7 @@ export class SellerService {
     return `This action returns a #${id} seller`;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  update(id: number, updateSellerDto: UpdateSellerDto) {
+  update(id: number) {
     return `This action updates a #${id} seller`;
   }
 
@@ -249,6 +247,7 @@ export class SellerService {
     }
   }
 
+  //? Seller dashboard stats
   async getDashboardStatistics(userId: string) {
     const sellerId = await this.helper.sellerExists(userId);
 
