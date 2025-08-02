@@ -38,7 +38,6 @@ export class AuthController {
         : [];
 
     const profileImageUrl = cloudinaryUrls[0];
-
     return this.authService.signup(createAuthDto, profileImageUrl);
   }
 

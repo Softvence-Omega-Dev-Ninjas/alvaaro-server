@@ -129,15 +129,6 @@ export class SellerService {
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} seller`;
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  update(id: number, updateSellerDto: UpdateSellerDto) {
-    return `This action updates a #${id} seller`;
-  }
-
   // Seller verified by admin
   async verifiedSeller(userId: string) {
     const seller = await this.prisma.seller.findUnique({
@@ -158,10 +149,6 @@ export class SellerService {
 
       return ApiResponse.success(result, 'Seller verified successfully');
     }
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} seller`;
   }
 
   async contactSeller(productId: string, contactSellerDto: ContactSellerDto) {
