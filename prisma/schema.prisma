@@ -39,6 +39,7 @@ model Seller {
   updatedAt          DateTime                  @updatedAt
   Product            Product[]
   Amount             Amount[]
+  Inquiry            Inquiry[]
 }
 
 // Cars
@@ -145,6 +146,20 @@ model Contact {
   message   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Inquiry {
+  id         String   @id @default(uuid())
+  buyerName  String
+  buyerEmail String
+  buyerPhone String?
+  message    String
+  productId  String
+  sellerId   String
+  createdAt  DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id])
+  seller  Seller  @relation(fields: [sellerId], references: [id])
 }
 
 model Newsletter {

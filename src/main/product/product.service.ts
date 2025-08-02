@@ -167,6 +167,7 @@ export class ProductService {
             companyWebsite: true,
           },
         },
+        // views: true,
         RealEstate: true,
         Car: true,
         Yacht: true,
@@ -215,9 +216,6 @@ export class ProductService {
     return ApiResponse.success(product, 'Product fetched successfully');
   }
 
-  // async findAllPremiumProducts(category?: CategoryType) {
-  //   const products = await this.prisma.product.findMany({
-  //     where: { category, premium: true },
   async findAllPremiumProducts(category?: CategoryType, search?: string) {
     const premiumProducts = await this.prisma.product.findMany({
       where: {
@@ -451,5 +449,14 @@ export class ProductService {
     });
 
     return { message: 'Added to wishlist' };
+  }
+
+  async getTotalViews(sellerId: string) {
+    const { data: products } = await this.findProductBySellerId(sellerId);
+    const totalViews = products.reduce(
+      (sum, product) => sum + product.views,
+      0,
+    );
+    return totalViews;
   }
 }

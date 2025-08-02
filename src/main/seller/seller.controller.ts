@@ -109,4 +109,11 @@ export class SellerController {
   ) {
     return this.sellerService.contactSeller(productId, contactSellerDto);
   }
+
+  @UseGuards(AuthGuard)
+  @Roles(UserRole.SELLER)
+  @Get('dashboard/stats')
+  getDashboardStatistics(@Req() req: { userid: string }) {
+    return this.sellerService.getDashboardStatistics(req.userid);
+  }
 }
