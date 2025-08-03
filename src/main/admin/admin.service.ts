@@ -1,9 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
 import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
@@ -97,20 +93,15 @@ export class AdminService {
   // get total amount monthwise
   async findTotalAmount() {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       const amounts = await this.prisma.amount.findMany({});
       // total amount
       const totalAmount = amounts.reduce(
         (acc, curr) => acc + parseFloat(curr.amount),
         0,
       );
-      console.log(totalAmount);
-      console.log(amounts);
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       const grouped = amounts.reduce(
         (acc, curr) => {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-call
           const month = curr.createdAt.toISOString().slice(0, 7); // e.g. '2025-08'
           const amountNum = parseFloat(curr.amount);
 
