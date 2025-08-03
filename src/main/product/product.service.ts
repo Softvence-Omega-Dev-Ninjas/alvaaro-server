@@ -419,6 +419,7 @@ export class ProductService {
     }
   }
 
+  // remove trending functionality
   async update(id: string) {
     return await this.prisma.product.update({
       where: { id },
