@@ -54,11 +54,6 @@ export class RealEstateController {
     return this.realEstateService.findOne(+id);
   }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateRealEstateDto: UpdateRealEstateDto) {
-  //   return this.realEstateService.update(+id, updateRealEstateDto);
-  // }
-
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.realEstateService.remove(+id);
