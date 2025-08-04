@@ -34,7 +34,6 @@ export class MailService {
 
       this.logger.log(`Email sent successfully to ${to}`);
     } catch (error) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       this.logger.error(`Failed to send email to ${to}`, error.stack);
       throw new Error('Email could not be sent. Please try again later.');
     }
