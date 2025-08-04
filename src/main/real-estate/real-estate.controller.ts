@@ -37,7 +37,6 @@ export class RealEstateController {
     @Body() createProductDto: CreateRealEstateDto,
     @Req() req: { userid: string },
   ) {
-    // console.log({createProductDto});
     return await this.productService.handleProductCreation(
       createProductDto,
       images,
