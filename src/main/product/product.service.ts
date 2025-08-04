@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
 import { uploadMultipleToCloudinary } from 'src/utils/common/cloudinary/cloudinary';
