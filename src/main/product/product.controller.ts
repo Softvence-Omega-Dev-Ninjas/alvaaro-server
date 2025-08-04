@@ -83,11 +83,6 @@ export class ProductController {
     return updatedProduct;
   }
 
-  @Patch('trending/:id')
-  update(@Param('id') id: string) {
-    return this.productService.update(id);
-  }
-
   @UseGuards(AuthGuard)
   @Post('wishlist/:productId')
   toggleWishlist(
