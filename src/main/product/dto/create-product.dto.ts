@@ -34,6 +34,8 @@ export class CreateProductDto {
     description: 'Is the product premium?',
     example: false,
   })
+
+  // Note: Changed type from boolean to string to match the controller's expectation
   @IsBoolean({ message: 'premium must be true or false (boolean)' })
   premium: string;
 }
