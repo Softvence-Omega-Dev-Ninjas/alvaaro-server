@@ -9,7 +9,7 @@ export class MailService {
 
   constructor(private readonly configService: ConfigService) {
     this.transporter = nodemailer.createTransport({
-      service: 'gmail', // ✅ Can later change to SMTP or SendGrid easily
+      service: 'gmail',
       auth: {
         user: this.configService.get<string>('EMAIL_USER'),
         pass: this.configService.get<string>('APP_PASS'),
