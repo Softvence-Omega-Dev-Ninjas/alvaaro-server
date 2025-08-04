@@ -36,7 +36,4 @@ export class CreateProductDto {
   })
   @IsBoolean({ message: 'premium must be true or false (boolean)' })
   premium: string;
-  // @ApiProperty({ required: false })
-  // @IsOptional()
-  // realEstateDetails?: CreateRealEstateDto;
 }
