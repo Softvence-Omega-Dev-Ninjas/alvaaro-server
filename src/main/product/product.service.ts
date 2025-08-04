@@ -419,18 +419,6 @@ export class ProductService {
     }
   }
 
-  // remove trending functionality
-  async update(id: string) {
-    return await this.prisma.product.update({
-      where: { id },
-      data: {
-        trending: {
-          increment: 1,
-        },
-      },
-    });
-  }
-
   async toggleWishlist(productId: string, userId: string) {
     const existing = await this.prisma.wishlist.findUnique({
       where: {
