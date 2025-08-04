@@ -102,7 +102,7 @@ export class SellerService {
 
       const result = await this.prisma.seller.findMany({
         where: {
-          ...(verificationStatus && { verificationStatus }), // ✅ no "in"
+          ...(verificationStatus && { verificationStatus }),
           ...(subscriptionStatus && {
             subscriptionStatus: subscriptionStatus === 'ACTIVE',
           }),
