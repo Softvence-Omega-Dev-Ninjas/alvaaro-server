@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { UserSearchPayload } from './dto/create-admin.dto';
 
@@ -37,8 +37,8 @@ export class AdminController {
   }
 
   // seller verification by admin
-  @Get('verify-seller')
-  async verifySeller(@Query('id') id: string) {
+  @Post('verify-seller/:id')
+  async verifySeller(@Param('id') id: string) {
     return this.adminService.verifySeller(id);
   }
 }
