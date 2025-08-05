@@ -142,7 +142,7 @@ export class AdminService {
         'New sellers fetched successfully',
       );
     } catch (error) {
-      return ApiResponse.error('Error fetching new sellers');
+      return ApiResponse.error('Error fetching new sellers', error);
     }
   }
   // seller verification by admin
