@@ -35,10 +35,4 @@ export class AdminController {
   findAllUsersAndSellers() {
     return this.adminService.findAllUsersAndSellers();
   }
-
-  // find new sellers of this month and total sellers
-  @Get('new-sellers')
-  findNewSellers() {
-    return this.adminService.findNewSellers();
-  }
 }

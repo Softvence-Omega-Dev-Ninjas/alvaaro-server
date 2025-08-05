@@ -130,14 +130,7 @@ export class AdminService {
       return ApiResponse.error('Error fetching users and sellers', error);
     }
   }
-  // find new sellers
-  async findNewSellers() {
-    try {
-      // Fetch new sellers who have been added in the running month
-    } catch (error) {
-      return ApiResponse.error('Error fetching new sellers', error);
-    }
-  }
+
   // seller verification by admin
   async verifySeller(id: string) {
     try {
