@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
 import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
@@ -83,7 +81,7 @@ export class AdminService {
         'Users and Sellers fetched successfully',
       );
     } catch (error) {
-      return ApiResponse.error('Error fetching users and sellers');
+      return ApiResponse.error('Error fetching users and sellers', error);
     }
   }
   // get total amount monthwise
