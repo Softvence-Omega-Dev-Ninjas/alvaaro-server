@@ -155,7 +155,7 @@ export class AdminService {
       });
       return ApiResponse.success(updatedSeller, 'Seller verified successfully');
     } catch (error) {
-      return ApiResponse.error('Error verifying seller');
+      return ApiResponse.error('Error verifying seller', error);
     }
   }
 }
