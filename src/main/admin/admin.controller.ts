@@ -7,7 +7,7 @@ export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
   // get query parameters for filtering sellers
-  @Get('all-sellers')
+  @Post('all-sellers')
   findAllSellers(@Query() payload: UserSearchPayload) {
     const normalizedPayload = {
       ...payload,

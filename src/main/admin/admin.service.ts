@@ -121,7 +121,6 @@ export class AdminService {
         {
           users: users.length,
           sellers: sellers.length,
-          totalSellers: sellers.length,
           newSellersOFthisMonth: newSellers.length,
         },
         'Users and Sellers fetched successfully',
