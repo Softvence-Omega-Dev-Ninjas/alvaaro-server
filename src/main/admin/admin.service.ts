@@ -114,7 +114,10 @@ export class AdminService {
         'Total amount monthwise fetched successfully',
       );
     } catch (error) {
-      return ApiResponse.error('Total amount monthwise is not implemented yet');
+      return ApiResponse.error(
+        'Total amount monthwise is not implemented yet',
+        error,
+      );
     }
   }
   // find new sellers
