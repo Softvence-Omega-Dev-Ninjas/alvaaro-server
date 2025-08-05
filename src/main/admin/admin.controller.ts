@@ -35,4 +35,6 @@ export class AdminController {
   findAllUsersAndSellers() {
     return this.adminService.findAllUsersAndSellers();
   }
+
+  // TODO: Implement total sales
 }
