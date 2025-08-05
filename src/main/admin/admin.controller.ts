@@ -20,25 +20,25 @@ export class AdminController {
     };
     return this.adminService.findAllSellers(normalizedPayload);
   }
-  // get all users and sellers
-  @Get('all-users-sellers')
-  findAllUsersAndSellers() {
-    return this.adminService.findAllUsersAndSellers();
-  }
   // get total amount monthwise
   @Get('total-amount')
   findTotalAmount() {
     return this.adminService.findTotalAmount();
   }
-  // find new sellers of this month and total sellers
-  @Get('new-sellers')
-  findNewSellers() {
-    return this.adminService.findNewSellers();
-  }
-
   // seller verification by admin
   @Post('verify-seller/:id')
   async verifySeller(@Param('id') id: string) {
     return this.adminService.verifySeller(id);
+  }
+  // get all users and sellers
+  @Get('all-users-sellers')
+  findAllUsersAndSellers() {
+    return this.adminService.findAllUsersAndSellers();
+  }
+
+  // find new sellers of this month and total sellers
+  @Get('new-sellers')
+  findNewSellers() {
+    return this.adminService.findNewSellers();
   }
 }

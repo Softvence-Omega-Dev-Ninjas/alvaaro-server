@@ -61,29 +61,6 @@ export class AdminService {
     }
   }
 
-  // find all users and sellers
-  async findAllUsersAndSellers() {
-    try {
-      // Fetch all users and sellers count
-      const users = await this.prisma.user.findMany();
-      const sellers = await this.prisma.seller.findMany({
-        where: {
-          verificationStatus: 'VERIFIED',
-          subscriptionStatus: true,
-        },
-      });
-
-      return ApiResponse.success(
-        {
-          users: users.length,
-          sellers: sellers.length,
-        },
-        'Users and Sellers fetched successfully',
-      );
-    } catch (error) {
-      return ApiResponse.error('Error fetching users and sellers', error);
-    }
-  }
   // get total amount monthwise
   async findTotalAmount() {
     try {
@@ -120,10 +97,16 @@ export class AdminService {
       );
     }
   }
-  // find new sellers
-  async findNewSellers() {
+  // find all users and sellers
+  async findAllUsersAndSellers() {
     try {
-      // Fetch new sellers who have been added in the running month
+      const users = await this.prisma.user.findMany();
+      const sellers = await this.prisma.seller.findMany({
+        where: {
+          verificationStatus: 'VERIFIED',
+          subscriptionStatus: true,
+        },
+      });
       const startOfMonth = new Date();
       startOfMonth.setDate(1);
 
@@ -134,13 +117,23 @@ export class AdminService {
           },
         },
       });
-      //
-      // find total sellers
-      const totalSellers = await this.prisma.seller.count({});
       return ApiResponse.success(
-        { newSellers: newSellers.length, totalSellers },
-        'New sellers fetched successfully',
+        {
+          users: users.length,
+          sellers: sellers.length,
+          totalSellers: sellers.length,
+          newSellersOFthisMonth: newSellers.length,
+        },
+        'Users and Sellers fetched successfully',
       );
+    } catch (error) {
+      return ApiResponse.error('Error fetching users and sellers', error);
+    }
+  }
+  // find new sellers
+  async findNewSellers() {
+    try {
+      // Fetch new sellers who have been added in the running month
     } catch (error) {
       return ApiResponse.error('Error fetching new sellers', error);
     }
