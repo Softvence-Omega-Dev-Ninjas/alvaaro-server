@@ -74,7 +74,6 @@ export class TiktokService {
       }
       return ApiResponse.success('Video uploaded successfully');
     } catch (error: any) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       this.logger.error('TikTok Upload Error:', error?.response?.data || error);
       return ApiResponse.error('Video upload failed');
     }
