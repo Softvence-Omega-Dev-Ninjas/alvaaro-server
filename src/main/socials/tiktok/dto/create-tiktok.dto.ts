@@ -19,7 +19,14 @@ export class UploadTiktokVideoDto {
     type: 'string',
     description: 'TikTok Access Token',
     example:
-      'act.vijtqLqn7Jlgy4C13y1A3uVvQpOHVbrGE0LnpZaUrFtrBpicDTydbqEyMcj5!4450.va',
+      'act.TPtIxFLPcyndHohIjPtxlRnLiGSZuAKNeJA0tWTzUC1uiF7nhbnjI9HoWd0F!4480.va',
   })
   accessToken: string;
+
+  @ApiProperty({
+    type: 'string',
+    description: 'Scheduled time to publish the video',
+    example: '2023-03-15T12:00:00Z',
+  })
+  runAt: Date;
 }
