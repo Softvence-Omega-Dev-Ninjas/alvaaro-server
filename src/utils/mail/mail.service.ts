@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
+import { ApiResponse } from '../common/apiresponse/apiresponse';
 
 @Injectable()
 export class MailService {
@@ -9,7 +10,7 @@ export class MailService {
 
   constructor(private readonly configService: ConfigService) {
     this.transporter = nodemailer.createTransport({
-      service: 'gmail', // ✅ Can later change to SMTP or SendGrid easily
+      service: 'gmail',
       auth: {
         user: this.configService.get<string>('EMAIL_USER'),
         pass: this.configService.get<string>('APP_PASS'),
@@ -34,9 +35,7 @@ export class MailService {
 
       this.logger.log(`Email sent successfully to ${to}`);
     } catch (error) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      this.logger.error(`Failed to send email to ${to}`, error.stack);
-      throw new Error('Email could not be sent. Please try again later.');
+      ApiResponse.error(`Failed to send email to ${to}: ${error.message}`, 500);
     }
   }
 }

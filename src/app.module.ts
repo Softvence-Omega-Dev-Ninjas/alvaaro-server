@@ -16,6 +16,7 @@ import { YachtModule } from './main/yacht/yacht.module';
 import { PaymentModule } from './main/payment/payment.module';
 import { CouponModule } from './main/coupon/coupon.module';
 import { AdminModule } from './main/admin/admin.module';
+import { TiktokModule } from './main/socials/tiktok/tiktok.module';
 
 @Module({
   imports: [
@@ -39,6 +40,8 @@ import { AdminModule } from './main/admin/admin.module';
     CouponModule,
 
     AdminModule,
+
+    TiktokModule,
   ],
 })
 export class AppModule {}

@@ -3,7 +3,6 @@ import {
   Get,
   Post,
   Body,
-  // Patch,
   Param,
   Delete,
   UseGuards,
@@ -38,7 +37,6 @@ export class RealEstateController {
     @Body() createProductDto: CreateRealEstateDto,
     @Req() req: { userid: string },
   ) {
-    // console.log({createProductDto});
     return await this.productService.handleProductCreation(
       createProductDto,
       images,
@@ -55,11 +53,6 @@ export class RealEstateController {
   findOne(@Param('id') id: string) {
     return this.realEstateService.findOne(+id);
   }
-
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateRealEstateDto: UpdateRealEstateDto) {
-  //   return this.realEstateService.update(+id, updateRealEstateDto);
-  // }
 
   @Delete(':id')
   remove(@Param('id') id: string) {

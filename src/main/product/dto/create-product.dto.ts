@@ -34,17 +34,8 @@ export class CreateProductDto {
     description: 'Is the product premium?',
     example: false,
   })
-  // @Transform(({ value }) => {
-  //   if (typeof value === 'string') {
-  //     if (value= 'true') return true;
-  //     if (value= 'false') return false;
-  //   }
-  //   console.log({value},'value')
-  //   return Boolean(value); // fallback: handles 0, 1, etc.
-  // })
+
+  // Note: Changed type from boolean to string to match the controller's expectation
   @IsBoolean({ message: 'premium must be true or false (boolean)' })
   premium: string;
-  // @ApiProperty({ required: false })
-  // @IsOptional()
-  // realEstateDetails?: CreateRealEstateDto;
 }
