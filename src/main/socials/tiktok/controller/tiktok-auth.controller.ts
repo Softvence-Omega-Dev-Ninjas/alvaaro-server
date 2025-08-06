@@ -17,13 +17,13 @@ export class TiktokAuthController {
         [key: string]: any;
       };
       //   console.log({ tokenResponse });
-      //   const redirectUrl = `http://localhost:3001/?accessToken=${tokenResponse.access_token}&refreshToken=${tokenResponse.refresh_token}`;
-      //   return res.redirect(redirectUrl);
+      const redirectUrl = `http://localhost:4000/?accessToken=${tokenResponse.access_token}&refreshToken=${tokenResponse.refresh_token}`;
+      return res.redirect(redirectUrl);
       //   console.log(`Redirecting to: ${redirectUrl}`);
-      res.send({
-        accessToken: tokenResponse.access_token,
-        refreshToken: tokenResponse.refresh_token,
-      });
+      //   res.send({
+      //     accessToken: tokenResponse.access_token,
+      //     refreshToken: tokenResponse.refresh_token,
+      //   });
     } catch (err) {
       console.error(err);
     }
