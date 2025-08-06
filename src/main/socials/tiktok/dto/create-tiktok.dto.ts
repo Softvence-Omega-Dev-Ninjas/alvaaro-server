@@ -28,5 +28,5 @@ export class UploadTiktokVideoDto {
     description: 'Scheduled time to publish the video',
     example: '2023-03-15T12:00:00Z',
   })
-  runAt: Date;
+  scheduledAt: Date;
 }
