@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { TiktokService } from './tiktok.service';
-import { TiktokController } from './tiktok.controller';
+import { TiktokAuthService } from './services/tiktok-auth.service';
+import { TiktokAuthController } from './controller/tiktok-auth.controller';
 
 @Module({
-  controllers: [TiktokController],
-  providers: [TiktokService],
+  controllers: [TiktokAuthController],
+  providers: [TiktokAuthService, TiktokAuthService],
 })
 export class TiktokModule {}
