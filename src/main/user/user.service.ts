@@ -29,11 +29,6 @@ export class UserService {
     }
   }
 
-  update(id: number, updateUserDto: Partial<CreateUserDto>) {
-    console.log('Update User DTO:', updateUserDto);
-    return `This action updates a #${id} user`;
-  }
-
   async remove(id: string) {
     try {
       const user = await this.prisma.user.findFirst({
