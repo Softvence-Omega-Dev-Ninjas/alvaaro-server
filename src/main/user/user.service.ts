@@ -1,9 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
 import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
-import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UserService {
@@ -26,14 +23,8 @@ export class UserService {
 
       return ApiResponse.success(user, 'User found successfully');
     } catch (error) {
-      console.error('Error finding user:', error);
       return ApiResponse.error(error.response.message);
     }
-  }
-
-  update(id: number, updateUserDto: Partial<CreateUserDto>) {
-    console.log('Update User DTO:', updateUserDto);
-    return `This action updates a #${id} user`;
   }
 
   async remove(id: string) {
