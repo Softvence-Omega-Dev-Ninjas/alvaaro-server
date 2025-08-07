@@ -37,5 +37,3 @@ export class TiktokAuthService {
     }
   }
 }
-
-// Define TikTokOAuthTokenResponse type
