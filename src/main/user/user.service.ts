@@ -23,7 +23,6 @@ export class UserService {
 
       return ApiResponse.success(user, 'User found successfully');
     } catch (error) {
-      console.error('Error finding user:', error);
       return ApiResponse.error(error.response.message);
     }
   }
