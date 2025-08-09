@@ -41,7 +41,6 @@ export class SellerService {
     );
     return { message: 'OTP sent successfully. Please check your email.' };
   }
-
   async verifyOtpAndCreate(otp: OtpDto, userId: string, userEmail: string) {
     // seller info check in database
     const sellerInfo = await this.prisma.seller.findUnique({
