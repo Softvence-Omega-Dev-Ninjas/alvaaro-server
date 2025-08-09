@@ -70,6 +70,9 @@ export class SellerService {
     if (cacheOtp !== otp.otp) {
       return ApiResponse.error('Invalid OTP');
     }
+
+    // TODO: Payment processing logic here
+
     const result = await this.prisma.seller.create({
       data: {
         userId,
