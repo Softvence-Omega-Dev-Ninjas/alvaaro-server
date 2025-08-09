@@ -41,7 +41,6 @@ export class SellerService {
     );
     return { message: 'OTP sent successfully. Please check your email.' };
   }
-
   async verifyOtpAndCreate(otp: OtpDto, userId: string, userEmail: string) {
     // seller info check in database
     const sellerInfo = await this.prisma.seller.findUnique({
@@ -70,6 +69,9 @@ export class SellerService {
     if (cacheOtp !== otp.otp) {
       return ApiResponse.error('Invalid OTP');
     }
+
+    // TODO: Payment processing logic here
+
     const result = await this.prisma.seller.create({
       data: {
         userId,

@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { lastValueFrom } from 'rxjs';
 import * as qs from 'querystring';
 import { HttpService } from '@nestjs/axios';
+import { TikTokOAuthTokenResponse } from '../../../../utils/type/TikTokOAuthTokenResponse';
 @Injectable()
 export class TiktokAuthService {
   private readonly logger = new Logger(TiktokAuthService.name);
@@ -35,16 +36,4 @@ export class TiktokAuthService {
       this.logger.error('getAccessToken error', error);
     }
   }
-}
-
-// Define TikTokOAuthTokenResponse type
-export interface TikTokOAuthTokenResponse {
-  access_token: string;
-  expires_in: number;
-  refresh_token: string;
-  refresh_expires_in: number;
-  open_id: string;
-  scope: string;
-  token_type: string;
-  [key: string]: any;
 }
