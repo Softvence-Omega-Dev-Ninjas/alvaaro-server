@@ -2,6 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateNewsletterDto } from './dto/create-newsletter.dto';
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
 import { MailService } from 'src/utils/mail/mail.service';
+import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 
 @Injectable()
 export class NewsletterService {
@@ -32,7 +33,14 @@ export class NewsletterService {
     return newsLetter;
   }
 
-  findAll() {
-    return `This action returns all newsletter`;
+  async findAll() {
+    const result = await this.prisma.newsletter.findMany({
+      select: {
+        email: true,
+        createdAt: true,
+      },
+    });
+
+    return ApiResponse.success(result, 'Newsletter fetched successfully');
   }
 }
