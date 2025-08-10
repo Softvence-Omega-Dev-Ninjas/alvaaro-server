@@ -22,7 +22,6 @@ export class PaymentService {
     couponCode?: string,
   ) {
     try {
-      //
       // 1. Check if the user exists in the database
       const userExists = await this.helperService.userExists(userId);
       if (!userExists) {
