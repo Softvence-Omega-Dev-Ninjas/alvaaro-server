@@ -37,6 +37,7 @@ export class PaymentController {
     );
   }
 
+  // ! Routes for Payment Success
   @Get('payment-success')
   paymentSuccess(@Res() res: Response) {
     return res.send(
@@ -44,6 +45,7 @@ export class PaymentController {
     );
   }
 
+  // ! Routes for Payment Cancel
   @Get('payment-cancel')
   paymentCancel(@Res() res: Response) {
     return res.send(
@@ -51,7 +53,7 @@ export class PaymentController {
     );
   }
 
-  // * Webhook
+  // ! Routes for Webhook
   @Post('webhook')
   async handleWebhook(
     @Req() req: RawBodyRequest<Request>,
