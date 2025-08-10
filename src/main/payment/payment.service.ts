@@ -15,7 +15,7 @@ export class PaymentService {
   ) {
     this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {});
   }
-
+  // ! create checkout session
   async createCheckoutSession(
     userId: string,
     packageId: string,
@@ -43,12 +43,10 @@ export class PaymentService {
       }
       // 2. Check if the package exists in the database
       const packageExists = await this.helperService.packageExists(packageId);
-      console.log('Package Exists:', packageExists);
       if (!packageExists) {
         return ApiResponse.error('Package does not exist');
       }
       // 3. Check if the coupon exists in the database
-      console.log('Coupon Code:', couponCode);
       type Coupon = { stripeCouponId: string };
       let couponExists: Coupon[] = [];
       if (couponCode) {
@@ -95,7 +93,7 @@ export class PaymentService {
       console.error('Error creating checkout session:', error);
     }
   }
-  // Handle Stripe webhook events
+  // ! Handle Stripe webhook events
   async handleWebhook(payload: Buffer, sig: string) {
     try {
       const event = this.stripe.webhooks.constructEvent(

@@ -1,4 +1,3 @@
-// src/stripe/stripe.controller.ts
 import {
   Body,
   Controller,
