@@ -19,7 +19,7 @@ import { CreatePaymentDto } from './dto/create-payment.dto';
 export class PaymentController {
   constructor(private readonly stripeService: PaymentService) {}
 
-  // * Routes for Stripe Checkout
+  // ! Routes for Stripe Checkout
   @UseGuards(AuthGuard)
   @Post('checkout')
   async checkout(
