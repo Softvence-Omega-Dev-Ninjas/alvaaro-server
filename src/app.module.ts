@@ -1,4 +1,6 @@
 import { Module } from '@nestjs/common';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 import { UserModule } from './main/user/user.module';
 import { PrismaModule } from './prisma-service/prisma-service.module';
 import { AuthModule } from './main/auth/auth.module';
@@ -20,6 +22,10 @@ import { TiktokModule } from './main/socials/tiktok/tiktok.module';
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+      serveRoot: '/',
+    }),
     UserModule,
     PrismaModule,
     AuthModule,
@@ -44,4 +50,4 @@ import { TiktokModule } from './main/socials/tiktok/tiktok.module';
     TiktokModule,
   ],
 })
-export class AppModule {}
+export class AppModule { }

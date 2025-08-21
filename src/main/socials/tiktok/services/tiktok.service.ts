@@ -7,7 +7,7 @@ import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 @Injectable()
 export class TiktokService {
   private readonly logger = new Logger(TiktokService.name);
-  constructor(private readonly httpService: HttpService) {}
+  constructor(private readonly httpService: HttpService) { }
   async publish(title: string, filename: string, accessToken: string) {
     try {
       const videoPath = path.join(process.cwd(), 'public', 'uploads', filename);

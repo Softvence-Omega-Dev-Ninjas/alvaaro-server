@@ -12,7 +12,7 @@ export class TiktokAuthService {
   private readonly redirectUri =
     'https://cobra-humorous-sharply.ngrok-free.app/tiktok-auth/callback';
 
-  constructor(private readonly httpService: HttpService) {}
+  constructor(private readonly httpService: HttpService) { }
 
   async getAccessToken(
     code: string,
@@ -33,6 +33,7 @@ export class TiktokAuthService {
       const responses = await lastValueFrom(response);
       return responses.data as TikTokOAuthTokenResponse;
     } catch (error) {
+      console.log("getAccessToken error", error.response.data);
       this.logger.error('getAccessToken error', error);
     }
   }
