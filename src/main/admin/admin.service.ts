@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
 import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
@@ -63,33 +61,6 @@ export class AdminService {
     }
   }
 
-  // find all users and sellers
-  async findAllUsersAndSellers() {
-    try {
-      // Fetch all users and sellers count
-      const users = await this.prisma.user.findMany();
-      const sellers = await this.prisma.seller.findMany({
-        where: {
-          verificationStatus: 'VERIFIED',
-          subscriptionStatus: true,
-        },
-      });
-
-      return ApiResponse.success(
-        {
-          users: users.length,
-          sellers: sellers.length,
-        },
-        'Users and Sellers fetched successfully',
-      );
-    } catch (error) {
-      return ApiResponse.error('Error fetching users and sellers');
-      // Optionally, you can log the error or handle it differently
-      // console.error(error);
-      // return ApiResponse.error('Failed to fetch users and sellers');
-      // throw new Error('Error fetching users and sellers');
-    }
-  }
   // get total amount monthwise
   async findTotalAmount() {
     try {
@@ -120,13 +91,22 @@ export class AdminService {
         'Total amount monthwise fetched successfully',
       );
     } catch (error) {
-      return ApiResponse.error('Total amount monthwise is not implemented yet');
+      return ApiResponse.error(
+        'Total amount monthwise is not implemented yet',
+        error,
+      );
     }
   }
-  // find new sellers
-  async findNewSellers() {
+  // find all users and sellers
+  async findAllUsersAndSellers() {
     try {
-      // Fetch new sellers who have been added in the running month
+      const users = await this.prisma.user.findMany();
+      const sellers = await this.prisma.seller.findMany({
+        where: {
+          verificationStatus: 'VERIFIED',
+          subscriptionStatus: true,
+        },
+      });
       const startOfMonth = new Date();
       startOfMonth.setDate(1);
 
@@ -137,17 +117,19 @@ export class AdminService {
           },
         },
       });
-      //
-      // find total sellers
-      const totalSellers = await this.prisma.seller.count({});
       return ApiResponse.success(
-        { newSellers: newSellers.length, totalSellers },
-        'New sellers fetched successfully',
+        {
+          users: users.length,
+          sellers: sellers.length,
+          newSellersOFthisMonth: newSellers.length,
+        },
+        'Users and Sellers fetched successfully',
       );
     } catch (error) {
-      return ApiResponse.error('Error fetching new sellers');
+      return ApiResponse.error('Error fetching users and sellers', error);
     }
   }
+
   // seller verification by admin
   async verifySeller(id: string) {
     try {
@@ -158,7 +140,7 @@ export class AdminService {
       });
       return ApiResponse.success(updatedSeller, 'Seller verified successfully');
     } catch (error) {
-      return ApiResponse.error('Error verifying seller');
+      return ApiResponse.error('Error verifying seller', error);
     }
   }
 }
