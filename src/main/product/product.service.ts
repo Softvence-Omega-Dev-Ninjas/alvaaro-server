@@ -36,13 +36,16 @@ export class ProductService {
           )
         : [];
 
-      let isPremium;
+      console.log(dto.isExclusive);
+      // let isPremium: boolean;
 
-      if (dto.premium === 'true') {
-        isPremium = true;
-      } else if (dto.premium === 'false') {
-        isPremium = false;
-      }
+      console.log(JSON.stringify(dto));
+
+      // if (dto.isExclusive === true) {
+      //   isPremium = true;
+      // } else if (dto.isExclusive === false) {
+      //   isPremium = false;
+      // }
 
       const product = await this.prisma.product.create({
         data: {
@@ -51,7 +54,7 @@ export class ProductService {
           price: dto.price,
           images: imageUrls,
           category: dto.category,
-          premium: isPremium,
+          isExclusive: Boolean(dto.isExclusive),
           sellerId,
           views: 0,
         },
@@ -217,7 +220,7 @@ export class ProductService {
   async findAllPremiumProducts(category?: CategoryType, search?: string) {
     const premiumProducts = await this.prisma.product.findMany({
       where: {
-        premium: true,
+        isExclusive: true,
         ...(category && { category }),
         ...(search && {
           name: {
