@@ -4,7 +4,7 @@ import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 
 type UserSearchPayload = {
   v_status?: 'PENDING' | 'VERIFIED' | 'REJECTED'; // optional if you want it flexible
-  s_status?: string; // also optional
+  s_status?: string;
   fullName?: string;
   email?: string;
 };

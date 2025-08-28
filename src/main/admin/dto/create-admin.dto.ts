@@ -1,5 +1,16 @@
 import { IsEmail, IsOptional, IsString } from 'class-validator';
 
+export enum VStatus {
+  PENDING = 'PENDING',
+  VERIFIED = 'VERIFIED',
+  REJECTED = 'REJECTED',
+}
+
+export enum SStatus {
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
+}
+
 import { ApiProperty } from '@nestjs/swagger';
 export class UserSearchPayload {
   @ApiProperty({ required: false })
@@ -12,13 +23,11 @@ export class UserSearchPayload {
   @IsOptional()
   email?: string;
 
-  @ApiProperty()
-  @IsString()
+  @ApiProperty({ enum: VStatus, required: false })
   @IsOptional()
-  v_status?: 'PENDING' | 'VERIFIED' | 'REJECTED';
+  v_status?: VStatus;
 
-  @ApiProperty()
-  @IsString()
+  @ApiProperty({ enum: SStatus, required: false })
   @IsOptional()
-  s_status?: string; // 'active' or 'inactive'
+  s_status?: SStatus;
 }

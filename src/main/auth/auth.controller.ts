@@ -18,6 +18,8 @@ import { Request } from 'express';
 import { PasswordDto } from './dto/passwords.dto';
 import { Public } from 'src/guards/public.decorator';
 import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
+import { ForgotPasswordDto } from './dto/forgotPassword.dto';
+import { VerifyOtpForgottenPasswordDto } from './dto/verifyOtpForgottenPassword.dto';
 
 @Controller('auth')
 @UseGuards(AuthGuard)
@@ -56,5 +58,19 @@ export class AuthController {
   @UseGuards(AuthGuard)
   async changePassword(@Body() dto: PasswordDto, @Req() req: Request) {
     return await this.authService.changePassword(req['userid'] as string, dto);
+  }
+  @Post('request-password-reset')
+  @Public()
+  async requestPasswordReset(@Body() dto: ForgotPasswordDto) {
+    return await this.authService.requestPasswordReset(dto.email);
+  }
+  @Post('reset-password')
+  @Public()
+  async resetPassword(@Body() dto: VerifyOtpForgottenPasswordDto) {
+    return await this.authService.verifyOtp(
+      dto.email,
+      dto.otp,
+      dto.newPassword,
+    );
   }
 }

@@ -1,10 +1,15 @@
-import { Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { UserSearchPayload } from './dto/create-admin.dto';
+import { UserRole } from '@prisma/client';
+import { AuthGuard } from 'src/guards/auth.guard';
+import { Roles } from 'src/guards/roles.decorator';
 
 @Controller('admin')
+@UseGuards(AuthGuard)
+@Roles(UserRole.ADMIN)
 export class AdminController {
-  constructor(private readonly adminService: AdminService) {}
+  constructor(private readonly adminService: AdminService) { }
 
   // get query parameters for filtering sellers
   @Post('all-sellers')
@@ -36,5 +41,7 @@ export class AdminController {
     return this.adminService.findAllUsersAndSellers();
   }
 
-  // TODO: Implement total sales
+  //! TODO: Implement total sales
+
+
 }
