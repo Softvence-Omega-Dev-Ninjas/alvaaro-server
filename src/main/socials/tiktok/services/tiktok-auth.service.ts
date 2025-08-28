@@ -3,6 +3,7 @@ import { lastValueFrom } from 'rxjs';
 import * as qs from 'querystring';
 import { HttpService } from '@nestjs/axios';
 import { TikTokOAuthTokenResponse } from '../../../../utils/type/TikTokOAuthTokenResponse';
+import { PrismaService } from 'src/prisma-service/prisma-service.service';
 @Injectable()
 export class TiktokAuthService {
   private readonly logger = new Logger(TiktokAuthService.name);
@@ -12,10 +13,14 @@ export class TiktokAuthService {
   private readonly redirectUri =
     'https://cobra-humorous-sharply.ngrok-free.app/tiktok-auth/callback';
 
-  constructor(private readonly httpService: HttpService) { }
+  constructor(
+    private readonly httpService: HttpService,
+    private readonly prisma: PrismaService,
+  ) {}
 
   async getAccessToken(
     code: string,
+    userId: string,
   ): Promise<TikTokOAuthTokenResponse | undefined> {
     const url = 'https://open.tiktokapis.com/v2/oauth/token/';
     const body = qs.stringify({
@@ -31,9 +36,22 @@ export class TiktokAuthService {
       });
 
       const responses = await lastValueFrom(response);
+      const result = await this.prisma.token.upsert({
+        where: { id: userId },
+        update: {
+          accessTokenTiktok: responses.data.access_token,
+          refreshTokenTiktok: responses.data.refresh_token,
+        },
+        create: {
+          id: userId,
+          userId: userId,
+          accessTokenTiktok: responses.data.access_token,
+          refreshTokenTiktok: responses.data.refresh_token,
+        },
+      });
       return responses.data as TikTokOAuthTokenResponse;
     } catch (error) {
-      console.log("getAccessToken error", error.response.data);
+      console.log('getAccessToken error', error.response.data);
       this.logger.error('getAccessToken error', error);
     }
   }

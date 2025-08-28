@@ -20,14 +20,13 @@ export class SellerService {
     private mail: MailService,
     private readonly helper: HelperService,
     private productService: ProductService,
-  ) {}
+  ) { }
 
   async sendOtpAndCacheInfo(
     createSellerDto: CreateSellerDto,
     userEmail: string,
   ) {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    console.log(`Generated OTP: ${otp} for email: ${userEmail}`);
     const cacheKey = `otp-${userEmail}`;
     const sellerInfoKey = `seller-info-${userEmail}`;
 
@@ -82,11 +81,14 @@ export class SellerService {
         state: userInfo.state,
         city: userInfo.city,
         zip: userInfo.zip,
+        subscriptionStatus: true,
       },
     });
     await this.prisma.user.update({
       where: { id: userId },
-      data: { role: 'SELLER' },
+      data: {
+        role: 'SELLER',
+      },
     });
 
     await this.cacheManager.del(`otp-${userEmail}`);

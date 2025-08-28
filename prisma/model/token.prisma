@@ -1,0 +1,11 @@
+model Token {
+  id                 String  @id @default(cuid())
+  userId             String
+  accessTokenTiktok  String?
+  refreshTokenTiktok String?
+
+  accessTokenInstagram  String?
+  refreshTokenInstagram String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}

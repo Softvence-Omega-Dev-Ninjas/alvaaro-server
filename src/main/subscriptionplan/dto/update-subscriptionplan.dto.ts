@@ -23,7 +23,7 @@ export class UpdateSubscriptionplanDto {
   @IsOptional()
   price: string;
 
-  @ApiProperty({ example: ["Feature 1", "Feature 2", "Feature 3"] })
+  @ApiProperty({ example: ['Feature 1', 'Feature 2', 'Feature 3'] })
   @IsString()
   @IsOptional()
   features: string[];

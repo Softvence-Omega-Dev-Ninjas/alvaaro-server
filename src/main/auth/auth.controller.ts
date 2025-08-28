@@ -6,6 +6,7 @@ import {
   UploadedFiles,
   UseGuards,
   Req,
+  BadRequestException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
@@ -17,24 +18,30 @@ import { AuthGuard } from 'src/guards/auth.guard';
 import { Request } from 'express';
 import { PasswordDto } from './dto/passwords.dto';
 import { Public } from 'src/guards/public.decorator';
+import { ExceptionsHandler } from '@nestjs/core/exceptions/exceptions-handler';
+import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 
-@Public()
 @Controller('auth')
+@UseGuards(AuthGuard)
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
   @Post('signup')
+  @Public()
   @UseInterceptors(FilesInterceptor('images'))
   @ApiConsumes('multipart/form-data')
   async signup(
     @Body() createAuthDto: CreateUserDto,
     @UploadedFiles() files: Express.Multer.File[],
   ) {
+    if (!files || files.length === 0) {
+      return ApiResponse.error('Image is required');
+    }
     const cloudinaryUrls =
       files?.length > 0
         ? (await uploadMultipleToCloudinary(files)).map(
-            (res: { secure_url: string }) => res.secure_url,
-          )
+          (res: { secure_url: string }) => res.secure_url,
+        )
         : [];
 
     const profileImageUrl = cloudinaryUrls[0];

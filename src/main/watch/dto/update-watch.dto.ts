@@ -1,4 +1,3 @@
-
 import { CategoryType } from '@prisma/client';
 
 export class UpdateWatchDto {
@@ -21,4 +20,3 @@ export class UpdateWatchDto {
   tractionType?: string;
   features?: string[] | string;
 }
-

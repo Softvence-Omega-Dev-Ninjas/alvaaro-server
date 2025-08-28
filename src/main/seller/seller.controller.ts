@@ -23,23 +23,13 @@ import { ContactSellerDto } from './dto/contact-seller.dto';
 @UseGuards(AuthGuard)
 @Controller('seller')
 export class SellerController {
-  constructor(private readonly sellerService: SellerService) {}
+  constructor(private readonly sellerService: SellerService) { }
 
   @Post('create-seller')
-  // @UseInterceptors(FilesInterceptor('documents'))
-  // @ApiConsumes('multipart/form-data')
   async sendOtpAndCacheInfo(
     @Body() createSellerDto: CreateSellerDto,
     @Req() req: Request,
-    // @UploadedFiles() documents: Express.Multer.File[],
   ) {
-    // const cloudinaryUrls =
-    //   documents?.length > 0
-    //     ? (await uploadMultipleToCloudinary(documents)).map(
-    //         (res: { secure_url: string }) => res.secure_url,
-    //       )
-    //     : [];
-    // console.log('cloudinaryUrls from seller controller', cloudinaryUrls);
     return this.sellerService.sendOtpAndCacheInfo(
       createSellerDto,
       req['email'] as string,
@@ -78,8 +68,6 @@ export class SellerController {
     @Query('subscriptionStatus') subscriptionStatus?: 'ACTIVE' | 'INACTIVE',
     @Query('search') search?: string,
   ) {
-    // console.log(verificationStatus, subscriptionStatus, search);
-    // const {verificationStatus, subscriptionStatus, search} =
     return await this.sellerService.findAll({
       verificationStatus,
       subscriptionStatus,

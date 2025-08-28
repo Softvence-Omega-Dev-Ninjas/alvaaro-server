@@ -4,6 +4,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  ValidationArguments,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { UserRole } from '@prisma/client';
@@ -33,12 +34,13 @@ export class CreateUserDto {
   password: string;
 
   @ApiProperty({
-    description: 'Photo showing the problem (required)',
+    description: 'Photo showing the problem',
     type: 'array',
     items: { type: 'file', format: 'binary' },
     required: true,
   })
-  images?: Express.Multer.File[];
+  @IsNotEmpty({ each: true })
+  images: Express.Multer.File[];
 
   @ApiProperty({
     example: 'USER',

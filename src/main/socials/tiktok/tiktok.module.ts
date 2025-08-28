@@ -4,9 +4,10 @@ import { TiktokAuthController } from './controller/tiktok-auth.controller';
 import { HttpModule } from '@nestjs/axios';
 import { TiktokController } from './controller/tiktok.controller';
 import { TiktokService } from './services/tiktok.service';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
-  imports: [HttpModule],
+  imports: [HttpModule, JwtModule],
   controllers: [TiktokAuthController, TiktokController],
   providers: [TiktokAuthService, TiktokAuthService, TiktokService],
 })

@@ -4,12 +4,20 @@ import { lastValueFrom } from 'rxjs';
 import * as path from 'path';
 import * as fs from 'fs';
 import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
+import { PrismaService } from 'src/prisma-service/prisma-service.service';
 @Injectable()
 export class TiktokService {
   private readonly logger = new Logger(TiktokService.name);
-  constructor(private readonly httpService: HttpService) { }
-  async publish(title: string, filename: string, accessToken: string) {
+  constructor(
+    private readonly httpService: HttpService,
+    private readonly prisma: PrismaService,
+  ) {}
+  async publish(title: string, filename: string, userId: string) {
     try {
+      const accessToken = await this.prisma.token.findMany({
+        where: { userId: userId },
+      });
+      const accessTokenTiktok = accessToken[0].accessTokenTiktok;
       const videoPath = path.join(process.cwd(), 'public', 'uploads', filename);
       const videoStat = fs.statSync(videoPath);
       const videoSize = videoStat.size;
@@ -35,7 +43,7 @@ export class TiktokService {
         payload,
         {
           headers: {
-            Authorization: `Bearer ${accessToken}`,
+            Authorization: `Bearer ${accessTokenTiktok}`,
             'Content-Type': 'application/json',
           },
         },
