@@ -26,6 +26,7 @@ export class SellerController {
   constructor(private readonly sellerService: SellerService) { }
 
   @Post('create-seller')
+  @UseGuards(AuthGuard)
   async sendOtpAndCacheInfo(
     @Body() createSellerDto: CreateSellerDto,
     @Req() req: Request,
@@ -45,7 +46,7 @@ export class SellerController {
   }
 
   @Get()
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard)
   @Roles(UserRole.ADMIN)
   @ApiQuery({
     name: 'verificationStatus',
