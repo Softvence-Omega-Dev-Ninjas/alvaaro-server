@@ -19,7 +19,7 @@ export class ProductService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly helperService: HelperService,
-  ) {}
+  ) { }
 
   async handleProductCreation(
     dto: CreateProductDto,
@@ -32,8 +32,8 @@ export class ProductService {
       // console.log(sellerId);
       const imageUrls = images?.length
         ? (await uploadMultipleToCloudinary(images)).map(
-            (res: { secure_url: string }) => res.secure_url,
-          )
+          (res: { secure_url: string }) => res.secure_url,
+        )
         : [];
 
       console.log(dto.isExclusive);
@@ -274,29 +274,29 @@ export class ProductService {
         AND: [
           location
             ? {
-                RealEstate: {
-                  is: {
-                    OR: [
-                      { address: { contains: location, mode: 'insensitive' } },
-                      { city: { contains: location, mode: 'insensitive' } },
-                      { state: { contains: location, mode: 'insensitive' } },
-                      { zip: { contains: location, mode: 'insensitive' } },
-                    ],
-                  },
+              RealEstate: {
+                is: {
+                  OR: [
+                    { address: { contains: location, mode: 'insensitive' } },
+                    { city: { contains: location, mode: 'insensitive' } },
+                    { state: { contains: location, mode: 'insensitive' } },
+                    { zip: { contains: location, mode: 'insensitive' } },
+                  ],
                 },
-              }
+              },
+            }
             : {},
 
           type
             ? {
-                RealEstate: {
-                  is: {
-                    feature: {
-                      has: type,
-                    },
+              RealEstate: {
+                is: {
+                  feature: {
+                    has: type,
                   },
                 },
-              }
+              },
+            }
             : {},
         ],
       },
