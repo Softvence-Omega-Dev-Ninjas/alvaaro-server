@@ -35,7 +35,7 @@ export class AdminService {
           },
         });
       }
-      return await this.prisma.seller.findMany({
+      const result = await this.prisma.seller.findMany({
         where: {
           subscriptionStatus: payload.s_status === 'active',
           verificationStatus: payload.v_status,
@@ -52,6 +52,7 @@ export class AdminService {
           },
         },
       });
+      console.log(result);
     } catch (error) {
       ApiResponse.error(
         'Error fetching sellers',

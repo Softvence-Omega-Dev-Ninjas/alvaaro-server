@@ -4,11 +4,13 @@ import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 
 @Injectable()
 export class JewelleryService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async findAll() {
     try {
-      const allJewelries = await this.prisma.jewellery.findMany();
+      const allJewelries = await this.prisma.jewellery.findMany({
+        include: { product: true },
+      });
       return ApiResponse.success(allJewelries, 'All Jewelries Retrieved');
     } catch (error) {
       return ApiResponse.error('Jewellery retrieved Unsuccessful', error);
