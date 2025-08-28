@@ -3,9 +3,9 @@ import {
   Get,
   Post,
   Body,
-  Patch,
+
   Param,
-  Delete,
+
   UseGuards,
   UseInterceptors,
   UploadedFiles,
@@ -13,7 +13,6 @@ import {
 } from '@nestjs/common';
 import { YachtService } from './yacht.service';
 import { CreateYachtDto } from './dto/create-yacht.dto';
-import { UpdateYachtDto } from './dto/update-yacht.dto';
 import { ProductService } from '../product/product.service';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { Roles } from 'src/guards/roles.decorator';

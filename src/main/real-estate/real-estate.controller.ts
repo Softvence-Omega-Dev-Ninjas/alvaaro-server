@@ -4,7 +4,6 @@ import {
   Post,
   Body,
   Param,
-  Delete,
   UseGuards,
   UseInterceptors,
   UploadedFiles,
@@ -23,8 +22,8 @@ import { ApiBody, ApiConsumes } from '@nestjs/swagger';
 export class RealEstateController {
   constructor(
     private readonly realEstateService: RealEstateService,
-    private readonly productService: ProductService, // <-- Inject ProductService
-  ) {}
+    private readonly productService: ProductService,
+  ) { }
 
   @UseGuards(AuthGuard)
   @Roles(UserRole.SELLER)
@@ -51,11 +50,7 @@ export class RealEstateController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.realEstateService.findOne(+id);
+    return this.realEstateService.findOne(id);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.realEstateService.remove(+id);
-  }
 }

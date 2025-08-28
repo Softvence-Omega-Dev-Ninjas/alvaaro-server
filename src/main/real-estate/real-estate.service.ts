@@ -1,26 +1,22 @@
 import { Injectable } from '@nestjs/common';
-import { CreateRealEstateDto } from './dto/create-real-estate.dto';
-import { UpdateRealEstateDto } from './dto/update-real-estate.dto';
+import { PrismaService } from 'src/prisma-service/prisma-service.service';
+import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 
 @Injectable()
 export class RealEstateService {
-  create(createRealEstateDto: CreateRealEstateDto) {
-    return 'This action adds a new realEstate';
+  constructor(private readonly prismaService: PrismaService) { }
+
+  async findAll() {
+    const realEstates = await this.prismaService.realEstate.findMany();
+    return ApiResponse.success(realEstates, 'Real estates retrieved successfully');
   }
 
-  findAll() {
-    return `This action returns all realEstate`;
+  findOne(id: string) {
+    const realEstate = this.prismaService.realEstate.findUnique({ where: { id } });
+    return ApiResponse.success(realEstate, 'Real estate retrieved successfully');
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} realEstate`;
-  }
 
-  update(id: number, updateRealEstateDto: UpdateRealEstateDto) {
-    return `This action updates a #${id} realEstate`;
-  }
 
-  remove(id: number) {
-    return `This action removes a #${id} realEstate`;
-  }
+
 }
