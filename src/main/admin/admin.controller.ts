@@ -18,10 +18,8 @@ export class AdminController {
       ...payload,
       s_status:
         typeof payload.s_status === 'boolean'
-          ? payload.s_status
-            ? 'active'
-            : 'inactive'
-          : payload.s_status,
+          ? (payload.s_status ? "true" : "false")
+          : (payload.s_status as "true" | "false" | undefined),
     };
     return this.adminService.findAllSellers(normalizedPayload);
   }

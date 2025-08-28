@@ -91,7 +91,7 @@ export class PaymentService {
         success_url: 'http://localhost:3000/stripe/payment-success',
         cancel_url: 'http://localhost:3000/stripe/payment-cancel',
       });
-      return { url: session.url };
+      return ApiResponse.success({ url: session.url }, 'Checkout session created successfully');
     } catch (error) {
       console.error('Error creating checkout session:', error);
     }
@@ -149,17 +149,10 @@ export class PaymentService {
           );
         }
 
-        // Check if seller exists
-        const sellerExistsid = await this.helperService.sellerExists(
-          subscriptionEventData.metadata.userId,
-        );
-
-        if (!sellerExistsid) {
-          return ApiResponse.error('Seller not found');
-        }
+        console.log(subscriptionEventData.metadata.userId);
 
         await this.prismaService.userSubscriptionValidity.upsert({
-          where: { sellerId: sellerExistsid },
+          where: { userId: subscriptionEventData.metadata.userId },
           update: {
             subscribedPlan: subscribedPlan.id,
             startTime: startTime,
@@ -167,7 +160,7 @@ export class PaymentService {
             payabeAmount: (Number(invoiceDetails.amount_paid) / 100).toString(),
           },
           create: {
-            sellerId: sellerExistsid,
+            userId: subscriptionEventData.metadata.userId,
             subscribedPlan: subscribedPlan.id,
             startTime: startTime,
             expiryTime: expiryTime,
@@ -176,7 +169,7 @@ export class PaymentService {
         });
         await this.prismaService.amount.create({
           data: {
-            sellerId: sellerExistsid,
+            userId: subscriptionEventData.metadata.userId,
             amount: (Number(invoiceDetails.amount_paid) / 100).toString(),
           },
         });
@@ -185,6 +178,7 @@ export class PaymentService {
           'Subscription validity updated successfully',
         );
       }
+
     } catch (error) {
       console.error('Webhook error:', error.message);
       throw error;

@@ -3,8 +3,8 @@ import { PrismaService } from 'src/prisma-service/prisma-service.service';
 import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 
 type UserSearchPayload = {
-  v_status?: 'PENDING' | 'VERIFIED' | 'REJECTED'; // optional if you want it flexible
-  s_status?: string;
+  v_status?: 'PENDING' | 'VERIFIED' | 'REJECTED';
+  s_status?: 'true' | 'false';
   fullName?: string;
   email?: string;
 };
@@ -15,51 +15,51 @@ export class AdminService {
 
   // find all sellers by status and verification status
   async findAllSellers(payload: UserSearchPayload) {
-    try {
-      const userFilters: any[] = [];
-
-      if (payload.fullName) {
-        userFilters.push({
-          fullName: {
-            contains: payload.fullName,
-            mode: 'insensitive',
-          },
-        });
-      }
-
-      if (payload.email) {
-        userFilters.push({
-          email: {
-            contains: payload.email,
-            mode: 'insensitive',
-          },
-        });
-      }
-      const result = await this.prisma.seller.findMany({
-        where: {
-          subscriptionStatus: payload.s_status === 'active',
-          verificationStatus: payload.v_status,
-          user: {
-            OR: userFilters,
-          },
-        },
-        include: {
-          user: {
-            select: {
-              fullName: true,
-              email: true,
-            },
-          },
-        },
-      });
-      console.log(result);
-    } catch (error) {
-      ApiResponse.error(
-        'Error fetching sellers',
-        error.message || 'Internal Server Error',
-      );
+    let subscriptionFilter: boolean | undefined = undefined;
+    if (payload?.s_status) {
+      subscriptionFilter =
+        payload.s_status.toLowerCase() === 'active'
+          ? true
+          : payload.s_status.toLowerCase() === 'inactive'
+            ? false
+            : undefined;
     }
+
+
+    let verificationFilter: 'PENDING' | 'VERIFIED' | 'REJECTED' | undefined = undefined;
+    if (payload?.v_status) {
+      verificationFilter =
+        payload.v_status.toUpperCase() === 'PENDING'
+          ? 'PENDING'
+          : payload.v_status.toUpperCase() === 'VERIFIED'
+            ? 'VERIFIED'
+            : payload.v_status.toUpperCase() === 'REJECTED'
+              ? 'REJECTED'
+              : undefined;
+    }
+
+    const getData = await this.prisma.seller.findMany({
+      where: {
+        user: {
+          fullName: {
+            contains: payload.fullName || '',
+            mode: 'insensitive',
+          },
+          email: {
+            contains: payload.email || '',
+            mode: 'insensitive',
+          },
+        },
+        subscriptionStatus: subscriptionFilter,
+        verificationStatus: verificationFilter,
+      },
+    })
+
+    return ApiResponse.success(getData, 'Sellers fetched successfully');
+
   }
+
+
 
   // get total amount monthwise
   async findTotalAmount() {

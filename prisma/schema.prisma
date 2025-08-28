@@ -8,19 +8,21 @@ datasource db {
 }
 
 model User {
-  id        String     @unique @default(uuid())
-  fullName  String
-  email     String     @unique
-  password  String
-  images    String
-  role      UserRole   @default(USER)
-  isDeleted Boolean    @default(false)
-  otp       String?
-  otpExpiry String?
-  Seller    Seller?
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  Wishlist  Wishlist[]
+  id                       String                     @unique @default(uuid())
+  fullName                 String
+  email                    String                     @unique
+  password                 String
+  images                   String
+  role                     UserRole                   @default(USER)
+  isDeleted                Boolean                    @default(false)
+  otp                      String?
+  otpExpiry                String?
+  Seller                   Seller?
+  createdAt                DateTime                   @default(now())
+  updatedAt                DateTime                   @updatedAt
+  Wishlist                 Wishlist[]
+  UserSubscriptionValidity UserSubscriptionValidity[]
+  Amount                   Amount?
 }
 
 model Seller {
@@ -36,11 +38,12 @@ model Seller {
   zip                String
   verificationStatus VerificationStatusType    @default(PENDING)
   subscriptionStatus Boolean                   @default(false)
-  subscriptions      UserSubscriptionValidity?
+  subscriptionsId    String?
+  subscriptions      UserSubscriptionValidity? @relation(fields: [subscriptionsId], references: [id])
   createdAt          DateTime                  @default(now())
   updatedAt          DateTime                  @updatedAt
   Product            Product[]
-  Amount             Amount[]
+  amounts            Amount[]
   Inquiry            Inquiry[]
 }
 

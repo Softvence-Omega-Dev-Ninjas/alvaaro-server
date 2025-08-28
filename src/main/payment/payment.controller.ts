@@ -14,6 +14,7 @@ import { PaymentService } from './payment.service';
 import { Request, Response } from 'express';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { CreatePaymentDto } from './dto/create-payment.dto';
+import { Public } from 'src/guards/public.decorator';
 
 @Controller('stripe')
 export class PaymentController {
@@ -38,6 +39,7 @@ export class PaymentController {
   }
 
   @Get('payment-success')
+  @Public()
   paymentSuccess(@Res() res: Response) {
     return res.send(
       '<h1>Payment Successful!</h1><p>Thank you for your purchase.</p>',
@@ -45,6 +47,7 @@ export class PaymentController {
   }
 
   @Get('payment-cancel')
+  @Public()
   paymentCancel(@Res() res: Response) {
     return res.send(
       '<h1>Payment Cancelled</h1><p>Your payment was cancelled.</p>',
@@ -53,6 +56,7 @@ export class PaymentController {
 
   // * Webhook
   @Post('webhook')
+  @Public()
   async handleWebhook(
     @Req() req: RawBodyRequest<Request>,
     @Headers('stripe-signature') sig: string,
@@ -61,7 +65,7 @@ export class PaymentController {
       await this.stripeService.handleWebhook(req.body, sig);
       return { received: true };
     } catch (err) {
-      return { error: 'Webhook Error' };
+      return { error: 'Webhook Error', details: err };
     }
   }
 }
