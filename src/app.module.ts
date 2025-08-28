@@ -18,7 +18,6 @@ import { YachtModule } from './main/yacht/yacht.module';
 import { PaymentModule } from './main/payment/payment.module';
 import { CouponModule } from './main/coupon/coupon.module';
 import { AdminModule } from './main/admin/admin.module';
-import { TiktokModule } from './main/socials/tiktok/tiktok.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './guards/auth.guard';
 
@@ -47,8 +46,7 @@ import { AuthGuard } from './guards/auth.guard';
     PaymentModule,
     CouponModule,
     AdminModule,
-    TiktokModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: AuthGuard }],
 })
-export class AppModule {}
+export class AppModule { }
