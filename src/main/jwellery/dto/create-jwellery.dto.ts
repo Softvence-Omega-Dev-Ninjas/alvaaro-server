@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { CategoryType } from '@prisma/client';
 import { IsArray, IsBoolean, IsString } from 'class-validator';
-import { CreateProductDto } from 'src/main/product/dto/create-product.dto';
 
 export class CreateJewelleryDto {
   @ApiProperty({ example: 'Elegant Gold Necklace' })
@@ -24,9 +23,9 @@ export class CreateJewelleryDto {
   @ApiProperty({ enum: CategoryType, example: CategoryType.JEWELLERY })
   category: CategoryType;
 
-  @ApiProperty({ required: false })
+  @ApiProperty({ required: true })
   @IsBoolean()
-  premium: string;
+  isExclusive: boolean;
 
   @ApiProperty({ example: 'New' })
   condition: string;
