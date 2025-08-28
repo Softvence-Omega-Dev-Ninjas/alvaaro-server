@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateNewsletterDto } from './dto/create-newsletter.dto';
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
 import { MailService } from 'src/utils/mail/mail.service';
@@ -13,7 +13,7 @@ export class NewsletterService {
 
   async create(createNewsletterDto: CreateNewsletterDto) {
 
-    const newsLetter = await this.prisma.newsletter.upsert({
+    await this.prisma.newsletter.upsert({
       where: { email: createNewsletterDto.email },
       update: {},
       create: createNewsletterDto,
