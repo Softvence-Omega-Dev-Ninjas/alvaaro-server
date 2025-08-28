@@ -11,7 +11,7 @@ type UserSearchPayload = {
 
 @Injectable()
 export class AdminService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   // find all sellers by status and verification status
   async findAllSellers(payload: UserSearchPayload) {
@@ -35,7 +35,6 @@ export class AdminService {
           },
         });
       }
-      console.log(payload);
       return await this.prisma.seller.findMany({
         where: {
           subscriptionStatus: payload.s_status === 'active',

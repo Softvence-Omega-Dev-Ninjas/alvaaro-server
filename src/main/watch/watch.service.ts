@@ -10,7 +10,7 @@ import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 
 @Injectable()
 export class WatchService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async create(createWatchDto: CreateWatchDto, images: string[]) {
     try {
@@ -44,8 +44,8 @@ export class WatchService {
           ? createWatchDto.features
           : typeof createWatchDto.features === 'string'
             ? (createWatchDto.features as string)
-                .split(',')
-                .map((f) => f.trim())
+              .split(',')
+              .map((f) => f.trim())
             : [],
       };
 
@@ -56,7 +56,6 @@ export class WatchService {
 
       return createdWatch;
     } catch (error) {
-      console.error('Create Watch Error:', error);
       throw new InternalServerErrorException('Failed to create watch.');
     }
   }

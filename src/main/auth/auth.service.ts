@@ -12,7 +12,7 @@ export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   async signup(createUserDto: CreateUserDto, imageUrl: string) {
     try {
@@ -83,7 +83,7 @@ export class AuthService {
       };
 
       const token = await this.jwtService.signAsync(payload);
-      console.log(token);
+
       return ApiResponse.success({ accessToken: token }, 'Login successful');
     } catch (error: unknown) {
       console.error('Error signing in:', error);

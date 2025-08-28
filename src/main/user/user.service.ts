@@ -4,11 +4,10 @@ import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
   async findAll() {
     const users = await this.prisma.user.findMany();
-    users.map((user) => console.log(user));
-    console.log('Users:', users);
+
     return users;
   }
 

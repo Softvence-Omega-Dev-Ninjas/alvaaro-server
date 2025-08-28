@@ -17,7 +17,7 @@ import { CreatePaymentDto } from './dto/create-payment.dto';
 
 @Controller('stripe')
 export class PaymentController {
-  constructor(private readonly stripeService: PaymentService) {}
+  constructor(private readonly stripeService: PaymentService) { }
 
   // * Routes for Stripe Checkout
   @UseGuards(AuthGuard)
@@ -29,7 +29,7 @@ export class PaymentController {
     const userId = req.userid;
     const packageId = createPaymentDto.packageId;
     const couponCode = createPaymentDto.couponCode;
-    console.log('User ID:', userId);
+
     return this.stripeService.createCheckoutSession(
       userId,
       packageId,
@@ -58,11 +58,9 @@ export class PaymentController {
     @Headers('stripe-signature') sig: string,
   ) {
     try {
-      console.log('Received webhook event:', sig);
       await this.stripeService.handleWebhook(req.body, sig);
       return { received: true };
     } catch (err) {
-      console.error('Webhook error:', err);
       return { error: 'Webhook Error' };
     }
   }

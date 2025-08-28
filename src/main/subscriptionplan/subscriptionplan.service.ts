@@ -15,7 +15,6 @@ export class SubscriptionplanService {
 
   async createSubscription(dto: CreateSubscriptionPlanDto) {
     try {
-      console.log('Creating subscription plan with data:', dto);
       // Step 1: Check if plan already exists
       const existingPlan = await this.prisma.subscriptionPlan.findUnique({
         where: { type: dto.type },

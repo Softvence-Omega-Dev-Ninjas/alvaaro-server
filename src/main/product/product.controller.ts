@@ -20,7 +20,7 @@ import { AuthGuard } from 'src/guards/auth.guard';
 
 @Controller('product')
 export class ProductController {
-  constructor(private readonly productService: ProductService) {}
+  constructor(private readonly productService: ProductService) { }
 
   @Get()
   @ApiQuery({ name: 'category', enum: CategoryType, required: false })
@@ -48,7 +48,7 @@ export class ProductController {
   @ApiQuery({ name: 'maxPrice', required: false })
   @ApiQuery({ name: 'type', required: false })
   searchRealEstate(@Query() query?: RealEstateSearchQueryDto) {
-    console.log(query);
+
     return this.productService.searchRealEstate(query);
   }
 

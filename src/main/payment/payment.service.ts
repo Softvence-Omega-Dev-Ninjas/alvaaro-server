@@ -45,19 +45,19 @@ export class PaymentService {
       }
       // 2. Check if the package exists in the database
       const packageExists = await this.helperService.packageExists(packageId);
-      console.log('Package Exists:', packageExists);
+
       if (!packageExists) {
         return ApiResponse.error('Package does not exist');
       }
       // 3. Check if the coupon exists in the database
-      console.log('Coupon Code:', couponCode);
+
       type Coupon = { stripeCouponId: string };
       let couponExists: Coupon[] = [];
       if (couponCode) {
         couponExists = (await this.helperService.couponExists(
           couponCode,
         )) as Coupon[];
-        console.log('Coupon Exists:', couponExists);
+
       }
       const session = await this.stripe.checkout.sessions.create({
         payment_method_types: ['card'],
@@ -80,18 +80,17 @@ export class PaymentService {
         ],
         ...(couponExists.length > 0
           ? {
-              discounts: [
-                {
-                  coupon: couponExists[0]?.stripeCouponId,
-                },
-              ],
-            }
+            discounts: [
+              {
+                coupon: couponExists[0]?.stripeCouponId,
+              },
+            ],
+          }
           : {}),
 
         success_url: 'http://localhost:3000/stripe/payment-success',
         cancel_url: 'http://localhost:3000/stripe/payment-cancel',
       });
-      console.log('session', session);
       return { url: session.url };
     } catch (error) {
       console.error('Error creating checkout session:', error);
@@ -105,24 +104,21 @@ export class PaymentService {
         sig,
         process.env.STRIPE_WEBHOOK_SECRET as string,
       );
-      console.log('Stripe Webhook Event:', event);
+
       if (
         event.type === 'customer.subscription.created' ||
         event.type === 'customer.subscription.updated' ||
         event.type === 'invoice.payment_succeeded'
       ) {
         const subscriptionEventData = event.data.object as Stripe.Subscription;
-        console.log(
-          'Subscription Event Data Invoice ID:',
-          subscriptionEventData.latest_invoice,
-        );
+
         const invoiceDetails = await this.stripe.invoices.retrieve(
           subscriptionEventData?.latest_invoice as string,
         );
-        console.log('Invoice Details:', invoiceDetails.amount_paid);
+
         const planType = subscriptionEventData?.items?.data?.[0]?.price
           ?.metadata?.planType as string | undefined;
-        console.log('Plan Type:', planType);
+
 
         if (!planType) {
           throw new Error('Plan type is missing in subscription metadata.');
@@ -208,15 +204,11 @@ export class PaymentService {
       // Try to parse as just a number (assume days)
       const numericLength = parseInt(planLength);
       if (!isNaN(numericLength)) {
-        console.log(`Parsing numeric length: ${numericLength} days`);
         expiryTime.setDate(expiryTime.getDate() + numericLength);
         return expiryTime;
       }
 
       // Default to 30 days if parsing fails
-      console.warn(
-        `Could not parse plan length: ${planLength}, defaulting to 30 days`,
-      );
       expiryTime.setDate(expiryTime.getDate() + 30);
       return expiryTime;
     }

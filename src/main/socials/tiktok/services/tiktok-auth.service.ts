@@ -16,7 +16,7 @@ export class TiktokAuthService {
   constructor(
     private readonly httpService: HttpService,
     private readonly prisma: PrismaService,
-  ) {}
+  ) { }
 
   async getAccessToken(
     code: string,
@@ -51,7 +51,6 @@ export class TiktokAuthService {
       });
       return responses.data as TikTokOAuthTokenResponse;
     } catch (error) {
-      console.log('getAccessToken error', error.response.data);
       this.logger.error('getAccessToken error', error);
     }
   }

@@ -5,7 +5,7 @@ import { AuthGuard } from 'src/guards/auth.guard';
 
 @Controller('tiktok-auth')
 export class TiktokAuthController {
-  constructor(private readonly tiktokAuthService: TiktokAuthService) {}
+  constructor(private readonly tiktokAuthService: TiktokAuthService) { }
   // Define your methods for handling TikTok authentication here
 
   @UseGuards(AuthGuard)
@@ -24,15 +24,9 @@ export class TiktokAuthController {
         refresh_token: string;
         [key: string]: any;
       };
-      //   console.log({ tokenResponse });
       return res.redirect(
         `http://localhost:4000/?accessToken=${tokenResponse.access_token}&refreshToken=${tokenResponse.refresh_token}`,
       );
-      //   console.log(`Redirecting to: ${redirectUrl}`);
-      //   res.send({
-      //     accessToken: tokenResponse.access_token,
-      //     refreshToken: tokenResponse.refresh_token,
-      //   });
     } catch (err) {
       console.error(err);
     }

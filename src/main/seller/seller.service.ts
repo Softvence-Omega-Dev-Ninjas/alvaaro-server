@@ -127,7 +127,6 @@ export class SellerService {
 
       return ApiResponse.success(result, 'Sellers retrieved successfully!');
     } catch (error) {
-      console.error(error);
       return ApiResponse.error('Failed to retrieve sellers', error);
     }
   }
@@ -148,7 +147,6 @@ export class SellerService {
           verificationStatus: VerificationStatusType.VERIFIED,
         },
       });
-      console.log(result, 'result');
 
       return ApiResponse.success(result, 'Seller verified successfully');
     }
@@ -209,7 +207,6 @@ export class SellerService {
         'Inquiry sent successfully to the seller!',
       );
     } catch (error) {
-      console.error('contactSeller error:', error);
 
       if (error instanceof NotFoundException) {
         return ApiResponse.error('Product not found');
@@ -234,7 +231,6 @@ export class SellerService {
 
       return ApiResponse.success(result, 'Inquiry retrieved successfully!');
     } catch (error) {
-      console.log(error);
       return ApiResponse.error('Failed to retrieve inquiry!');
     }
   }

@@ -27,19 +27,15 @@ export class ProductService {
     userid: string,
   ) {
     try {
-      // console.log({ dto })
       const sellerId = await this.helperService.sellerExists(userid);
-      // console.log(sellerId);
       const imageUrls = images?.length
         ? (await uploadMultipleToCloudinary(images)).map(
           (res: { secure_url: string }) => res.secure_url,
         )
         : [];
 
-      console.log(dto.isExclusive);
       // let isPremium: boolean;
 
-      console.log(JSON.stringify(dto));
 
       // if (dto.isExclusive === true) {
       //   isPremium = true;
@@ -144,10 +140,8 @@ export class ProductService {
           },
         });
       }
-      // console.log('Product created successfully:', { product });
       return ApiResponse.success(product, 'Product created successfully');
     } catch (error) {
-      console.error('Error creating product:', error);
       return ApiResponse.error(
         'Failed to create product, please try again later',
         error,
@@ -263,7 +257,7 @@ export class ProductService {
     type?: string;
   }) {
     const { location, minPrice, maxPrice, type } = query ?? {};
-    // console.log(type);
+
     const products = await this.prisma.product.findMany({
       where: {
         category: 'REAL_ESTATE',

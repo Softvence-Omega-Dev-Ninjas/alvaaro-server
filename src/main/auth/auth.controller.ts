@@ -6,7 +6,6 @@ import {
   UploadedFiles,
   UseGuards,
   Req,
-  BadRequestException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
@@ -18,7 +17,6 @@ import { AuthGuard } from 'src/guards/auth.guard';
 import { Request } from 'express';
 import { PasswordDto } from './dto/passwords.dto';
 import { Public } from 'src/guards/public.decorator';
-import { ExceptionsHandler } from '@nestjs/core/exceptions/exceptions-handler';
 import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 
 @Controller('auth')
@@ -49,6 +47,7 @@ export class AuthController {
   }
 
   @Post('signin')
+  @Public()
   async signin(@Body() signinDto: SignInDto) {
     return await this.authService.signin(signinDto);
   }
@@ -56,6 +55,6 @@ export class AuthController {
   @Post('change-password')
   @UseGuards(AuthGuard)
   async changePassword(@Body() dto: PasswordDto, @Req() req: Request) {
-    return await this.authService.changePassword(req['userid'], dto);
+    return await this.authService.changePassword(req['userid'] as string, dto);
   }
 }

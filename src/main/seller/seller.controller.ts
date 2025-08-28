@@ -79,7 +79,7 @@ export class SellerController {
   @Roles(UserRole.SELLER)
   @Get('inquiry')
   getInquiryBySellerId(@Req() req: { userid: string }) {
-    // console.log(req);
+
     return this.sellerService.getInquiryBySellerId(req.userid);
   }
 
