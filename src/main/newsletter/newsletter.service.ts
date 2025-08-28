@@ -2,24 +2,21 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateNewsletterDto } from './dto/create-newsletter.dto';
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
 import { MailService } from 'src/utils/mail/mail.service';
+import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 
 @Injectable()
 export class NewsletterService {
   constructor(
     private prisma: PrismaService,
     private mailService: MailService,
-  ) {}
+  ) { }
 
   async create(createNewsletterDto: CreateNewsletterDto) {
-    const existingEmail = await this.prisma.newsletter.findUnique({
-      where: { email: createNewsletterDto.email },
-    });
 
-    if (existingEmail) {
-      throw new BadRequestException('This email is already subscribed.');
-    }
-    const newsLetter = this.prisma.newsletter.create({
-      data: createNewsletterDto,
+    const newsLetter = await this.prisma.newsletter.upsert({
+      where: { email: createNewsletterDto.email },
+      update: {},
+      create: createNewsletterDto,
     });
 
     // Send email confirmation
@@ -29,10 +26,10 @@ export class NewsletterService {
       'Thanks for subscribing to our newsletter!',
     );
 
-    return newsLetter;
+    return ApiResponse.success(null, 'Newsletter created successfully');
   }
 
-  findAll() {
-    return `This action returns all newsletter`;
+  async findAll() {
+    return ApiResponse.success(await this.prisma.newsletter.findMany(), 'Newsletters retrieved successfully');
   }
 }
