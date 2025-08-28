@@ -142,6 +142,7 @@ export class ProductService {
       }
       return ApiResponse.success(product, 'Product created successfully');
     } catch (error) {
+      console.log('Error creating product:', error);
       return ApiResponse.error(
         'Failed to create product, please try again later',
         error,

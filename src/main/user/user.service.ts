@@ -8,7 +8,7 @@ export class UserService {
   async findAll() {
     const users = await this.prisma.user.findMany();
 
-    return users;
+    return ApiResponse.success(users, 'Users retrieved successfully');
   }
 
   async findOne(id: string) {

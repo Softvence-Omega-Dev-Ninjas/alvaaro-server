@@ -42,13 +42,5 @@ export class CreateUserDto {
   @IsNotEmpty({ each: true })
   images: Express.Multer.File[];
 
-  @ApiProperty({
-    example: 'USER',
-    enum: UserRole,
-    description: 'User role (USER, SELLER, ADMIN)',
-    default: UserRole.USER,
-  })
-  @IsOptional()
-  @IsEnum(UserRole)
-  role?: UserRole;
+
 }
