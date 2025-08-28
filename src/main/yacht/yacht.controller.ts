@@ -26,7 +26,7 @@ export class YachtController {
   constructor(
     private readonly yachtService: YachtService,
     private readonly productService: ProductService,
-  ) {}
+  ) { }
 
   @UseGuards(AuthGuard)
   @Roles(UserRole.SELLER)
@@ -53,16 +53,10 @@ export class YachtController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.yachtService.findOne(+id);
+    return this.yachtService.findOne(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateYachtDto: UpdateYachtDto) {
-    return this.yachtService.update(+id, updateYachtDto);
-  }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.yachtService.remove(+id);
-  }
+
+
 }

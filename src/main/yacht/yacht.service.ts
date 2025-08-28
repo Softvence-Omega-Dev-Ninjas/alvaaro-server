@@ -1,26 +1,25 @@
 import { Injectable } from '@nestjs/common';
 import { CreateYachtDto } from './dto/create-yacht.dto';
 import { UpdateYachtDto } from './dto/update-yacht.dto';
+import { PrismaService } from 'src/prisma-service/prisma-service.service';
+import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 
 @Injectable()
 export class YachtService {
-  create(createYachtDto: CreateYachtDto) {
-    return 'This action adds a new yacht';
+  constructor(private readonly prismaService: PrismaService) { }
+
+  async findAll() {
+    const yachts = await this.prismaService.yacht.findMany({});
+    return ApiResponse.success(yachts, 'Yachts retrieved successfully');
   }
 
-  findAll() {
-    return `This action returns all yacht`;
+  async findOne(id: string) {
+    const yacht = await this.prismaService.yacht.findUnique({ where: { id } });
+    if (!yacht) {
+      return ApiResponse.error('Yacht not found');
+    }
+    return ApiResponse.success(yacht, 'Yacht retrieved successfully');
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} yacht`;
-  }
 
-  update(id: number, updateYachtDto: UpdateYachtDto) {
-    return `This action updates a #${id} yacht`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} yacht`;
-  }
 }
