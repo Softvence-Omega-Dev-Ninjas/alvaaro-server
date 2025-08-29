@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 // import { CreateCarDto } from './dto/create-car.dto';
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
 import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
+import { UpdateCarDto } from './dto/update-car.dto';
 
 @Injectable()
 export class CarService {
@@ -48,6 +49,18 @@ export class CarService {
     } catch (error) {
       console.error('Error finding car:', error);
       return ApiResponse.error('Failed to find car.', error);
+    }
+  }
+  // update a car
+  async carUpdate(id: string, updateCarDto: UpdateCarDto) {
+    try {
+      const carDetails = await this.prisma.car.findUnique({
+        where: { id }
+      });
+
+    } catch (error) {
+      console.error('Error updating car:', error);
+      return ApiResponse.error('Failed to update car.', error);
     }
   }
 

@@ -34,14 +34,7 @@ export class ProductService {
         )
         : [];
 
-      // let isPremium: boolean;
 
-
-      // if (dto.isExclusive === true) {
-      //   isPremium = true;
-      // } else if (dto.isExclusive === false) {
-      //   isPremium = false;
-      // }
 
       const product = await this.prisma.product.create({
         data: {
@@ -406,7 +399,7 @@ export class ProductService {
         },
       });
 
-      return result;
+      return ApiResponse.success(result, 'Product updated successfully');
     } catch (error) {
       return ApiResponse.error(
         'Failed to update product, please try again later',
@@ -426,14 +419,14 @@ export class ProductService {
       await this.prisma.wishlist.delete({
         where: { userId_productId: { userId, productId } },
       });
-      return { message: 'Removed from wishlist' };
+      return ApiResponse.success(null, 'Removed from wishlist');
     }
 
     await this.prisma.wishlist.create({
       data: { userId, productId },
     });
 
-    return { message: 'Added to wishlist' };
+    return ApiResponse.success(null, 'Added to wishlist');
   }
 
   async getTotalViews(sellerId: string) {
@@ -442,6 +435,6 @@ export class ProductService {
       (sum, product) => sum + product.views,
       0,
     );
-    return totalViews;
+    return ApiResponse.success(totalViews, 'Total views retrieved successfully');
   }
 }
