@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
 import { ApiResponse } from '../common/apiresponse/apiresponse';
 
@@ -20,7 +20,8 @@ export class HelperService {
     });
 
     if (!seller) {
-      throw new Error('Seller does not exist');
+      // return ApiResponse.error('Seller does not exist');
+      throw new BadRequestException('You Are not Verified From Admin');
     }
 
     return seller.id;

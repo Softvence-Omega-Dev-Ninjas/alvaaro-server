@@ -20,13 +20,14 @@ import { UserRole } from 'src/utils/common/enum/userEnum';
 import { ApiBody, ApiQuery } from '@nestjs/swagger';
 import { ContactSellerDto } from './dto/contact-seller.dto';
 
-@UseGuards(AuthGuard)
 @Controller('seller')
+@UseGuards(AuthGuard, RolesGuard)
 export class SellerController {
   constructor(private readonly sellerService: SellerService) { }
 
   @Post('create-seller')
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.SELLER)
   async sendOtpAndCacheInfo(
     @Body() createSellerDto: CreateSellerDto,
     @Req() req: Request,
@@ -46,7 +47,7 @@ export class SellerController {
   }
 
   @Get()
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @ApiQuery({
     name: 'verificationStatus',
@@ -76,7 +77,7 @@ export class SellerController {
     });
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.SELLER)
   @Get('inquiry')
   getInquiryBySellerId(@Req() req: { userid: string }) {
@@ -111,14 +112,14 @@ export class SellerController {
     return this.sellerService.contactSeller(productId, contactSellerDto);
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.SELLER)
   @Get('dashboard/stats')
   getDashboardStatistics(@Req() req: { userid: string }) {
     return this.sellerService.getDashboardStatistics(req.userid);
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.SELLER)
   @Get('dashboard/analysis')
   getDashboardAnalysis(@Req() req: { userid: string }) {
