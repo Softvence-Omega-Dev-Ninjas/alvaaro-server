@@ -11,8 +11,11 @@ export class RealEstateService {
     return ApiResponse.success(realEstates, 'Real estates retrieved successfully');
   }
 
-  findOne(id: string) {
-    const realEstate = this.prismaService.realEstate.findUnique({ where: { id } });
+  async findOne(id: string) {
+    const realEstate = await this.prismaService.realEstate.findUnique({
+      where: { id },
+      include: { product: true }
+    });
     return ApiResponse.success(realEstate, 'Real estate retrieved successfully');
   }
 

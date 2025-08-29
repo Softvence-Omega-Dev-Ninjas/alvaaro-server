@@ -20,6 +20,7 @@ import { ProductService } from '../product/product.service';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { Roles } from 'src/guards/roles.decorator';
 import { UserRole } from 'src/utils/common/enum/userEnum';
+import { RolesGuard } from 'src/guards/role.guard';
 
 @ApiTags('Watch')
 @Controller('watch')
@@ -27,9 +28,9 @@ export class WatchController {
   constructor(
     private readonly watchService: WatchService,
     private readonly productService: ProductService,
-  ) {}
+  ) { }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.SELLER)
   @Post()
   @UseInterceptors(FilesInterceptor('images'))
@@ -48,21 +49,32 @@ export class WatchController {
   }
 
   @Get()
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.SELLER)
   findAll() {
     return this.watchService.findAll();
   }
 
   @Get(':id')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.SELLER)
   findOne(@Param('id') id: string) {
     return this.watchService.findOne(id);
   }
 
   @Patch(':id')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.SELLER)
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FilesInterceptor('images'))
+  @ApiBody({ type: UpdateWatchDto })
   update(@Param('id') id: string, @Body() updateWatchDto: UpdateWatchDto) {
     return this.watchService.update(id, updateWatchDto);
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.SELLER)
   remove(@Param('id') id: string) {
     return this.watchService.remove(id);
   }

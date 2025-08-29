@@ -5,46 +5,8 @@ import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 
 @Injectable()
 export class CarService {
-  constructor(private prisma: PrismaService) {}
-  // async create(createCarDto: CreateCarDto, images: string[]) {
-  //   try {
-  //     const result = await this.prisma.$transaction(async (tx) => {
-  //       const product = await tx.product.create({
-  //         data: {
-  //           sellerId: '88b6b5fe-6d9a-45f0-a03b-c5bcb2e6cce3',
-  //           name: createCarDto.name,
-  //           description: createCarDto.description,
-  //           price: createCarDto.price,
-  //           images,
-  //           category: createCarDto.category as CategoryType,
-  //         },
-  //       });
+  constructor(private prisma: PrismaService) { }
 
-  //       const car = await tx.car.create({
-  //         data: {
-  //           condition: createCarDto.condition,
-  //           manufacture: createCarDto.manufacture,
-  //           year: createCarDto.year,
-  //           model: createCarDto.model,
-  //           carBodyStyle: createCarDto.carBodyStyle,
-  //           transmission: createCarDto.transmission,
-  //           mileage: createCarDto.mileage,
-  //           cylinders: createCarDto.cylinders,
-  //           tractionType: createCarDto.tractionType,
-  //           fuelType: createCarDto.fuelType,
-  //           productId: product.id,
-  //         },
-  //       });
-
-  //       return { ...product, ...car };
-  //     });
-
-  //     return ApiResponse.success(result, 'Car created successfully.');
-  //   } catch (error) {
-  //     console.error('Transaction Error:', error);
-  //     return ApiResponse.error('Failed to create car with transaction.', error);
-  //   }
-  // }
 
   async findAll() {
     try {
@@ -71,7 +33,8 @@ export class CarService {
   }
   async findOne(id: string) {
     try {
-      const carDetails = await this.prisma.car.findUniqueOrThrow({
+      console.log('id', id);
+      const carDetails = await this.prisma.car.findUnique({
         where: { id },
         include: {
           product: true,
@@ -104,4 +67,6 @@ export class CarService {
       return ApiResponse.error('Failed to delete car.', error);
     }
   }
+
+
 }

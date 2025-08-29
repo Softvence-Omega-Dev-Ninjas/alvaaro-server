@@ -231,7 +231,7 @@ export class SellerService {
 
       return ApiResponse.success(result, 'Inquiry retrieved successfully!');
     } catch (error) {
-      return ApiResponse.error('Failed to retrieve inquiry!');
+      return ApiResponse.error(error, 'Failed to retrieve inquiry!');
     }
   }
 

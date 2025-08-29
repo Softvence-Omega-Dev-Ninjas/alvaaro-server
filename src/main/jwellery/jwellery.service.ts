@@ -21,6 +21,7 @@ export class JewelleryService {
     try {
       const jewellery = await this.prisma.jewellery.findUnique({
         where: { id },
+        include: { product: true },
       });
 
       return ApiResponse.success(jewellery, 'Jewellery Found Here');
@@ -31,12 +32,12 @@ export class JewelleryService {
 
   async remove(id: string) {
     try {
-      const jewellery = await this.prisma.jewellery.delete({
+      await this.prisma.jewellery.delete({
         where: { id },
       });
-      return ApiResponse.success(jewellery, 'Jewellery deleted successfully');
+      return ApiResponse.success(null, 'Jewellery deleted successfully');
     } catch (error) {
-      return ApiResponse.error('Jewellery deleted failed', error);
+      return ApiResponse.error('Jewellery deleted failed', error.meta.cause);
     }
   }
 }

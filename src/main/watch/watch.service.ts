@@ -1,64 +1,11 @@
-import {
-  Injectable,
-  NotFoundException,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
-import { CreateWatchDto } from './dto/create-watch.dto';
 import { UpdateWatchDto } from './dto/update-watch.dto';
 import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 
 @Injectable()
 export class WatchService {
   constructor(private readonly prisma: PrismaService) { }
-
-  async create(createWatchDto: CreateWatchDto, images: string[]) {
-    try {
-      const productData = {
-        sellerId: '88b6b5fe-6d9a-45f0-a03b-c5bcb2e6cce3',
-        name: createWatchDto.name,
-        description: createWatchDto.description,
-        price: String(createWatchDto.price ?? ''),
-        images,
-        category: createWatchDto.category,
-        views: 0,
-      };
-
-      const createdProduct = await this.prisma.product.create({
-        data: productData,
-      });
-
-      const watchData = {
-        productId: createdProduct.id,
-        condition: createWatchDto.condition,
-        manufacture: createWatchDto.manufacture,
-        warranty: createWatchDto.warranty,
-        model: createWatchDto.model,
-        waterResistance: createWatchDto.waterResistance,
-        displayType: createWatchDto.displayType,
-        strapMaterial: createWatchDto.strapMaterial,
-        movement: createWatchDto.movement,
-        size: createWatchDto.size,
-        tractionType: createWatchDto.tractionType,
-        features: Array.isArray(createWatchDto.features)
-          ? createWatchDto.features
-          : typeof createWatchDto.features === 'string'
-            ? (createWatchDto.features as string)
-              .split(',')
-              .map((f) => f.trim())
-            : [],
-      };
-
-      const createdWatch = await this.prisma.watch.create({
-        data: watchData,
-        include: { product: true },
-      });
-
-      return createdWatch;
-    } catch (error) {
-      throw new InternalServerErrorException('Failed to create watch.');
-    }
-  }
 
   async findAll() {
     try {
@@ -67,8 +14,7 @@ export class WatchService {
       });
       return ApiResponse.success(allWatch, 'Watches fetched successfully');
     } catch (error) {
-      console.error('Find All Watches Error:', error);
-      throw new InternalServerErrorException('Failed to fetch watches.');
+      return ApiResponse.error('Failed to fetch watches', error);
     }
   }
 
@@ -79,14 +25,9 @@ export class WatchService {
         include: { product: true },
       });
 
-      if (!watch) {
-        throw new NotFoundException(`Watch with ID ${id} not found`);
-      }
-
       return ApiResponse.success(watch, 'Watch fetched successfully');
     } catch (error) {
-      console.error(`Find Watch Error for ID ${id}:`, error);
-      throw new InternalServerErrorException('Failed to fetch watch.');
+      return ApiResponse.error('Failed to fetch watch', error);
     }
   }
 
@@ -118,9 +59,8 @@ export class WatchService {
                 updateWatchDto.price !== undefined
                   ? String(updateWatchDto.price)
                   : undefined,
-              images: updateWatchDto.images,
-              category: updateWatchDto.category,
-              sellerId: updateWatchDto.sellerId,
+              // images: updateWatchDto.images,
+
             },
           },
         },
@@ -129,8 +69,8 @@ export class WatchService {
 
       return ApiResponse.success(updatedWatch, 'Watch updated successfully');
     } catch (error) {
-      console.error(`Update Watch Error for ID ${id}:`, error);
-      throw new InternalServerErrorException('Failed to update watch.');
+      console.log({ error });
+      return ApiResponse.error('Failed to update watch', error);
     }
   }
 
@@ -141,7 +81,7 @@ export class WatchService {
       });
 
       if (!existingWatch) {
-        throw new NotFoundException(`Watch with ID ${id} not found`);
+        return ApiResponse.error(`Watch with ID ${id} not found`);
       }
 
       await this.prisma.watch.delete({ where: { id } });
@@ -149,10 +89,10 @@ export class WatchService {
         where: { id: existingWatch.productId },
       });
 
-      return { message: 'Watch and associated product deleted successfully' };
+      return ApiResponse.success(null, 'Watch and associated product deleted successfully');
+
     } catch (error) {
-      console.error(`Delete Watch Error for ID ${id}:`, error);
-      throw new InternalServerErrorException('Failed to delete watch.');
+      return ApiResponse.error('Failed to delete watch', error);
     }
   }
 }

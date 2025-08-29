@@ -7,16 +7,30 @@ export class YachtService {
   constructor(private readonly prismaService: PrismaService) { }
 
   async findAll() {
-    const yachts = await this.prismaService.yacht.findMany({});
-    return ApiResponse.success(yachts, 'Yachts retrieved successfully');
+    try {
+      const yachts = await this.prismaService.yacht.findMany({
+        include: { product: true }
+      });
+      return ApiResponse.success(yachts, 'Yachts retrieved successfully');
+    } catch (error) {
+      return ApiResponse.error('Failed to retrieve yachts', error);
+    }
   }
 
   async findOne(id: string) {
-    const yacht = await this.prismaService.yacht.findUnique({ where: { id } });
-    if (!yacht) {
-      return ApiResponse.error('Yacht not found');
+    try {
+      const yacht = await this.prismaService.yacht.findUnique({
+        where: { id },
+        include: { product: true }
+      });
+
+      if (!yacht) {
+        return ApiResponse.error('Yacht not found');
+      }
+      return ApiResponse.success(yacht, 'Yacht retrieved successfully');
+    } catch (error) {
+      return ApiResponse.error('Failed to retrieve yacht', error);
     }
-    return ApiResponse.success(yacht, 'Yacht retrieved successfully');
   }
 
 

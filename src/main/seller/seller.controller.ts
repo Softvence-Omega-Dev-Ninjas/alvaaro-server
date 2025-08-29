@@ -27,7 +27,7 @@ export class SellerController {
 
   @Post('create-seller')
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(UserRole.SELLER)
+  @Roles(UserRole.USER)
   async sendOtpAndCacheInfo(
     @Body() createSellerDto: CreateSellerDto,
     @Req() req: Request,
