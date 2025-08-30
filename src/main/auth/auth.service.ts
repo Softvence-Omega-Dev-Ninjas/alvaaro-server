@@ -1,190 +1,172 @@
-import { HttpException, Injectable } from '@nestjs/common';
-import { CreateUserDto } from '../user/dto/create-user.dto';
-import * as bcrypt from 'bcrypt';
-import { PrismaService } from '../../prisma-service/prisma-service.service';
-import { SignInDto } from './dto/signin.dto';
-import { JwtService } from '@nestjs/jwt';
-import { PasswordDto } from './dto/passwords.dto';
-import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
-import { HelperService } from 'src/utils/helper/helper.service';
-import { MailService } from 'src/utils/mail/mail.service';
+import { HttpException, Injectable } from "@nestjs/common"
+import { CreateUserDto } from "../user/dto/create-user.dto"
+import * as bcrypt from "bcrypt"
+import { PrismaService } from "../../prisma-service/prisma-service.service"
+import { SignInDto } from "./dto/signin.dto"
+import { JwtService } from "@nestjs/jwt"
+import { PasswordDto } from "./dto/passwords.dto"
+import { ApiResponse } from "src/utils/common/apiresponse/apiresponse"
+import { HelperService } from "src/utils/helper/helper.service"
+import { MailService } from "src/utils/mail/mail.service"
 
 @Injectable()
 export class AuthService {
-  constructor(
-    private readonly prisma: PrismaService,
-    private readonly jwtService: JwtService,
-    private readonly helper: HelperService,
-    private readonly mailService: MailService,
-  ) { }
+	constructor(
+		private readonly prisma: PrismaService,
+		private readonly jwtService: JwtService,
+		private readonly helper: HelperService,
+		private readonly mailService: MailService
+	) {}
 
-  async signup(createUserDto: CreateUserDto, imageUrl: string) {
-    try {
-      const existingUser = await this.prisma.user.findUnique({
-        where: { email: createUserDto.email },
-      });
-      if (existingUser) {
-        return ApiResponse.error(
-          'Already registered with this email, please login',
-        );
-      }
-      const saltOrRounds = 10;
-      const hashedPassword = await bcrypt.hash(
-        createUserDto.password,
-        saltOrRounds,
-      );
+	async signup(createUserDto: CreateUserDto, imageUrl: string) {
+		try {
+			const existingUser = await this.prisma.user.findUnique({
+				where: { email: createUserDto.email }
+			})
+			if (existingUser) {
+				return ApiResponse.error("Already registered with this email, please login")
+			}
+			const saltOrRounds = 10
+			const hashedPassword = await bcrypt.hash(createUserDto.password, saltOrRounds)
 
-      // Ensure 'images' property is included, as Prisma expects a string
-      const { images, ...rest } = createUserDto;
-      let imagesString: string;
-      if (Array.isArray(images)) {
-        // Convert array of files to a JSON string or comma-separated string as needed
-        imagesString = JSON.stringify(images);
-      } else {
-        imagesString = images ?? '';
-      }
-      console.log(imagesString);
-      const data = {
-        ...rest,
-        password: hashedPassword,
-        images: imageUrl,
-      };
+			// Ensure 'images' property is included, as Prisma expects a string
+			const { images, ...rest } = createUserDto
+			let imagesString: string
+			if (Array.isArray(images)) {
+				// Convert array of files to a JSON string or comma-separated string as needed
+				imagesString = JSON.stringify(images)
+			} else {
+				imagesString = images ?? ""
+			}
+			console.log(imagesString)
+			const data = {
+				...rest,
+				password: hashedPassword,
+				images: imageUrl
+			}
 
-      const result = await this.prisma.user.create({ data });
-      return ApiResponse.success(result, 'User Created Successfully');
-    } catch (error) {
-      return ApiResponse.error('User Creation Failed!!', error);
-    }
-  }
+			const result = await this.prisma.user.create({ data })
+			return ApiResponse.success(result, "User Created Successfully")
+		} catch (error) {
+			return ApiResponse.error("User Creation Failed!!", error)
+		}
+	}
 
-  async signin(signinDto: SignInDto) {
-    try {
-      const user = await this.prisma.user.findFirst({
-        where: { email: signinDto.email },
-      });
+	async signin(signinDto: SignInDto) {
+		try {
+			const user = await this.prisma.user.findFirst({
+				where: { email: signinDto.email }
+			})
 
-      if (!user) {
-        return ApiResponse.error('User not found');
-      }
+			if (!user) {
+				return ApiResponse.error("User not found")
+			}
 
-      if (user.isDeleted) {
-        return ApiResponse.error('This account has been deleted');
-      }
+			if (user.isDeleted) {
+				return ApiResponse.error("This account has been deleted")
+			}
 
-      const isPasswordValid = await bcrypt.compare(
-        signinDto.password,
-        user.password,
-      );
+			const isPasswordValid = await bcrypt.compare(signinDto.password, user.password)
 
-      if (!isPasswordValid) {
-        return ApiResponse.error('Invalid password');
-      }
+			if (!isPasswordValid) {
+				return ApiResponse.error("Invalid password")
+			}
 
-      const payload = {
-        id: user.id,
-        email: user.email,
-        role: user.role,
-      };
+			const payload = {
+				id: user.id,
+				email: user.email,
+				role: user.role
+			}
 
-      const token = await this.jwtService.signAsync(payload);
+			const token = await this.jwtService.signAsync(payload)
 
-      return ApiResponse.success({ accessToken: token }, 'Login successful');
-    } catch (error: unknown) {
-      console.error('Error signing in:', error);
-      const message =
-        error instanceof HttpException
-          ? error.message
-          : 'Internal server error';
+			return ApiResponse.success({ accessToken: token }, "Login successful")
+		} catch (error: unknown) {
+			console.error("Error signing in:", error)
+			const message = error instanceof HttpException ? error.message : "Internal server error"
 
-      return {
-        success: false,
-        error: message,
-      };
-    }
-  }
+			return {
+				success: false,
+				error: message
+			}
+		}
+	}
 
-  async changePassword(id: string, dto: PasswordDto) {
-    const user = await this.prisma.user.findUnique({ where: { id } });
+	async changePassword(id: string, dto: PasswordDto) {
+		const user = await this.prisma.user.findUnique({ where: { id } })
 
-    if (!user) {
-      return ApiResponse.error('User not found');
-    }
+		if (!user) {
+			return ApiResponse.error("User not found")
+		}
 
-    const isOldPasswordCorrect = await bcrypt.compare(
-      dto.oldpassword,
-      user.password,
-    );
+		const isOldPasswordCorrect = await bcrypt.compare(dto.oldpassword, user.password)
 
-    if (!isOldPasswordCorrect) {
-      return ApiResponse.error('Old password is incorrect');
-    }
+		if (!isOldPasswordCorrect) {
+			return ApiResponse.error("Old password is incorrect")
+		}
 
-    const hashedPassword = await bcrypt.hash(dto.newpassword, 10);
+		const hashedPassword = await bcrypt.hash(dto.newpassword, 10)
 
-    await this.prisma.user.update({
-      where: { id },
-      data: { password: hashedPassword },
-    });
+		await this.prisma.user.update({
+			where: { id },
+			data: { password: hashedPassword }
+		})
 
-    return ApiResponse.success(null, 'Password updated successfully');
-  }
+		return ApiResponse.success(null, "Password updated successfully")
+	}
 
-  // forgot password
-  async requestPasswordReset(email: string) {
-    const user = await this.prisma.user.findUnique({ where: { email } });
+	// forgot password
+	async requestPasswordReset(email: string) {
+		const user = await this.prisma.user.findUnique({ where: { email } })
 
-    if (!user) {
-      return ApiResponse.error('User not found');
-    }
+		if (!user) {
+			return ApiResponse.error("User not found")
+		}
 
-    // Generate secure token
-    const otp = Math.floor(100000 + Math.random() * 900000).toString(); // 6-character OTP
-    const expiry = this.helper.getLocalDateTime(5); // 5 minutes from now
-    console.log({ otp, expiry });
-    // Store token and expiry in the database
-    await this.prisma.user.update({
-      where: { email },
-      data: {
-        otp,
-        otpExpiry: expiry,
-      },
-    });
+		// Generate secure token
+		const otp = Math.floor(100000 + Math.random() * 900000).toString() // 6-character OTP
+		const expiry = this.helper.getLocalDateTime(5) // 5 minutes from now
+		console.log({ otp, expiry })
+		// Store token and expiry in the database
+		await this.prisma.user.update({
+			where: { email },
+			data: {
+				otp,
+				otpExpiry: expiry
+			}
+		})
 
-    // Send email with OTP
-    await this.mailService.sendMail(email, 'Password Reset', otp);
+		// Send email with OTP
+		await this.mailService.sendMail(email, "Password Reset", otp)
 
-    return ApiResponse.success(null, 'Reset password email sent');
-  }
-  // verify OTP
-  async verifyOtp(email: string, otp: string, newPassword: string) {
-    const user = await this.prisma.user.findUnique({ where: { email } });
+		return ApiResponse.success(null, "Reset password email sent")
+	}
+	// verify OTP
+	async verifyOtp(email: string, otp: string, newPassword: string) {
+		const user = await this.prisma.user.findUnique({ where: { email } })
 
-    if (!user) {
-      return ApiResponse.error('User not found');
-    }
+		if (!user) {
+			return ApiResponse.error("User not found")
+		}
 
-    if (user.otp !== otp) {
-      return ApiResponse.error('Invalid OTP');
-    }
-    const getCurrentTime = this.helper.getLocalDateTime(0);
-    console.log({ getCurrentTime });
-    if (
-      !user.otpExpiry ||
-      new Date(user.otpExpiry as string | number | Date) < new Date(getCurrentTime)
-    ) {
-      return ApiResponse.error('OTP has expired');
-    }
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-    await this.prisma.user.update({
-      where: { email },
-      data: {
-        otp: null,
-        otpExpiry: null,
-        password: hashedPassword,
-      },
-    });
-    return ApiResponse.success(null, 'Password reset successfully');
-    // OTP is valid
-  }
-
+		if (user.otp !== otp) {
+			return ApiResponse.error("Invalid OTP")
+		}
+		const getCurrentTime = this.helper.getLocalDateTime(0)
+		console.log({ getCurrentTime })
+		if (!user.otpExpiry || new Date(user.otpExpiry as string | number | Date) < new Date(getCurrentTime)) {
+			return ApiResponse.error("OTP has expired")
+		}
+		const hashedPassword = await bcrypt.hash(newPassword, 10)
+		await this.prisma.user.update({
+			where: { email },
+			data: {
+				otp: null,
+				otpExpiry: null,
+				password: hashedPassword
+			}
+		})
+		return ApiResponse.success(null, "Password reset successfully")
+		// OTP is valid
+	}
 }
