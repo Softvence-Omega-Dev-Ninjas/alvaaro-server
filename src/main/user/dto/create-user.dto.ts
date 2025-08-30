@@ -1,5 +1,5 @@
 import { IsEmail, IsNotEmpty, IsOptional, IsString } from "class-validator"
-import { ApiProperty } from "@nestjs/swagger"
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger"
 
 export class CreateUserDto {
 	@ApiProperty({
@@ -15,7 +15,6 @@ export class CreateUserDto {
 		description: "User email address"
 	})
 	@IsEmail()
-	@IsOptional()
 	email: string
 
 	@ApiProperty({
@@ -26,12 +25,11 @@ export class CreateUserDto {
 	@IsNotEmpty()
 	password: string
 
-	@ApiProperty({
+	@ApiPropertyOptional({
 		description: "Photo showing the problem",
 		type: "array",
 		items: { type: "file", format: "binary" },
 		required: true
 	})
-	@IsNotEmpty({ each: true })
 	images: Express.Multer.File[]
 }
