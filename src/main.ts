@@ -9,7 +9,8 @@ async function bootstrap() {
 	app.useGlobalFilters(new AllExceptionsFilter())
 
 	app.enableCors({
-		origin: ["http://localhost:5173"]
+		origin: ["http://localhost:5173"],
+		credentials: true
 	})
 
 	const config = new DocumentBuilder()
