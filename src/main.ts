@@ -9,7 +9,7 @@ async function bootstrap() {
 	app.useGlobalFilters(new AllExceptionsFilter())
 
 	app.enableCors({
-		origin: ["http://localhost:5173"],
+		origin: ["http://localhost:5173", "https://john-07.netlify.app"],
 		credentials: true
 	})
 
