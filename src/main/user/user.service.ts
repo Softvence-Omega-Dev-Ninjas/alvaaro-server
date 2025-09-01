@@ -11,39 +11,14 @@ export class UserService {
     return ApiResponse.success(users, 'Users retrieved successfully');
   }
 
-  async findOne(id: string) {
-    try {
-      const user = await this.prisma.user.findFirst({
-        where: { id },
-      });
-      if (!user) {
-        throw new NotFoundException(`User with ID ${id} not found`);
-      }
 
-      return ApiResponse.success(user, 'User found successfully');
-    } catch (error) {
-      return ApiResponse.error(error.response.message);
-    }
-  }
 
-  async remove(id: string) {
-    try {
-      const user = await this.prisma.user.findFirst({
-        where: { id },
-      });
-      if (!user) {
-        return ApiResponse.error(`User with ID ${id} not found`);
-      }
 
-      await this.prisma.user.update({
-        where: { id },
-        data: { isDeleted: true },
-      });
-
-      return ApiResponse.success(null, 'User removed successfully');
-    } catch (error) {
-      console.error('Error removing user:', error);
-      return ApiResponse.error(error);
-    }
+  // find current user
+  async findCurrentUser(userId: string) {
+    const user = await this.prisma.user.findFirst({
+      where: { id: userId },
+    });
+    return ApiResponse.success(user, 'Current user found successfully');
   }
 }
