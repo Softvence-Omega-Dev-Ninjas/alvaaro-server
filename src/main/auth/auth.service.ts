@@ -16,12 +16,12 @@ export class AuthService {
 		private readonly jwtService: JwtService,
 		private readonly helper: HelperService,
 		private readonly mailService: MailService
-	) {}
+	) { }
 
 	async signup(createUserDto: CreateUserDto, imageUrl: string) {
 		try {
 			const existingUser = await this.prisma.user.findUnique({
-				where: { email: createUserDto.email }
+				where: { email: createUserDto.email, isDeleted: false }
 			})
 			if (existingUser) {
 				return ApiResponse.error("Already registered with this email, please login")
@@ -41,13 +41,15 @@ export class AuthService {
 			console.log(imagesString)
 			const data = {
 				...rest,
+				isDeleted: false,
 				password: hashedPassword,
 				images: imageUrl
 			}
 
-			const result = await this.prisma.user.create({ data })
+			const result = await this.prisma.user.upsert({ where: { email: createUserDto.email }, update: data, create: data })
 			return ApiResponse.success(result, "User Created Successfully")
 		} catch (error) {
+			console.log(error);
 			return ApiResponse.error("User Creation Failed!!", error)
 		}
 	}

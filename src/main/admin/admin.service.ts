@@ -144,4 +144,17 @@ export class AdminService {
       return ApiResponse.error('Error verifying seller', error);
     }
   }
+  // delete seller
+  async deleteSeller(id: string) {
+    try {
+      await this.prisma.user.update({
+        where: { id },
+        data: { isDeleted: true },
+      });
+      return ApiResponse.success(null, 'Seller deleted successfully');
+    } catch (error) {
+      console.log('Error deleting seller:', error);
+      return ApiResponse.error('Error deleting seller', error);
+    }
+  }
 }

@@ -40,6 +40,12 @@ export class AdminController {
   }
 
   //! TODO: Implement total sales
-
+  // delete seller
+  @Post('delete-seller/:id')
+  @UseGuards(AuthGuard)
+  @Roles(UserRole.ADMIN)
+  async deleteSeller(@Param('id') id: string) {
+    return this.adminService.deleteSeller(id);
+  }
 
 }

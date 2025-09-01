@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsOptional, IsString } from "class-validator"
+import { IsEmail, IsNotEmpty, IsString } from "class-validator"
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger"
 
 export class CreateUserDto {
@@ -30,6 +30,7 @@ export class CreateUserDto {
 		type: "array",
 		items: { type: "file", format: "binary" },
 		required: true
+
 	})
 	images: Express.Multer.File[]
 }
