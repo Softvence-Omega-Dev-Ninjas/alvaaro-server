@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
 import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
+import { HelperService } from 'src/utils/helper/helper.service';
 
 type UserSearchPayload = {
   v_status?: 'PENDING' | 'VERIFIED' | 'REJECTED';
@@ -11,7 +12,9 @@ type UserSearchPayload = {
 
 @Injectable()
 export class AdminService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService,
+    private readonly helper: HelperService
+  ) { }
 
   // find all sellers by status and verification status
   async findAllSellers(payload: UserSearchPayload) {
@@ -49,6 +52,7 @@ export class AdminService {
             contains: payload.email || '',
             mode: 'insensitive',
           },
+          isDeleted: false
         },
         subscriptionStatus: subscriptionFilter,
         verificationStatus: verificationFilter,
@@ -105,6 +109,7 @@ export class AdminService {
         where: {
           verificationStatus: 'VERIFIED',
           subscriptionStatus: true,
+          isDeleted: false
         },
       });
       const startOfMonth = new Date();
@@ -147,7 +152,8 @@ export class AdminService {
   // delete seller
   async deleteSeller(id: string) {
     try {
-      await this.prisma.user.update({
+
+      await this.prisma.seller.update({
         where: { id },
         data: { isDeleted: true },
       });

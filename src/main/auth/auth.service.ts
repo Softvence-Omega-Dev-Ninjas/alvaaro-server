@@ -24,7 +24,7 @@ export class AuthService {
 				where: { email: createUserDto.email, isDeleted: false }
 			})
 			if (existingUser) {
-				return ApiResponse.error("Already registered with this email, please login")
+				throw new HttpException("User with this email already exists", 400)
 			}
 			const saltOrRounds = 10
 			const hashedPassword = await bcrypt.hash(createUserDto.password, saltOrRounds)
