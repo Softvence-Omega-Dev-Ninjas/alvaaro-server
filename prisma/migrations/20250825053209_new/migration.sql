@@ -45,7 +45,7 @@ CREATE TABLE "Product" (
     "price" TEXT NOT NULL,
     "images" TEXT[],
     "category" "CategoryType" NOT NULL,
-    "premium" BOOLEAN,
+    "isExclusive" BOOLEAN,
     "views" INTEGER NOT NULL,
     "trending" INTEGER NOT NULL DEFAULT 0,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -209,6 +209,20 @@ CREATE TABLE "Contact" (
 );
 
 -- CreateTable
+CREATE TABLE "Inquiry" (
+    "id" TEXT NOT NULL,
+    "buyerName" TEXT NOT NULL,
+    "buyerEmail" TEXT NOT NULL,
+    "buyerPhone" TEXT,
+    "message" TEXT NOT NULL,
+    "productId" TEXT NOT NULL,
+    "sellerId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "Inquiry_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "Newsletter" (
     "id" TEXT NOT NULL,
     "email" TEXT NOT NULL,
@@ -332,3 +346,9 @@ ALTER TABLE "Wishlist" ADD CONSTRAINT "Wishlist_userId_fkey" FOREIGN KEY ("userI
 
 -- AddForeignKey
 ALTER TABLE "Wishlist" ADD CONSTRAINT "Wishlist_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Inquiry" ADD CONSTRAINT "Inquiry_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Inquiry" ADD CONSTRAINT "Inquiry_sellerId_fkey" FOREIGN KEY ("sellerId") REFERENCES "Seller"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
