@@ -20,6 +20,7 @@ import { CouponModule } from './main/coupon/coupon.module';
 import { AdminModule } from './main/admin/admin.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './guards/auth.guard';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { AuthGuard } from './guards/auth.guard';
     CouponModule,
     AdminModule,
   ],
+  controllers: [AppController],
   providers: [{ provide: APP_GUARD, useClass: AuthGuard }],
 })
 export class AppModule { }
