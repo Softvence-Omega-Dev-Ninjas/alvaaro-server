@@ -1,10 +1,13 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
 import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
+import { HelperService } from 'src/utils/helper/helper.service';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService,
+    private readonly helper: HelperService
+  ) { }
   async findAll() {
     const users = await this.prisma.user.findMany();
 
@@ -16,9 +19,9 @@ export class UserService {
 
   // find current user
   async findCurrentUser(userId: string) {
-    const user = await this.prisma.user.findFirst({
-      where: { id: userId },
-    });
-    return ApiResponse.success(user, 'Current user found successfully');
+    const userExist = await this.helper.userExists(userId);
+    console.log(userExist);
+
+    return ApiResponse.success(userExist, 'Current user found successfully');
   }
 }
