@@ -57,6 +57,7 @@ export class SellerService {
     if (!cacheOtp || !userInfo) {
       return ApiResponse.error('Otp has been expired');
     }
+    // Account table check korte hbe se ki age tar package onojai pay korse kina 
 
     const subscriptionPlanDetails =
       await this.prisma.subscriptionPlan.findUnique({
@@ -69,7 +70,7 @@ export class SellerService {
       return ApiResponse.error('Invalid OTP');
     }
 
-    // TODO: Payment processing logic here
+
 
     const result = await this.prisma.seller.create({
       data: {
