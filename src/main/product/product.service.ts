@@ -19,7 +19,7 @@ export class ProductService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly helperService: HelperService,
-  ) { }
+  ) {}
 
   async handleProductCreation(
     dto: CreateProductDto,
@@ -30,11 +30,9 @@ export class ProductService {
       const sellerId = await this.helperService.sellerExists(userid);
       const imageUrls = images?.length
         ? (await uploadMultipleToCloudinary(images)).map(
-          (res: { secure_url: string }) => res.secure_url,
-        )
+            (res: { secure_url: string }) => res.secure_url,
+          )
         : [];
-
-
 
       const product = await this.prisma.product.create({
         data: {
@@ -59,8 +57,9 @@ export class ProductService {
             zip: dto.zip,
             size: dto.size,
             washroom: dto.washroom,
-            text: Array.isArray(dto.text) ? dto.text : [dto.text],
-            feature: Array.isArray(dto.feature) ? dto.feature : [dto.feature],
+            features: Array.isArray(dto.features)
+              ? dto.features
+              : [dto.features],
           },
         });
       } else if (isCarDto(dto)) {
@@ -90,8 +89,9 @@ export class ProductService {
             zip: dto.zip,
             size: dto.size,
             washroom: dto.washroom,
-            text: Array.isArray(dto.text) ? dto.text : [dto.text],
-            feature: Array.isArray(dto.feature) ? dto.feature : [dto.feature],
+            features: Array.isArray(dto.features)
+              ? dto.features
+              : [dto.features],
           },
         });
       } else if (isWatchDto(dto)) {
@@ -262,29 +262,29 @@ export class ProductService {
         AND: [
           location
             ? {
-              RealEstate: {
-                is: {
-                  OR: [
-                    { address: { contains: location, mode: 'insensitive' } },
-                    { city: { contains: location, mode: 'insensitive' } },
-                    { state: { contains: location, mode: 'insensitive' } },
-                    { zip: { contains: location, mode: 'insensitive' } },
-                  ],
+                RealEstate: {
+                  is: {
+                    OR: [
+                      { address: { contains: location, mode: 'insensitive' } },
+                      { city: { contains: location, mode: 'insensitive' } },
+                      { state: { contains: location, mode: 'insensitive' } },
+                      { zip: { contains: location, mode: 'insensitive' } },
+                    ],
+                  },
                 },
-              },
-            }
+              }
             : {},
 
           type
             ? {
-              RealEstate: {
-                is: {
-                  feature: {
-                    has: type,
+                RealEstate: {
+                  is: {
+                    features: {
+                      has: type,
+                    },
                   },
                 },
-              },
-            }
+              }
             : {},
         ],
       },
@@ -435,6 +435,9 @@ export class ProductService {
       (sum, product) => sum + product.views,
       0,
     );
-    return ApiResponse.success(totalViews, 'Total views retrieved successfully');
+    return ApiResponse.success(
+      totalViews,
+      'Total views retrieved successfully',
+    );
   }
 }
