@@ -110,12 +110,11 @@ model RealEstate {
   beds      String
   washroom  String
   size      String
-  text      String[]
   state     String
   city      String
   zip       String
   address   String
-  feature   String[]
+  features  String[]
 }
 
 // yachts
@@ -126,12 +125,11 @@ model Yacht {
   beds      String
   washroom  String
   size      String
-  text      String[]
   state     String
   city      String
   zip       String
   address   String
-  feature   String[]
+  features  String[]
 }
 
 model Wishlist {
