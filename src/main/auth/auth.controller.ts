@@ -12,6 +12,8 @@ import { Public } from "src/guards/public.decorator"
 import { ApiResponse } from "src/utils/common/apiresponse/apiresponse"
 import { ForgotPasswordDto } from "./dto/forgotPassword.dto"
 import { VerifyOtpForgottenPasswordDto } from "./dto/verifyOtpForgottenPassword.dto"
+import { VerifyOtpAndCreateUserDto } from "./dto/verifyOtpAndCreateUser.dto"
+import { ResendOtpDto } from "./dto/resendOtp.dto"
 
 @Controller("auth")
 @UseGuards(AuthGuard)
@@ -23,15 +25,21 @@ export class AuthController {
 	@UseInterceptors(FilesInterceptor("images"))
 	@ApiConsumes("multipart/form-data")
 	async signup(@Body() createAuthDto: CreateUserDto, @UploadedFiles() files: Express.Multer.File[]) {
-		// if (!files || files.length === 0) {
-		//   return ApiResponse.error('Image is required');
-		// }
+		if (!files || files.length === 0) {
+			return ApiResponse.error("Image is required")
+		}
 		const cloudinaryUrls = files?.length > 0 ? (await uploadMultipleToCloudinary(files)).map((res: { secure_url: string }) => res.secure_url) : []
 
 		const profileImageUrl = cloudinaryUrls[0]
 		return this.authService.signup(createAuthDto, profileImageUrl)
 	}
 
+	// otp verification endpoint
+	@Post("verify-otp")
+	@Public()
+	async verifyOtp(@Body() dto: VerifyOtpAndCreateUserDto) {
+		return await this.authService.otpVerifyEmail(dto.email, dto.otp)
+	}
 	@Post("signin")
 	@Public()
 	async signin(@Body() signinDto: SignInDto) {
@@ -52,5 +60,12 @@ export class AuthController {
 	@Public()
 	async resetPassword(@Body() dto: VerifyOtpForgottenPasswordDto) {
 		return await this.authService.verifyOtp(dto.email, dto.otp, dto.newPassword)
+	}
+
+	// request for otp resend
+	@Post("resend-otp")
+	@Public()
+	async resendOtp(@Body() dto: ResendOtpDto) {
+		return await this.authService.requestPasswordReset(dto.email)
 	}
 }

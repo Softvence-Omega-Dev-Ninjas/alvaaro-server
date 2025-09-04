@@ -17,6 +17,7 @@ model User {
   isDeleted                Boolean                    @default(false)
   otp                      String?
   otpExpiry                String?
+  isOtpVerified            Boolean                    @default(false)
   Seller                   Seller?
   createdAt                DateTime                   @default(now())
   updatedAt                DateTime                   @updatedAt

@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from "@nestjs/common"
+import { HttpException, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common"
 import { CreateUserDto } from "../user/dto/create-user.dto"
 import * as bcrypt from "bcrypt"
 import { PrismaService } from "../../prisma-service/prisma-service.service"
@@ -16,7 +16,7 @@ export class AuthService {
 		private readonly jwtService: JwtService,
 		private readonly helper: HelperService,
 		private readonly mailService: MailService
-	) { }
+	) {}
 
 	async signup(createUserDto: CreateUserDto, imageUrl: string) {
 		try {
@@ -31,6 +31,14 @@ export class AuthService {
 
 			// Ensure 'images' property is included, as Prisma expects a string
 			const { images, ...rest } = createUserDto
+
+			// handle current time and set to local time
+			const expiryTime = this.helper.getLocalDateTime(5) // 5 minutes from now
+			const otp = Math.floor(100000 + Math.random() * 900000).toString() // 6-character OTP
+
+			// sending otp to user email
+			await this.mailService.sendMail(createUserDto.email, "Verify your email", `Your OTP is: ${otp}`)
+
 			let imagesString: string
 			if (Array.isArray(images)) {
 				// Convert array of files to a JSON string or comma-separated string as needed
@@ -41,19 +49,44 @@ export class AuthService {
 			console.log(imagesString)
 			const data = {
 				...rest,
-				isDeleted: false,
 				password: hashedPassword,
-				images: imageUrl
+				images: imageUrl,
+				otp,
+				otpExpiry: expiryTime
 			}
 
 			const result = await this.prisma.user.upsert({ where: { email: createUserDto.email }, update: data, create: data })
-			return ApiResponse.success(result, "User Created Successfully")
+			return ApiResponse.success(result, "User Created Successfully Wait for OTP verification")
 		} catch (error) {
-			console.log(error);
+			console.log(error)
 			return ApiResponse.error("User Creation Failed!!", error)
 		}
 	}
 
+	// otp verification will be done during signin
+	async otpVerifyEmail(email: string, otp: string) {
+		const user = await this.prisma.user.findUnique({ where: { email } })
+		if (!user) {
+			throw new NotFoundException("User not found")
+		}
+		if (user.otp !== otp) {
+			throw new NotFoundException("Verification token not found or expired")
+		}
+		const getCurrentTime = this.helper.getLocalDateTime(0)
+		if (!user.otpExpiry || new Date(user.otpExpiry as string | number | Date) < new Date(getCurrentTime)) {
+			throw new NotFoundException("Verification token not found or expired")
+		}
+		// OTP is valid
+		await this.prisma.user.update({
+			where: { email },
+			data: {
+				otp: null,
+				otpExpiry: null,
+				isOtpVerified: true
+			}
+		})
+		return ApiResponse.success(null, "Email verified successfully")
+	}
 	async signin(signinDto: SignInDto) {
 		try {
 			const user = await this.prisma.user.findFirst({
@@ -139,9 +172,9 @@ export class AuthService {
 		})
 
 		// Send email with OTP
-		await this.mailService.sendMail(email, "Password Reset", otp)
+		await this.mailService.sendMail(email, "Otp Verification from Alvaaro", otp)
 
-		return ApiResponse.success(null, "Reset password email sent")
+		return ApiResponse.success(null, "OTP sent to your email")
 	}
 	// verify OTP
 	async verifyOtp(email: string, otp: string, newPassword: string) {
@@ -170,5 +203,29 @@ export class AuthService {
 		})
 		return ApiResponse.success(null, "Password reset successfully")
 		// OTP is valid
+	}
+	// otp for change isotpverified to true
+	async otpVerify(email: string, otp: string) {
+		const user = await this.prisma.user.findUnique({ where: { email } })
+		if (!user) {
+			throw new NotFoundException("User not found")
+		}
+		if (user.otp !== otp) {
+			throw new NotFoundException("Verification token not found or expired")
+		}
+		const getCurrentTime = this.helper.getLocalDateTime(0)
+		if (!user.otpExpiry || new Date(user.otpExpiry as string | number | Date) < new Date(getCurrentTime)) {
+			throw new NotFoundException("Verification token not found or expired")
+		}
+		// OTP is valid
+		await this.prisma.user.update({
+			where: { email },
+			data: {
+				otp: null,
+				otpExpiry: null,
+				isOtpVerified: true
+			}
+		})
+		return ApiResponse.success(null, "Email verified successfully")
 	}
 }
