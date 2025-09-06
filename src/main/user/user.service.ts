@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
 import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 import { HelperService } from 'src/utils/helper/helper.service';
@@ -18,17 +18,17 @@ export class UserService {
   // find current user
   async findCurrentUser(userId: string) {
     const userExist = await this.helper.userExists(userId);
-
     if (!userExist) {
-      throw new Error('User not found');
+      throw new NotFoundException('User does not exist');
     }
-
     if (userExist.role === 'SELLER') {
-      const seller = await this.prisma.seller.findUnique({
-        where: { userId },
-        include: { user: true },
+      const sellerDetails = await this.prisma.seller.findUnique({
+        where: { userId: userId },
       });
-      return ApiResponse.success(seller, 'Current user found successfully');
+      return ApiResponse.success(
+        { ...userExist, sellerId: sellerDetails?.id },
+        'Current user found successfully',
+      );
     }
 
     return ApiResponse.success(userExist, 'Current user found successfully');
