@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
 import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 import { HelperService } from 'src/utils/helper/helper.service';
+import { VerificationStatusDto } from './dto/verficationStatus.dto';
 
 type UserSearchPayload = {
   v_status?: 'PENDING' | 'VERIFIED' | 'REJECTED';
@@ -12,9 +13,10 @@ type UserSearchPayload = {
 
 @Injectable()
 export class AdminService {
-  constructor(private readonly prisma: PrismaService,
-    private readonly helper: HelperService
-  ) { }
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly helper: HelperService,
+  ) {}
 
   // find all sellers by status and verification status
   async findAllSellers(payload: UserSearchPayload) {
@@ -28,8 +30,8 @@ export class AdminService {
             : undefined;
     }
 
-
-    let verificationFilter: 'PENDING' | 'VERIFIED' | 'REJECTED' | undefined = undefined;
+    let verificationFilter: 'PENDING' | 'VERIFIED' | 'REJECTED' | undefined =
+      undefined;
     if (payload?.v_status) {
       verificationFilter =
         payload.v_status.toUpperCase() === 'PENDING'
@@ -52,18 +54,15 @@ export class AdminService {
             contains: payload.email || '',
             mode: 'insensitive',
           },
-          isDeleted: false
+          isDeleted: false,
         },
         subscriptionStatus: subscriptionFilter,
         verificationStatus: verificationFilter,
       },
-    })
+    });
 
     return ApiResponse.success(getData, 'Sellers fetched successfully');
-
   }
-
-
 
   // get total amount monthwise
   async findTotalAmount() {
@@ -109,7 +108,7 @@ export class AdminService {
         where: {
           verificationStatus: 'VERIFIED',
           subscriptionStatus: true,
-          isDeleted: false
+          isDeleted: false,
         },
       });
       const startOfMonth = new Date();
@@ -136,12 +135,12 @@ export class AdminService {
   }
 
   // seller verification by admin
-  async verifySeller(id: string) {
+  async verifySeller(id: string, status: VerificationStatusDto) {
     try {
       // Verify seller by id
       const updatedSeller = await this.prisma.seller.update({
         where: { userId: id },
-        data: { verificationStatus: 'VERIFIED' },
+        data: { verificationStatus: status.status },
       });
       return ApiResponse.success(updatedSeller, 'Seller verified successfully');
     } catch (error) {
@@ -152,7 +151,6 @@ export class AdminService {
   // delete seller
   async deleteSeller(id: string) {
     try {
-
       await this.prisma.seller.update({
         where: { id },
         data: { isDeleted: true },
