@@ -5,22 +5,31 @@ import { HelperService } from 'src/utils/helper/helper.service';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly prisma: PrismaService,
-    private readonly helper: HelperService
-  ) { }
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly helper: HelperService,
+  ) {}
   async findAll() {
     const users = await this.prisma.user.findMany();
 
     return ApiResponse.success(users, 'Users retrieved successfully');
   }
 
-
-
-
   // find current user
   async findCurrentUser(userId: string) {
     const userExist = await this.helper.userExists(userId);
-    console.log(userExist);
+
+    if (!userExist) {
+      throw new Error('User not found');
+    }
+
+    if (userExist.role === 'SELLER') {
+      const seller = await this.prisma.seller.findUnique({
+        where: { userId },
+        include: { user: true },
+      });
+      return ApiResponse.success(seller, 'Current user found successfully');
+    }
 
     return ApiResponse.success(userExist, 'Current user found successfully');
   }
