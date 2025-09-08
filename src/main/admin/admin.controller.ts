@@ -55,4 +55,11 @@ export class AdminController {
   async deleteSeller(@Param('id') id: string) {
     return this.adminService.deleteSeller(id);
   }
+  // block user
+  @Post('block-user/:id')
+  @UseGuards(AuthGuard)
+  @Roles(UserRole.ADMIN)
+  async blockUser(@Param('id') id: string) {
+    return this.adminService.blockUser(id);
+  }
 }

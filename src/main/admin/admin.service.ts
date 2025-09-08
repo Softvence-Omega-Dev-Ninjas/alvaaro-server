@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
 import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 import { HelperService } from 'src/utils/helper/helper.service';
@@ -159,6 +159,29 @@ export class AdminService {
     } catch (error) {
       console.log('Error deleting seller:', error);
       return ApiResponse.error('Error deleting seller', error);
+    }
+  }
+
+  // block user
+  async blockUser(id: string) {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { id },
+      });
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+      const updatedUser = await this.prisma.user.update({
+        where: { id },
+        data: { isBlocked: !user.isBlocked },
+      });
+      return ApiResponse.success(
+        updatedUser,
+        `User ${updatedUser.isBlocked ? 'blocked' : 'unblocked'} successfully`,
+      );
+    } catch (error) {
+      console.log('Error blocking/unblocking user:', error);
+      return ApiResponse.error('Error blocking/unblocking user', error);
     }
   }
 }

@@ -11,7 +11,7 @@ import { RolesGuard } from 'src/guards/role.guard';
 export class SubscriptionplanController {
   constructor(
     private readonly subscriptionplanService: SubscriptionplanService,
-  ) { }
+  ) {}
 
   @Post('create-plan')
   @UseGuards(AuthGuard, RolesGuard)
@@ -22,7 +22,7 @@ export class SubscriptionplanController {
 
   @Get('all-plan')
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SELLER, UserRole.USER)
   async findAll() {
     const result = await this.subscriptionplanService.findAll();
     return result;
