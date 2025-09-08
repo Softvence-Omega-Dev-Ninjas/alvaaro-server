@@ -337,78 +337,50 @@ export class ProductService {
       );
     }
   }
-
   async updateProduct(
     productId: string,
     files: Express.Multer.File[],
     updateDto: UpdateProductDto,
   ) {
     try {
-      const {
-        name,
-        description,
-        price,
-        trending,
-        RealEstate,
-        Car,
-        Watch,
-        Yacht,
-        Jewellery,
-      } = updateDto;
-
-      // console.log(updateDto, files, 'Update dto');
-
-      const productUpdateData: any = {
-        name,
-        description,
-        price,
-        trending: Number(trending),
-      };
-
-      const existingProduct = await this.prisma.product.findFirst({
+      const existingProduct = await this.prisma.product.findUnique({
         where: { id: productId },
       });
 
-      // Add relational updates conditionally
-      if (RealEstate) {
-        productUpdateData.RealEstate = {
-          update: RealEstate,
-        };
-      }
-      if (Car) {
-        productUpdateData.Car = {
-          update: Car,
-        };
-      }
-      if (Watch) {
-        productUpdateData.Watch = {
-          update: Watch,
-        };
-      }
-      if (Yacht) {
-        productUpdateData.Yacht = {
-          update: Yacht,
-        };
-      }
-      if (Jewellery) {
-        productUpdateData.Jewellery = {
-          update: Jewellery,
-        };
+      if (!existingProduct) {
+        return ApiResponse.error('Product not found');
       }
 
-      if (files.length > 0) {
-        const imageUrls = files?.length
-          ? (await uploadMultipleToCloudinary(files)).map(
-              (res: { secure_url: string }) => res.secure_url,
-            )
-          : existingProduct?.images;
+      // --- Build update object dynamically ---
+      const productUpdateData: any = {
+        name: updateDto.name ?? existingProduct.name,
+        description: updateDto.description ?? existingProduct.description,
+        price: updateDto.price ?? existingProduct.price,
+        trending: updateDto.trending ?? existingProduct.trending,
+      };
 
-        productUpdateData.images = imageUrls;
+      // --- Handle relational updates ---
+      const relations = ['RealEstate', 'Car', 'Watch', 'Yacht', 'Jewellery'];
+      for (const relation of relations) {
+        if (updateDto[relation]) {
+          productUpdateData[relation] = {
+            update: updateDto[relation],
+          };
+        }
       }
 
-      // console.log(productUpdateData, 'Product update data');
+      // --- Handle image uploads ---
+      if (files?.length > 0) {
+        const uploadedImages = await uploadMultipleToCloudinary(files);
+        productUpdateData.images = uploadedImages.map(
+          (res: { secure_url: string }) => res.secure_url,
+        );
+      } else {
+        productUpdateData.images = existingProduct.images;
+      }
 
-      const result = await this.prisma.product.update({
+      // --- Update product ---
+      const updatedProduct = await this.prisma.product.update({
         where: { id: productId },
         data: productUpdateData,
         include: {
@@ -421,9 +393,12 @@ export class ProductService {
         },
       });
 
-      return ApiResponse.success(result, 'Product updated successfully');
+      return ApiResponse.success(
+        updatedProduct,
+        'Product updated successfully',
+      );
     } catch (error) {
-      console.log(error);
+      console.error('Error updating product:', error);
       return ApiResponse.error(
         'Failed to update product, please try again later',
         error,
