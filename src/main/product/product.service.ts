@@ -338,7 +338,11 @@ export class ProductService {
     }
   }
 
-  async updateProduct(productId: string, updateDto: UpdateProductDto) {
+  async updateProduct(
+    productId: string,
+    files: Express.Multer.File[],
+    updateDto: UpdateProductDto,
+  ) {
     try {
       const {
         name,
@@ -352,12 +356,18 @@ export class ProductService {
         Jewellery,
       } = updateDto;
 
+      // console.log(updateDto, files, 'Update dto');
+
       const productUpdateData: any = {
         name,
         description,
         price,
-        trending,
+        trending: Number(trending),
       };
+
+      const existingProduct = await this.prisma.product.findFirst({
+        where: { id: productId },
+      });
 
       // Add relational updates conditionally
       if (RealEstate) {
@@ -386,6 +396,18 @@ export class ProductService {
         };
       }
 
+      if (files.length > 0) {
+        const imageUrls = files?.length
+          ? (await uploadMultipleToCloudinary(files)).map(
+              (res: { secure_url: string }) => res.secure_url,
+            )
+          : existingProduct?.images;
+
+        productUpdateData.images = imageUrls;
+      }
+
+      // console.log(productUpdateData, 'Product update data');
+
       const result = await this.prisma.product.update({
         where: { id: productId },
         data: productUpdateData,
@@ -401,6 +423,7 @@ export class ProductService {
 
       return ApiResponse.success(result, 'Product updated successfully');
     } catch (error) {
+      console.log(error);
       return ApiResponse.error(
         'Failed to update product, please try again later',
         error,
