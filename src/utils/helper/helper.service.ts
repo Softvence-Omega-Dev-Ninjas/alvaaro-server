@@ -4,11 +4,14 @@ import { ApiResponse } from '../common/apiresponse/apiresponse';
 
 @Injectable()
 export class HelperService {
-  constructor(private readonly prismaService: PrismaService) { }
+  constructor(private readonly prismaService: PrismaService) {}
 
   async userExists(userId: string) {
     const user = await this.prismaService.user.findUnique({
       where: { id: userId },
+      select: {
+        Seller: true,
+      },
     });
     return user;
   }

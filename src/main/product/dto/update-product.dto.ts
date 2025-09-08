@@ -9,6 +9,7 @@ export class UpdateProductDto {
   description?: string;
   price?: string;
   trending?: number;
+  images?: string[];
   RealEstate?: CreateRealEstateDto;
   Car?: CreateCarDto;
   Watch?: CreateWatchDto;

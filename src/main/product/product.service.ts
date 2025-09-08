@@ -338,7 +338,11 @@ export class ProductService {
     }
   }
 
-  async updateProduct(productId: string, updateDto: UpdateProductDto) {
+  async updateProduct(
+    productId: string,
+    updateDto: UpdateProductDto,
+    files: Express.Multer.File[],
+  ) {
     try {
       const {
         name,
@@ -358,6 +362,10 @@ export class ProductService {
         price,
         trending,
       };
+
+      const existingProduct = await this.prisma.product.findFirst({
+        where: { id: productId },
+      });
 
       // Add relational updates conditionally
       if (RealEstate) {
@@ -386,9 +394,19 @@ export class ProductService {
         };
       }
 
+      if (files.length > 0) {
+        const imageUrls = files?.length
+          ? (await uploadMultipleToCloudinary(images)).map(
+              (res: { secure_url: string }) => res.secure_url,
+            )
+          : existingProduct?.images;
+
+        updateDto.images = imageUrls;
+      }
+
       const result = await this.prisma.product.update({
         where: { id: productId },
-        data: productUpdateData,
+        data: { ...productUpdateData, images: updateDto.images },
         include: {
           seller: true,
           RealEstate: true,
