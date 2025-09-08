@@ -1,4 +1,13 @@
-import { Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { UserSearchPayload } from './dto/create-admin.dto';
 import { UserRole } from '@prisma/client';
@@ -34,7 +43,7 @@ export class AdminController {
     return this.adminService.findTotalAmount();
   }
   // seller verification by admin
-  @Post('verify-seller/:id')
+  @Patch('verify-seller/:id')
   async verifySeller(
     @Param('id') id: string,
     @Query('status') status: VerificationStatusDto,
@@ -49,7 +58,7 @@ export class AdminController {
 
   //! TODO: Implement total sales
   // delete seller
-  @Post('delete-seller/:id')
+  @Delete('delete-seller/:id')
   @UseGuards(AuthGuard)
   @Roles(UserRole.ADMIN)
   async deleteSeller(@Param('id') id: string) {
