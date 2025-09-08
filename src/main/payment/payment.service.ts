@@ -57,7 +57,6 @@ export class PaymentService {
         couponExists = (await this.helperService.couponExists(
           couponCode,
         )) as Coupon[];
-
       }
       const session = await this.stripe.checkout.sessions.create({
         payment_method_types: ['card'],
@@ -80,18 +79,22 @@ export class PaymentService {
         ],
         ...(couponExists.length > 0
           ? {
-            discounts: [
-              {
-                coupon: couponExists[0]?.stripeCouponId,
-              },
-            ],
-          }
+              discounts: [
+                {
+                  coupon: couponExists[0]?.stripeCouponId,
+                },
+              ],
+            }
           : {}),
 
-        success_url: 'http://localhost:3000/stripe/payment-success',
+        // success_url: 'http://localhost:3000/stripe/payment-success',
+        success_url: 'http://localhost:5173/seller-info',
         cancel_url: 'http://localhost:3000/stripe/payment-cancel',
       });
-      return ApiResponse.success({ url: session.url }, 'Checkout session created successfully');
+      return ApiResponse.success(
+        { url: session.url },
+        'Checkout session created successfully',
+      );
     } catch (error) {
       console.error('Error creating checkout session:', error);
     }
@@ -118,7 +121,6 @@ export class PaymentService {
 
         const planType = subscriptionEventData?.items?.data?.[0]?.price
           ?.metadata?.planType as string | undefined;
-
 
         if (!planType) {
           throw new Error('Plan type is missing in subscription metadata.');
@@ -178,7 +180,6 @@ export class PaymentService {
           'Subscription validity updated successfully',
         );
       }
-
     } catch (error) {
       console.error('Webhook error:', error.message);
       throw error;
