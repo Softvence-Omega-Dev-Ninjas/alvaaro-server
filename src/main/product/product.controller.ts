@@ -71,10 +71,10 @@ export class ProductController {
     return this.productService.findProductBySellerId(sellerId);
   }
 
-  // @RolesGuard()
+  @Public()
   @Patch(':id')
   @UseInterceptors(FilesInterceptor('images'))
-  @ApiConsumes('multipart/form-data')
+  @ApiConsumes('application/json')
   async updateProduct(
     @UploadedFiles() images: Express.Multer.File[],
     @Param('id') id: string,
