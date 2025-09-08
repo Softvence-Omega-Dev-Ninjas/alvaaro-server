@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Delete,
   Get,
@@ -25,7 +26,7 @@ export class AdminController {
   @Get('all-sellers')
   @UseGuards(AuthGuard)
   @Roles(UserRole.ADMIN)
-  findAllSellers(@Query() payload: UserSearchPayload) {
+  async findAllSellers(@Query() payload: UserSearchPayload) {
     const normalizedPayload = {
       ...payload,
       s_status:
@@ -35,25 +36,25 @@ export class AdminController {
             : 'false'
           : (payload.s_status as 'true' | 'false' | undefined),
     };
-    return this.adminService.findAllSellers(normalizedPayload);
+    return await this.adminService.findAllSellers(normalizedPayload);
   }
   // get total amount monthwise
   @Get('total-amount')
-  findTotalAmount() {
-    return this.adminService.findTotalAmount();
+  async findTotalAmount() {
+    return await this.adminService.findTotalAmount();
   }
   // seller verification by admin
   @Patch('verify-seller/:id')
   async verifySeller(
     @Param('id') id: string,
-    @Query('status') status: VerificationStatusDto,
+    @Body() status: VerificationStatusDto,
   ) {
-    return this.adminService.verifySeller(id, status);
+    return await this.adminService.verifySeller(id, status);
   }
   // get all users and sellers
   @Get('all-users-sellers')
-  findAllUsersAndSellers() {
-    return this.adminService.findAllUsersAndSellers();
+  async findAllUsersAndSellers() {
+    return await this.adminService.findAllUsersAndSellers();
   }
 
   //! TODO: Implement total sales

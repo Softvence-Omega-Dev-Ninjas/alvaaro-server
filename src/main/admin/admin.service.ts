@@ -139,7 +139,7 @@ export class AdminService {
     try {
       // Verify seller by id
       const updatedSeller = await this.prisma.seller.update({
-        where: { userId: id },
+        where: { id },
         data: { verificationStatus: status.status },
       });
       return ApiResponse.success(updatedSeller, 'Seller verified successfully');
