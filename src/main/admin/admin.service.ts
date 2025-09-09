@@ -54,11 +54,12 @@ export class AdminService {
             contains: payload.email || '',
             mode: 'insensitive',
           },
-          // isDeleted: false,
         },
+        isDeleted: false,
         subscriptionStatus: subscriptionFilter,
         verificationStatus: verificationFilter,
       },
+      include: { user: true },
     });
 
     return ApiResponse.success(getData, 'Sellers fetched successfully');
