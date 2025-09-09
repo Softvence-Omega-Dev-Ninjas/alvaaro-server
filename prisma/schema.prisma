@@ -47,7 +47,6 @@ model Seller {
   Product            Product[]
   amounts            Amount[]
   Inquiry            Inquiry[]
-  isDeleted          Boolean                   @default(false)
 }
 
 // Cars

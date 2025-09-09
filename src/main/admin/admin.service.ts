@@ -54,8 +54,8 @@ export class AdminService {
             contains: payload.email || '',
             mode: 'insensitive',
           },
+          isDeleted: false,
         },
-        isDeleted: false,
         subscriptionStatus: subscriptionFilter,
         verificationStatus: verificationFilter,
       },
@@ -107,9 +107,9 @@ export class AdminService {
       const users = await this.prisma.user.findMany();
       const sellers = await this.prisma.seller.findMany({
         where: {
+          user: { isDeleted: false },
           verificationStatus: 'VERIFIED',
           subscriptionStatus: true,
-          isDeleted: false,
         },
       });
       const startOfMonth = new Date();
@@ -152,7 +152,7 @@ export class AdminService {
   // delete seller
   async deleteSeller(id: string) {
     try {
-      await this.prisma.seller.update({
+      await this.prisma.user.update({
         where: { id },
         data: { isDeleted: true },
       });
