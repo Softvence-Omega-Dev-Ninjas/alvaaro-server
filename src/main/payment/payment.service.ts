@@ -87,8 +87,8 @@ export class PaymentService {
             }
           : {}),
 
-        // success_url: 'http://localhost:3000/stripe/payment-success',
-        success_url: 'http://localhost:5173/seller-info',
+        success_url: 'http://localhost:3000/stripe/payment-success',
+        // success_url: 'http://localhost:5173/seller-info',
         cancel_url: 'http://localhost:3000/stripe/payment-cancel',
       });
       return ApiResponse.success(
