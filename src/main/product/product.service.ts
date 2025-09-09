@@ -356,7 +356,12 @@ export class ProductService {
         name: updateDto.name ?? existingProduct.name,
         description: updateDto.description ?? existingProduct.description,
         price: updateDto.price ?? existingProduct.price,
-        trending: updateDto.trending ?? existingProduct.trending,
+        // trending:
+        //   updateDto.trending !== undefined
+        //     ? typeof updateDto.trending === 'string'
+        //       ? parseInt(updateDto.trending)
+        //       : updateDto.trending
+        //     : existingProduct.trending,
       };
 
       // --- Handle relational updates ---
