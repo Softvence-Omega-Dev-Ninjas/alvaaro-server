@@ -74,7 +74,7 @@ export class ProductController {
   @Public()
   @Patch(':id')
   @UseInterceptors(FilesInterceptor('images'))
-  @ApiConsumes('application/json')
+  @ApiConsumes('multipart/form-data')
   async updateProduct(
     @UploadedFiles() images: Express.Multer.File[],
     @Param('id') id: string,
