@@ -1,18 +1,17 @@
 import { NestFactory } from "@nestjs/core"
-import { AppModule } from "./app.module"
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger"
-import { AllExceptionsFilter } from "./utils/common/filter/all-exceptions.filter"
 import * as bodyParser from "body-parser"
+import { AppModule } from "./app.module"
+import { AllExceptionsFilter } from "./utils/common/filter/all-exceptions.filter"
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule)
 	app.useGlobalFilters(new AllExceptionsFilter())
 
 	app.enableCors({
-		origin: ["http://localhost:5173"],
+		origin: ["http://localhost:5173", 'https://regal-gelato-3c9b8d.netlify.app'],
 		credentials: true
 	})
-
 	const config = new DocumentBuilder()
 		.setTitle("Alvaaro Server")
 		.setDescription("API description")
