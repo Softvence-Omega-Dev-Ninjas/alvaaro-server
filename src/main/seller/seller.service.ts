@@ -33,13 +33,13 @@ export class SellerService {
     userEmail: string,
   ) {
     // check if user payment in uservalidate table
-    const userPaymentValidate =
-      await this.prisma.userSubscriptionValidity.findUnique({
-        where: { userId, subscribedPlan: createSellerDto.subscriptionPlan },
-      });
-    if (!userPaymentValidate) {
-      return ApiResponse.error('User payment not found');
-    }
+    // const userPaymentValidate =
+    //   await this.prisma.userSubscriptionValidity.findUnique({
+    //     where: { userId, subscribedPlan: createSellerDto.subscriptionPlan },
+    //   });
+    // if (!userPaymentValidate) {
+    //   return ApiResponse.error('User payment not found');
+    // }
     const result = await this.prisma.seller.create({
       data: {
         userId,
