@@ -176,12 +176,11 @@ export class PaymentService {
             amount: (Number(invoiceDetails.amount_paid) / 100).toString(),
           },
         });
-        console.log(subscriptionEventData.metadata.email);
         await this.mailService.sendReceiptEmail({
           to: subscriptionEventData.metadata.email,
           subject: 'Your Subscription Receipt',
           title: 'Subscription Activated',
-          message: `Your subscription for the ${subscribedPlan.type} plan has been activated. It is valid until ${expiryTime.toDateString()}. Download received ${invoiceDetails.invoice_pdf}.`,
+          message: `Your subscription for the ${subscribedPlan.type} plan has been activated. It is valid until ${expiryTime.toDateString()}. Download received <a href=${invoiceDetails.invoice_pdf}>Link</a>.`,
         });
         return ApiResponse.success(
           'Subscription validity updated successfully',
