@@ -33,4 +33,23 @@ export class UserService {
 
     return ApiResponse.success(userExist, 'Current user found successfully');
   }
+  async findCurrentPlan(userId: string) {
+    const userExist = await this.helper.userExists(userId);
+    if (!userExist) {
+      throw new NotFoundException('User does not exist');
+    }
+    const plan = await this.prisma.userSubscriptionValidity.findFirst({
+      where: { userId: userId },
+    });
+    if (!plan) {
+      return ApiResponse.success(null, 'No active plan found for user');
+    }
+    const Currentplan = await this.prisma.subscriptionPlan.findUnique({
+      where: { id: plan.subscribedPlan },
+    });
+    if (!plan) {
+      return ApiResponse.success(null, 'No active plan found for user');
+    }
+    return ApiResponse.success(Currentplan, 'Current plan found successfully');
+  }
 }
