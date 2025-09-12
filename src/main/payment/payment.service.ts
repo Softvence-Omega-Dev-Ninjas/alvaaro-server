@@ -6,6 +6,7 @@ import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 import { HelperService } from 'src/utils/helper/helper.service';
 import Stripe from 'stripe';
 import { SubscriptionPlanType } from './type/subscriptionPlanType';
+import { MailService } from 'src/utils/mail/mail.service';
 
 @Injectable()
 export class PaymentService {
@@ -14,6 +15,7 @@ export class PaymentService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly helperService: HelperService,
+    private readonly mailService: MailService,
   ) {
     this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {});
   }
@@ -107,7 +109,7 @@ export class PaymentService {
         sig,
         process.env.STRIPE_WEBHOOK_SECRET as string,
       );
-
+      console.log('1', { event });
       if (
         event.type === 'customer.subscription.created' ||
         event.type === 'customer.subscription.updated' ||
@@ -118,7 +120,7 @@ export class PaymentService {
         const invoiceDetails = await this.stripe.invoices.retrieve(
           subscriptionEventData?.latest_invoice as string,
         );
-
+        console.log('2', { invoiceDetails });
         const planType = subscriptionEventData?.items?.data?.[0]?.price
           ?.metadata?.planType as string | undefined;
 
@@ -151,8 +153,6 @@ export class PaymentService {
           );
         }
 
-        console.log(subscriptionEventData.metadata.userId);
-
         await this.prismaService.userSubscriptionValidity.upsert({
           where: { userId: subscriptionEventData.metadata.userId },
           update: {
@@ -169,13 +169,20 @@ export class PaymentService {
             payabeAmount: (Number(invoiceDetails.amount_paid) / 100).toString(),
           },
         });
+
         await this.prismaService.amount.create({
           data: {
-            userId: subscriptionEventData.metadata.userId,
+            invoiceNumber: invoiceDetails.number as string,
             amount: (Number(invoiceDetails.amount_paid) / 100).toString(),
           },
         });
-
+        console.log(subscriptionEventData.metadata.email);
+        await this.mailService.sendReceiptEmail({
+          to: subscriptionEventData.metadata.email,
+          subject: 'Your Subscription Receipt',
+          title: 'Subscription Activated',
+          message: `Your subscription for the ${subscribedPlan.type} plan has been activated. It is valid until ${expiryTime.toDateString()}. Download received ${invoiceDetails.invoice_pdf}.`,
+        });
         return ApiResponse.success(
           'Subscription validity updated successfully',
         );

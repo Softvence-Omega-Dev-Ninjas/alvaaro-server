@@ -1,10 +1,10 @@
 model Amount {
-    id        String   @id @default(cuid())
-    userId    String   @unique
-    user      User     @relation(fields: [userId], references: [id])
-    amount    String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    Seller    Seller?  @relation(fields: [sellerId], references: [id])
-    sellerId  String?
+    id            String   @id @default(cuid())
+    invoiceNumber String
+    amount        String
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+    Seller        Seller?  @relation(fields: [sellerId], references: [id])
+    sellerId      String?
+    User          User[]
 }

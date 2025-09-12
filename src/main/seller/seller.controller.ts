@@ -18,6 +18,7 @@ import { RolesGuard } from 'src/guards/role.guard';
 import { UserRole } from 'src/utils/common/enum/userEnum';
 import { ApiBody, ApiQuery } from '@nestjs/swagger';
 import { ContactSellerDto } from './dto/contact-seller.dto';
+import { TimeValidation } from 'src/guards/timeValidation.guard';
 
 @Controller('seller')
 @UseGuards(AuthGuard, RolesGuard)
@@ -39,7 +40,7 @@ export class SellerController {
   }
 
   @Get()
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard, TimeValidation)
   @Roles(UserRole.ADMIN)
   @ApiQuery({
     name: 'verificationStatus',
@@ -69,7 +70,7 @@ export class SellerController {
     });
   }
 
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard, TimeValidation)
   @Roles(UserRole.SELLER)
   @Get('inquiry')
   getInquiryBySellerId(@Req() req: { userid: string }) {
@@ -103,14 +104,14 @@ export class SellerController {
     return this.sellerService.contactSeller(productId, contactSellerDto);
   }
 
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard, TimeValidation)
   @Roles(UserRole.SELLER)
   @Get('dashboard/stats')
   getDashboardStatistics(@Req() req: { userid: string }) {
     return this.sellerService.getDashboardStatistics(req.userid);
   }
 
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard, TimeValidation)
   @Roles(UserRole.SELLER)
   @Get('dashboard/analysis')
   getDashboardAnalysis(@Req() req: { userid: string }) {

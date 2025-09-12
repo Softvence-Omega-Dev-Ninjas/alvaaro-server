@@ -18,7 +18,7 @@ import { Public } from 'src/guards/public.decorator';
 
 @Controller('stripe')
 export class PaymentController {
-  constructor(private readonly stripeService: PaymentService) { }
+  constructor(private readonly stripeService: PaymentService) {}
 
   // * Routes for Stripe Checkout
   @UseGuards(AuthGuard)
@@ -38,21 +38,21 @@ export class PaymentController {
     );
   }
 
-  @Get('payment-success')
-  @Public()
-  paymentSuccess(@Res() res: Response) {
-    return res.send(
-      '<h1>Payment Successful!</h1><p>Thank you for your purchase.</p>',
-    );
-  }
+  // @Get('payment-success')
+  // @Public()
+  // paymentSuccess(@Res() res: Response) {
+  //   return res.send(
+  //     '<h1>Payment Successful!</h1><p>Thank you for your purchase.</p>',
+  //   );
+  // }
 
-  @Get('payment-cancel')
-  @Public()
-  paymentCancel(@Res() res: Response) {
-    return res.send(
-      '<h1>Payment Cancelled</h1><p>Your payment was cancelled.</p>',
-    );
-  }
+  // @Get('payment-cancel')
+  // @Public()
+  // paymentCancel(@Res() res: Response) {
+  //   return res.send(
+  //     '<h1>Payment Cancelled</h1><p>Your payment was cancelled.</p>',
+  //   );
+  // }
 
   // * Webhook
   @Post('webhook')

@@ -24,7 +24,8 @@ model User {
   updatedAt                DateTime                   @updatedAt
   Wishlist                 Wishlist[]
   UserSubscriptionValidity UserSubscriptionValidity[]
-  Amount                   Amount?
+  amountId                 String?
+  Amount                   Amount?                    @relation(fields: [amountId], references: [id])
 }
 
 model Seller {
