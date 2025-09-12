@@ -180,12 +180,13 @@ export class PaymentService {
           to: subscriptionEventData.metadata.email,
           subject: 'Your Subscription Receipt',
           title: 'Subscription Activated',
-          message: `Your subscription for the ${subscribedPlan.type} plan has been activated. It is valid until ${expiryTime.toDateString()}. Download received <a href=${invoiceDetails.invoice_pdf}>Link</a>.`,
+          message: `Your subscription for the ${subscribedPlan.type} plan has been activated. It is valid until ${expiryTime.toDateString()}`,
+          buttonText: 'View Invoice',
+          buttonUrl: invoiceDetails.invoice_pdf as string,
+          footerText: 'Thank you for subscribing to our service!',
         });
-        return ApiResponse.success(
-          'Subscription validity updated successfully',
-        );
       }
+      return ApiResponse.success('Subscription validity updated successfully');
     } catch (error) {
       console.error('Webhook error:', error.message);
       throw error;
