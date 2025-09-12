@@ -3,7 +3,7 @@ name: CI/CD Pipeline for Dockerized Application
 on:
   push:
     branches:
-      - main
+      - dev
 
 env:
   IMAGE_NAME: imranwebstudio/alvaro-server:latest
