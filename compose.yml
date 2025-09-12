@@ -13,7 +13,7 @@ services:
       - db_data:/var/lib/postgresql/data
   app:
     build: .
-    image: imranwebsite/alvaro-server:latest
+    image: imranwebstudio/alvaro-server:latest
     platform: linux/amd64
     container_name: alvaro-server
     restart: always
