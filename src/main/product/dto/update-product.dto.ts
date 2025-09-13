@@ -23,7 +23,27 @@ export class UpdateProductDto {
   @ApiPropertyOptional({ description: 'Product price', example: '2500' })
   @IsOptional()
   @IsString()
-  price?: string;
+  price?: number;
+
+  @ApiPropertyOptional({ description: 'Zip', example: '1234' })
+  @IsOptional()
+  @IsString()
+  zip?: string;
+
+  @ApiPropertyOptional({ description: 'City', example: 'Los Angeles' })
+  @IsOptional()
+  @IsString()
+  city?: string;
+
+  @ApiPropertyOptional({ description: 'State', example: 'California' })
+  @IsOptional()
+  @IsString()
+  state?: string;
+
+  @ApiPropertyOptional({ description: 'Address', example: '1234 Sunset Blvd' })
+  @IsOptional()
+  @IsString()
+  address?: string;
 
   @ApiPropertyOptional({
     description: 'Trending rank (1 = most trending)',

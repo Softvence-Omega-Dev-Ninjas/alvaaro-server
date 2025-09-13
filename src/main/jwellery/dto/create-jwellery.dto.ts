@@ -10,7 +10,7 @@ export class CreateJewelleryDto {
   description: string;
 
   @ApiProperty({ example: '5000' })
-  price: string;
+  price: number;
 
   @ApiProperty()
   @IsString()
