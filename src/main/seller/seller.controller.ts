@@ -69,6 +69,19 @@ export class SellerController {
     });
   }
 
+  // @Patch('profile/update')
+  // @UseGuards(AuthGuard, RolesGuard)
+  // @Roles(UserRole.SELLER)
+  // async updateSellerProfile(
+  //   @Body() updateSellerDto: CreateSellerDto,
+  //   @Req() req: Request,
+  // ) {
+  //   return await this.sellerService.updateSellerProfile(
+  //     updateSellerDto,
+  //     req['userid'] as string,
+  //   );
+  // }
+
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.SELLER)
   @Get('inquiry')
@@ -76,7 +89,6 @@ export class SellerController {
     return this.sellerService.getInquiryBySellerId(req.userid);
   }
 
-  // @Get(':id')
   // findOne(@Param('id') id: string) {
   //   return this.sellerService.findOne(+id);
   // }

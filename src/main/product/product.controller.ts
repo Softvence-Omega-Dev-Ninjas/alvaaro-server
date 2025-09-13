@@ -16,7 +16,7 @@ import {
 import { ProductService } from './product.service';
 import { ApiConsumes, ApiQuery } from '@nestjs/swagger';
 import { CategoryType } from '@prisma/client';
-import { RealEstateSearchQueryDto } from './dto/real-estate-search.dto';
+import { ProductSearchQueryDto } from './dto/real-estate-search.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { Public } from 'src/guards/public.decorator';
@@ -29,6 +29,9 @@ export class ProductController {
   @Get()
   @Public()
   @ApiQuery({ name: 'category', enum: CategoryType, required: false })
+  @ApiQuery({ name: 'location', required: false })
+  @ApiQuery({ name: 'minPrice', required: false })
+  @ApiQuery({ name: 'maxPrice', required: false })
   async findAllProducts(@Query('category') category?: CategoryType) {
     return await this.productService.findAllProducts(category);
   }
@@ -52,7 +55,7 @@ export class ProductController {
   @ApiQuery({ name: 'minPrice', required: false })
   @ApiQuery({ name: 'maxPrice', required: false })
   @ApiQuery({ name: 'type', required: false })
-  searchRealEstate(@Query() query?: RealEstateSearchQueryDto) {
+  searchRealEstate(@Query() query?: ProductSearchQueryDto) {
     return this.productService.searchRealEstate(query);
   }
 

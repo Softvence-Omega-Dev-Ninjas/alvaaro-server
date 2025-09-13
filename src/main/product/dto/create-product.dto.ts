@@ -16,6 +16,22 @@ export class CreateProductDto {
   @IsString()
   price: string;
 
+  @ApiProperty()
+  @IsString()
+  state: string;
+
+  @ApiProperty()
+  @IsString()
+  city: string;
+
+  @ApiProperty()
+  @IsString()
+  zip: string;
+
+  @ApiProperty()
+  @IsString()
+  address: string;
+
   @ApiProperty({
     type: 'array',
     items: {

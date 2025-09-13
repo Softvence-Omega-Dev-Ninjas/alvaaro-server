@@ -4,7 +4,11 @@ model Product {
   seller      Seller       @relation(fields: [sellerId], references: [id])
   name        String
   description String
-  price       String
+  price       Decimal
+  state       String
+  city        String
+  zip         String
+  address     String
   images      String[]
   category    CategoryType
   isExclusive Boolean?

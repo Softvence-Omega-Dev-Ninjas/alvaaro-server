@@ -12,6 +12,22 @@ export class CreateJewelleryDto {
   @ApiProperty({ example: '5000' })
   price: string;
 
+  @ApiProperty()
+  @IsString()
+  state: string;
+
+  @ApiProperty()
+  @IsString()
+  city: string;
+
+  @ApiProperty()
+  @IsString()
+  zip: string;
+
+  @ApiProperty()
+  @IsString()
+  address: string;
+
   @ApiProperty({
     description: 'Photo showing the problem (required)',
     type: 'array',

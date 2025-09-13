@@ -41,6 +41,10 @@ export class ProductService {
           price: dto.price,
           images: imageUrls,
           category: dto.category,
+          address: dto.address,
+          city: dto.city,
+          state: dto.state,
+          zip: dto.zip,
           isExclusive: Boolean(dto.isExclusive),
           sellerId,
           views: 0,
@@ -51,10 +55,6 @@ export class ProductService {
           data: {
             productId: product.id,
             beds: dto.beds,
-            address: dto.address,
-            city: dto.city,
-            state: dto.state,
-            zip: dto.zip,
             size: dto.size,
             washroom: dto.washroom,
             features: Array.isArray(dto.features)
@@ -83,10 +83,6 @@ export class ProductService {
           data: {
             productId: product.id,
             beds: dto.beds,
-            address: dto.address,
-            city: dto.city,
-            state: dto.state,
-            zip: dto.zip,
             size: dto.size,
             washroom: dto.washroom,
             features: Array.isArray(dto.features)
@@ -250,7 +246,7 @@ export class ProductService {
     maxPrice?: string;
     type?: string;
   }) {
-    const { location, minPrice, maxPrice, type } = query ?? {};
+    const { minPrice, maxPrice, type } = query ?? {};
 
     const products = await this.prisma.product.findMany({
       where: {
@@ -260,21 +256,6 @@ export class ProductService {
           lte: maxPrice ? maxPrice : undefined,
         },
         AND: [
-          location
-            ? {
-                RealEstate: {
-                  is: {
-                    OR: [
-                      { address: { contains: location, mode: 'insensitive' } },
-                      { city: { contains: location, mode: 'insensitive' } },
-                      { state: { contains: location, mode: 'insensitive' } },
-                      { zip: { contains: location, mode: 'insensitive' } },
-                    ],
-                  },
-                },
-              }
-            : {},
-
           type
             ? {
                 RealEstate: {
