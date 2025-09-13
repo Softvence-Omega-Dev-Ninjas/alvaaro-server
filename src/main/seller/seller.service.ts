@@ -26,37 +26,48 @@ export class SellerService {
     userId: string,
     userEmail: string,
   ) {
-    // check if user payment in uservalidate table
-    const userPaymentValidate =
-      await this.prisma.userSubscriptionValidity.findUnique({
-        where: { userId, subscribedPlan: createSellerDto.subscriptionPlan },
+    try {
+      const sellerExists = await this.prisma.seller.findUnique({
+        where: { userId },
       });
-    if (!userPaymentValidate) {
-      return ApiResponse.error('User payment not found');
-    }
-    const result = await this.prisma.seller.create({
-      data: {
-        userId,
-        companyName: createSellerDto.companyName,
-        companyWebsite: createSellerDto.companyWebsite,
-        phone: createSellerDto.phone,
-        address: createSellerDto.address,
-        state: createSellerDto.state,
-        city: createSellerDto.city,
-        zip: createSellerDto.zip,
-        subscriptionStatus: true,
-      },
-    });
-    await this.prisma.user.update({
-      where: { id: userId },
-      data: {
-        role: 'SELLER',
-      },
-    });
+      if (sellerExists) {
+        return ApiResponse.error('Seller already exists in same email');
+      }
+      // console.log({ createSellerDto, userId, userEmail });
+      // check if user payment in uservalidate table
+      // const userPaymentValidate =
+      //   await this.prisma.userSubscriptionValidity.findUnique({
+      //     where: { userId, subscribedPlan: createSellerDto.subscriptionPlan },
+      //   });
+      // if (!userPaymentValidate) {
+      //   return ApiResponse.error('User payment not found');
+      // }
+      const result = await this.prisma.seller.create({
+        data: {
+          userId,
+          companyName: createSellerDto.companyName,
+          companyWebsite: createSellerDto.companyWebsite,
+          phone: createSellerDto.phone,
+          address: createSellerDto.address,
+          state: createSellerDto.state,
+          city: createSellerDto.city,
+          zip: createSellerDto.zip,
+          subscriptionStatus: true,
+        },
+      });
 
-    await this.cacheManager.del(`otp-${userEmail}`);
-    await this.cacheManager.del(`seller-info-${userEmail}`);
-    return ApiResponse.success(result, 'Seller created successfully');
+      await this.prisma.user.update({
+        where: { id: userId },
+        data: {
+          role: 'SELLER',
+        },
+      });
+      await this.cacheManager.del(`otp-${userEmail}`);
+      await this.cacheManager.del(`seller-info-${userEmail}`);
+      return ApiResponse.success(result, 'Seller created successfully');
+    } catch (error) {
+      console.log(error.message);
+    }
   }
 
   // async updateS

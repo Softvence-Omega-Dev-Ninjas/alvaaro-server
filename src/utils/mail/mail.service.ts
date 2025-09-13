@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 import { ApiResponse } from '../common/apiresponse/apiresponse';
+import { buildReceiptEmail } from './templates/email-templates';
 
 @Injectable()
 export class MailService {
@@ -37,5 +38,28 @@ export class MailService {
     } catch (error) {
       ApiResponse.error(`Failed to send email to ${to}: ${error.message}`, 500);
     }
+  }
+
+  // Helper to send receipt emails using reusable template
+  async sendReceiptEmail(options: {
+    to: string;
+    subject: string;
+    title: string;
+    message: string;
+    buttonText?: string;
+    buttonUrl?: string;
+    footerText?: string;
+  }) {
+    const { to, subject, title, message, buttonText, buttonUrl, footerText } =
+      options;
+    const html = buildReceiptEmail({
+      title,
+      message,
+      buttonText,
+      buttonUrl,
+      footerText,
+    });
+
+    await this.sendMail(to, subject, html);
   }
 }

@@ -5,6 +5,7 @@ import { AuthGuard } from 'src/guards/auth.guard';
 import { Roles } from 'src/guards/roles.decorator';
 import { UserRole } from 'src/utils/common/enum/userEnum';
 import { RolesGuard } from 'src/guards/role.guard';
+import { Public } from 'src/guards/public.decorator';
 
 @Controller('subscriptionplan')
 @UseGuards(AuthGuard, RolesGuard)
@@ -21,8 +22,9 @@ export class SubscriptionplanController {
   }
 
   @Get('all-plan')
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.SELLER, UserRole.USER)
+  @Public()
+  // @UseGuards(AuthGuard, RolesGuard)
+  // @Roles(UserRole.ADMIN, UserRole.SELLER, UserRole.USER)
   async findAll() {
     const result = await this.subscriptionplanService.findAll();
     return result;

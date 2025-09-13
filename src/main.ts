@@ -1,53 +1,52 @@
-import { NestFactory } from "@nestjs/core"
-import { AppModule } from "./app.module"
-import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger"
-import { AllExceptionsFilter } from "./utils/common/filter/all-exceptions.filter"
-import * as bodyParser from "body-parser"
+import { NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as bodyParser from 'body-parser';
+import { AppModule } from './app.module';
+import { AllExceptionsFilter } from './utils/common/filter/all-exceptions.filter';
 
 async function bootstrap() {
-	const app = await NestFactory.create(AppModule)
-	app.useGlobalFilters(new AllExceptionsFilter())
+  const app = await NestFactory.create(AppModule);
+  app.useGlobalFilters(new AllExceptionsFilter());
 
-	app.enableCors({
-		origin: ["http://localhost:5173"],
-		credentials: true
-	})
+  app.enableCors({
+    origin: true,
+    credentials: true,
+  });
+  const config = new DocumentBuilder()
+    .setTitle('Alvaaro Server')
+    .setDescription('API description')
+    .setVersion('1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        in: 'bearer',
+      },
+      'access-token',
+    )
+    .build();
 
-	const config = new DocumentBuilder()
-		.setTitle("Alvaaro Server")
-		.setDescription("API description")
-		.setVersion("1.0")
-		.addBearerAuth(
-			{
-				type: "http",
-				scheme: "bearer",
-				bearerFormat: "JWT",
-				in: "bearer"
-			},
-			"access-token"
-		)
-		.build()
+  const documentFactory = SwaggerModule.createDocument(app, config);
 
-	const documentFactory = SwaggerModule.createDocument(app, config)
+  documentFactory.paths = Object.fromEntries(
+    Object.entries(documentFactory.paths).map(([path, ops]) => [
+      path,
+      Object.fromEntries(
+        Object.entries(ops).map(([method, op]) => [
+          method,
+          {
+            ...op,
+            security: [{ 'access-token': [] }],
+          },
+        ]),
+      ),
+    ]),
+  );
 
-	documentFactory.paths = Object.fromEntries(
-		Object.entries(documentFactory.paths).map(([path, ops]) => [
-			path,
-			Object.fromEntries(
-				Object.entries(ops).map(([method, op]) => [
-					method,
-					{
-						...op,
-						security: [{ "access-token": [] }]
-					}
-				])
-			)
-		])
-	)
+  SwaggerModule.setup('api', app, documentFactory);
 
-	SwaggerModule.setup("api", app, documentFactory)
-
-	app.use("/stripe/webhook", bodyParser.raw({ type: "application/json" }))
-	await app.listen(process.env.PORT ?? 3000)
+  app.use('/stripe/webhook', bodyParser.raw({ type: 'application/json' }));
+  await app.listen(process.env.PORT ?? 3000);
 }
-void bootstrap()
+void bootstrap();
