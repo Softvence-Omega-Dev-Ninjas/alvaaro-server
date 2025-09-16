@@ -6,10 +6,10 @@ import { AllExceptionsFilter } from './utils/common/filter/all-exceptions.filter
 import { seed } from './prisma-service/seed';
 
 async function bootstrap() {
+  // apply seed data
   await seed();
   const app = await NestFactory.create(AppModule);
   app.useGlobalFilters(new AllExceptionsFilter());
-  
 
   app.enableCors({
     origin: true,
