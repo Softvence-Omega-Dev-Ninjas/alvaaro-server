@@ -200,7 +200,7 @@ export class AdminService {
       }
       const updatedUser = await this.prisma.user.update({
         where: { id },
-        data: { role: role.role },
+        data: { role: role.role, isOtpVerified: true },
       });
       return ApiResponse.success(
         updatedUser,
