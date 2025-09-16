@@ -3,6 +3,7 @@ import { PrismaService } from 'src/prisma-service/prisma-service.service';
 import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 import { HelperService } from 'src/utils/helper/helper.service';
 import { VerificationStatusDto } from './dto/verficationStatus.dto';
+import { UpdateRoleDto } from './dto/updateRole.dto';
 
 type UserSearchPayload = {
   v_status?: 'PENDING' | 'VERIFIED' | 'REJECTED';
@@ -139,10 +140,12 @@ export class AdminService {
   async verifySeller(id: string, status: VerificationStatusDto) {
     try {
       // Verify seller by id
+
       const updatedSeller = await this.prisma.seller.update({
-        where: { id },
+        where: { userId: id },
         data: { verificationStatus: status.status },
       });
+      console.log('Updated Seller:', updatedSeller);
       return ApiResponse.success(updatedSeller, 'Seller verified successfully');
     } catch (error) {
       console.log('Error verifying seller:', error);
@@ -183,6 +186,28 @@ export class AdminService {
     } catch (error) {
       console.log('Error blocking/unblocking user:', error);
       return ApiResponse.error('Error blocking/unblocking user', error);
+    }
+  }
+  // update role
+  async updateUserRole(id: string, role: UpdateRoleDto) {
+    try {
+      console.log(role);
+      const user = await this.prisma.user.findUnique({
+        where: { id },
+      });
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+      const updatedUser = await this.prisma.user.update({
+        where: { id },
+        data: { role: role.role },
+      });
+      return ApiResponse.success(
+        updatedUser,
+        `User role updated to ${role} successfully`,
+      );
+    } catch (error) {
+      throw new NotFoundException(error.message);
     }
   }
 }

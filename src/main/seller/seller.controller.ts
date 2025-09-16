@@ -19,6 +19,7 @@ import { UserRole } from 'src/utils/common/enum/userEnum';
 import { ApiBody, ApiQuery } from '@nestjs/swagger';
 import { ContactSellerDto } from './dto/contact-seller.dto';
 import { TimeValidation } from 'src/guards/timeValidation.guard';
+import { UpdateSellerDto } from './dto/update-seller.dto';
 
 @Controller('seller')
 @UseGuards(AuthGuard, RolesGuard)
@@ -77,16 +78,6 @@ export class SellerController {
     return this.sellerService.getInquiryBySellerId(req.userid);
   }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.sellerService.findOne(+id);
-  // }
-
-  // @Patch(':id')
-  // update(@Param('id') id: string) {
-  //   return this.sellerService.update(+id);
-  // }
-
   @Patch('verified-seller/:id')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
@@ -116,5 +107,16 @@ export class SellerController {
   @Get('dashboard/analysis')
   getDashboardAnalysis(@Req() req: { userid: string }) {
     return this.sellerService.getDashboardAnalysis(req.userid);
+  }
+  // seller update
+  @Patch('update-seller')
+  @ApiBody({ type: UpdateSellerDto })
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.SELLER)
+  async updateSeller(
+    @Body() updateData: UpdateSellerDto,
+    @Req() @Req() req: { userid: string },
+  ) {
+    return await this.sellerService.updateSeller(req.userid, updateData);
   }
 }

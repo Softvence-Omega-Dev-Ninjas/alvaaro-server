@@ -179,6 +179,7 @@ enum UserRole {
   USER
   SELLER
   ADMIN
+  SUPER_ADMIN
 }
 
 enum VerificationStatusType {

@@ -2,12 +2,17 @@ import { Controller, Get, Req, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { Request } from 'express';
+import { RolesGuard } from 'src/guards/role.guard';
+import { Roles } from 'src/guards/roles.decorator';
+import { UserRole } from 'src/utils/common/enum/userEnum';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   findAll() {
     return this.userService.findAll();
   }

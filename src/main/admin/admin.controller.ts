@@ -15,6 +15,8 @@ import { UserRole } from '@prisma/client';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { Roles } from 'src/guards/roles.decorator';
 import { VerificationStatusDto } from './dto/verficationStatus.dto';
+import { UpdateRoleDto } from './dto/updateRole.dto';
+import { ApiBody, ApiConsumes } from '@nestjs/swagger';
 
 @Controller('admin')
 @UseGuards(AuthGuard)
@@ -71,5 +73,14 @@ export class AdminController {
   @Roles(UserRole.ADMIN)
   async blockUser(@Param('id') id: string) {
     return this.adminService.blockUser(id);
+  }
+  // role change
+  @Post('change-role/:id')
+  @UseGuards(AuthGuard)
+  @Roles(UserRole.SUPER_ADMIN)
+  @ApiConsumes('application/x-www-form-urlencoded')
+  @ApiBody({ type: UpdateRoleDto, enum: UserRole })
+  async changeUserRole(@Param('id') id: string, @Body() role: UpdateRoleDto) {
+    return await this.adminService.updateUserRole(id, role);
   }
 }
