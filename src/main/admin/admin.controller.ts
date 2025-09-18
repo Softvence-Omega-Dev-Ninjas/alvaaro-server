@@ -59,7 +59,6 @@ export class AdminController {
     return await this.adminService.findAllUsersAndSellers();
   }
 
-  //! TODO: Implement total sales
   // delete seller
   @Delete('delete-seller/:id')
   @UseGuards(AuthGuard)
