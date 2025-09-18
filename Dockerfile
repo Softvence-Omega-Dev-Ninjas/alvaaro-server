@@ -2,16 +2,20 @@ FROM node:22-alpine
 
 WORKDIR /app
 
-# Copy the entire project including prisma folder
-COPY . .
+# Copy package files first for better caching
+COPY package*.json ./
+COPY prisma ./prisma/
 
-# Install dependencies
-RUN npm install
+# Install dependencies without running postinstall scripts
+RUN npm ci --ignore-scripts
+
+# Generate Prisma client (without database connection)
+RUN npx prisma generate
+
+# Copy the rest of the application
+COPY . .
 
 # Build the app
 RUN npm run build
 
-# Optional: ensure Prisma client is generated
-RUN npx prisma generate
-
-CMD ["node", "dist/main.js"]
+CMD ["npm", "run", "start:prod"]
