@@ -51,4 +51,4 @@ import { AppController } from './app.controller';
   controllers: [AppController],
   providers: [{ provide: APP_GUARD, useClass: AuthGuard }],
 })
-export class AppModule { }
+export class AppModule {}

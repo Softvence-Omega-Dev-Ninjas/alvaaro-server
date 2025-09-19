@@ -13,6 +13,7 @@ import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 import { CategoryType } from '@prisma/client';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { HelperService } from 'src/utils/helper/helper.service';
+import { getLatLngByGoogle } from 'src/utils/findlocation/getLatLngByGoogle';
 
 @Injectable()
 export class ProductService {
@@ -33,7 +34,13 @@ export class ProductService {
             (res: { secure_url: string }) => res.secure_url,
           )
         : [];
-
+      const location = await getLatLngByGoogle(
+        'medical',
+        'Dhaka',
+        '1212',
+        'Bangladesh',
+      );
+      console.log({ location });
       const product = await this.prisma.product.create({
         data: {
           name: dto.name,

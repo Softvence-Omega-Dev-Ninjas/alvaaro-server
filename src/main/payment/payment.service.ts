@@ -104,6 +104,7 @@ export class PaymentService {
   // Handle Stripe webhook events
   async handleWebhook(payload: Buffer, sig: string) {
     try {
+      console.log('Webhook received');
       const event = this.stripe.webhooks.constructEvent(
         payload,
         sig,

@@ -32,6 +32,7 @@ export class SellerService {
     createSellerDto: CreateSellerDto,
     userId: string,
     userEmail: string,
+    documents: string[],
   ) {
     try {
       const sellerExists = await this.prisma.seller.findUnique({
@@ -60,6 +61,7 @@ export class SellerService {
           city: createSellerDto.city,
           zip: createSellerDto.zip,
           subscriptionStatus: true,
+          document: documents,
         },
       });
 
@@ -73,7 +75,7 @@ export class SellerService {
       await this.cacheManager.del(`seller-info-${userEmail}`);
       return ApiResponse.success(result, 'Seller created successfully');
     } catch (error) {
-      console.log(error.message);
+      throw new ForbiddenException(error.message);
     }
   }
 

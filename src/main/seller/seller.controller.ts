@@ -8,6 +8,8 @@ import {
   UseGuards,
   Req,
   Query,
+  UseInterceptors,
+  UploadedFiles,
 } from '@nestjs/common';
 import { SellerService } from './seller.service';
 import { CreateSellerDto } from './dto/create-seller.dto';
@@ -16,10 +18,12 @@ import { Request } from 'express';
 import { Roles } from 'src/guards/roles.decorator';
 import { RolesGuard } from 'src/guards/role.guard';
 import { UserRole } from 'src/utils/common/enum/userEnum';
-import { ApiBody, ApiQuery } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiQuery } from '@nestjs/swagger';
 import { ContactSellerDto } from './dto/contact-seller.dto';
 import { TimeValidation } from 'src/guards/timeValidation.guard';
 import { UpdateSellerDto } from './dto/update-seller.dto';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { storageConfig } from 'src/utils/file/fileUpload';
 
 @Controller('seller')
 @UseGuards(AuthGuard, RolesGuard)
@@ -29,14 +33,27 @@ export class SellerController {
   @Post('create-seller')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.USER)
+  @UseInterceptors(
+    FilesInterceptor('documents', 10, { storage: storageConfig() }),
+  )
+  @ApiBody({ type: CreateSellerDto })
+  @ApiConsumes('multipart/form-data')
   async verifyOtpAndCreate(
     @Body() createSellerDto: CreateSellerDto,
     @Req() req: Request,
+    @UploadedFiles() files: Express.Multer.File[],
   ) {
+    console.log({ files });
+
+    const filess = files.map(
+      (f) => `${process.env.DOMAIN}/uploads/${f.filename}`,
+    );
+
     return await this.sellerService.createSeller(
       createSellerDto,
       req['userid'] as string,
       req['email'] as string,
+      filess,
     );
   }
 

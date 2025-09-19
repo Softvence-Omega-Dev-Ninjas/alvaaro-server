@@ -4,6 +4,7 @@ import {
   IsBoolean,
   IsOptional,
   IsPhoneNumber,
+  IsNotEmpty,
 } from 'class-validator';
 
 export class CreateSellerDto {
@@ -39,14 +40,18 @@ export class CreateSellerDto {
   @IsOptional()
   @IsBoolean()
   subscriptionStatus?: boolean;
+
   @ApiProperty({
     description: 'Document showing the problem (required)',
     type: 'array',
     items: { type: 'file', format: 'binary' },
     required: true,
   })
+  @IsNotEmpty()
   documents: Express.Multer.File[];
+
   @ApiProperty({ example: '4b28bdea-cd53-4dae-aacb-2545a039012d' })
+  @IsNotEmpty()
   @IsString()
   subscriptionPlan: string;
 }

@@ -39,6 +39,7 @@ model Seller {
   state              String
   city               String
   zip                String
+  document           String[]
   verificationStatus VerificationStatusType    @default(PENDING)
   subscriptionStatus Boolean                   @default(false)
   subscriptionsId    String?
