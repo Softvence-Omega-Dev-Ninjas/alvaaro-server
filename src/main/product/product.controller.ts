@@ -15,12 +15,14 @@ import {
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { ApiConsumes, ApiQuery } from '@nestjs/swagger';
-import { CategoryType } from '@prisma/client';
-import { RealEstateSearchQueryDto } from './dto/real-estate-search.dto';
+import { CategoryType, UserRole } from '@prisma/client';
+import { ProductSearchQueryDto } from './dto/real-estate-search.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { Public } from 'src/guards/public.decorator';
 import { FilesInterceptor } from '@nestjs/platform-express';
+import { RolesGuard } from 'src/guards/role.guard';
+import { Roles } from 'src/guards/roles.decorator';
 
 @Controller('product')
 export class ProductController {
@@ -29,8 +31,21 @@ export class ProductController {
   @Get()
   @Public()
   @ApiQuery({ name: 'category', enum: CategoryType, required: false })
-  async findAllProducts(@Query('category') category?: CategoryType) {
-    return await this.productService.findAllProducts(category);
+  @ApiQuery({ name: 'location', required: false })
+  @ApiQuery({ name: 'minPrice', required: false })
+  @ApiQuery({ name: 'maxPrice', required: false })
+  async findAllProducts(
+    @Query('category') category?: CategoryType,
+    @Query('location') location?: string,
+    @Query('minPrice') minPrice?: number,
+    @Query('maxPrice') maxPrice?: number,
+  ) {
+    return await this.productService.findAllProducts(
+      category,
+      location,
+      minPrice,
+      maxPrice,
+    );
   }
 
   @Get('/premium')
@@ -52,7 +67,7 @@ export class ProductController {
   @ApiQuery({ name: 'minPrice', required: false })
   @ApiQuery({ name: 'maxPrice', required: false })
   @ApiQuery({ name: 'type', required: false })
-  searchRealEstate(@Query() query?: RealEstateSearchQueryDto) {
+  searchRealEstate(@Query() query?: ProductSearchQueryDto) {
     return this.productService.searchRealEstate(query);
   }
 
@@ -71,7 +86,8 @@ export class ProductController {
     return this.productService.findProductBySellerId(sellerId);
   }
 
-  @Public()
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.SELLER)
   @Patch(':id')
   @UseInterceptors(FilesInterceptor('images'))
   @ApiConsumes('multipart/form-data')

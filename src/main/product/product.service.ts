@@ -41,6 +41,10 @@ export class ProductService {
           price: dto.price,
           images: imageUrls,
           category: dto.category,
+          address: dto.address,
+          city: dto.city,
+          state: dto.state,
+          zip: dto.zip,
           isExclusive: Boolean(dto.isExclusive),
           sellerId,
           views: 0,
@@ -51,10 +55,6 @@ export class ProductService {
           data: {
             productId: product.id,
             beds: dto.beds,
-            address: dto.address,
-            city: dto.city,
-            state: dto.state,
-            zip: dto.zip,
             size: dto.size,
             washroom: dto.washroom,
             features: Array.isArray(dto.features)
@@ -83,10 +83,6 @@ export class ProductService {
           data: {
             productId: product.id,
             beds: dto.beds,
-            address: dto.address,
-            city: dto.city,
-            state: dto.state,
-            zip: dto.zip,
             size: dto.size,
             washroom: dto.washroom,
             features: Array.isArray(dto.features)
@@ -143,9 +139,32 @@ export class ProductService {
     }
   }
 
-  async findAllProducts(category?: CategoryType) {
+  async findAllProducts(
+    category?: CategoryType,
+    location?: string,
+    minPrice?: number,
+    maxPrice?: number,
+  ) {
     const products = await this.prisma.product.findMany({
-      where: category ? { category } : {},
+      where: {
+        ...(category && { category }),
+        ...(location && {
+          OR: [
+            { address: { contains: location, mode: 'insensitive' } },
+            { city: { contains: location, mode: 'insensitive' } },
+            { state: { contains: location, mode: 'insensitive' } },
+            { zip: { contains: location, mode: 'insensitive' } },
+          ],
+        }),
+        ...(minPrice !== undefined || maxPrice !== undefined
+          ? {
+              price: {
+                ...(minPrice !== undefined && { gte: minPrice }),
+                ...(maxPrice !== undefined && { lte: maxPrice }),
+              },
+            }
+          : {}),
+      },
       include: {
         seller: {
           select: {
@@ -156,7 +175,6 @@ export class ProductService {
             companyWebsite: true,
           },
         },
-        // views: true,
         RealEstate: true,
         Car: true,
         Yacht: true,
@@ -168,6 +186,7 @@ export class ProductService {
         createdAt: 'desc',
       },
     });
+
     return ApiResponse.success(products, 'Products fetched successfully');
   }
 
@@ -250,7 +269,7 @@ export class ProductService {
     maxPrice?: string;
     type?: string;
   }) {
-    const { location, minPrice, maxPrice, type } = query ?? {};
+    const { minPrice, maxPrice, type } = query ?? {};
 
     const products = await this.prisma.product.findMany({
       where: {
@@ -260,21 +279,6 @@ export class ProductService {
           lte: maxPrice ? maxPrice : undefined,
         },
         AND: [
-          location
-            ? {
-                RealEstate: {
-                  is: {
-                    OR: [
-                      { address: { contains: location, mode: 'insensitive' } },
-                      { city: { contains: location, mode: 'insensitive' } },
-                      { state: { contains: location, mode: 'insensitive' } },
-                      { zip: { contains: location, mode: 'insensitive' } },
-                    ],
-                  },
-                },
-              }
-            : {},
-
           type
             ? {
                 RealEstate: {
@@ -355,13 +359,11 @@ export class ProductService {
       const productUpdateData: any = {
         name: updateDto.name ?? existingProduct.name,
         description: updateDto.description ?? existingProduct.description,
+        state: updateDto.state ?? existingProduct.state,
+        city: updateDto.city ?? existingProduct.city,
+        zip: updateDto.zip ?? existingProduct.zip,
+        address: updateDto.address ?? existingProduct.address,
         price: updateDto.price ?? existingProduct.price,
-        // trending:
-        //   updateDto.trending !== undefined
-        //     ? typeof updateDto.trending === 'string'
-        //       ? parseInt(updateDto.trending)
-        //       : updateDto.trending
-        //     : existingProduct.trending,
       };
 
       // --- Handle relational updates ---
@@ -389,7 +391,7 @@ export class ProductService {
         where: { id: productId },
         data: productUpdateData,
         include: {
-          seller: true,
+          // seller: true,
           RealEstate: true,
           Car: true,
           Watch: true,

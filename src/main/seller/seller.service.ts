@@ -1,15 +1,9 @@
-import {
-  ForbiddenException,
-  Inject,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSellerDto } from './dto/create-seller.dto';
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { MailService } from 'src/utils/mail/mail.service';
-import { OtpDto } from '../auth/dto/signin.dto';
 import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 import { VerificationStatusType } from '@prisma/client';
 import { contactSellerTemplate } from 'src/utils/mail/templates/contact-seller.template';
@@ -76,6 +70,8 @@ export class SellerService {
       console.log(error.message);
     }
   }
+
+  // async updateS
 
   async findAll(filters: {
     verificationStatus?: 'PENDING' | 'VERIFIED' | 'REJECTED';
@@ -211,7 +207,7 @@ export class SellerService {
 
       return ApiResponse.success(result, 'Inquiry retrieved successfully!');
     } catch (error) {
-      return ApiResponse.error(error, 'Failed to retrieve inquiry!');
+      return ApiResponse.error('Failed to retrieve inquiry!', error);
     }
   }
 

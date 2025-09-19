@@ -7,9 +7,5 @@ export class CreateRealEstateDto extends CreateProductDto {
   @ApiProperty() @IsString() washroom: string;
   @ApiProperty() @IsString() size: string;
   // @ApiProperty({ type: [String] }) @IsArray() text: string[];
-  @ApiProperty() @IsString() state: string;
-  @ApiProperty() @IsString() city: string;
-  @ApiProperty() @IsString() zip: string;
-  @ApiProperty() @IsString() address: string;
   @ApiProperty({ type: [String] }) @IsArray() features: string[];
 }
