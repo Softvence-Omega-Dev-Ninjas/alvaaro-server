@@ -35,10 +35,10 @@ export class ProductService {
           )
         : [];
       const location = await getLatLngByGoogle(
-        'medical',
-        'Dhaka',
-        '1212',
-        'Bangladesh',
+        dto.address,
+        dto.city,
+        dto.zip,
+        dto.state,
       );
       console.log({ location });
       const product = await this.prisma.product.create({

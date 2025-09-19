@@ -1,4 +1,9 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateSellerDto } from './dto/create-seller.dto';
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
