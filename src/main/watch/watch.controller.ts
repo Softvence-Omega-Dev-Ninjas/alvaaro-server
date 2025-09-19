@@ -19,6 +19,7 @@ import { AuthGuard } from 'src/guards/auth.guard';
 import { Roles } from 'src/guards/roles.decorator';
 import { UserRole } from 'src/utils/common/enum/userEnum';
 import { RolesGuard } from 'src/guards/role.guard';
+import { storageConfig } from 'src/utils/file/fileUpload';
 
 @ApiTags('Watch')
 @Controller('watch')
@@ -31,7 +32,7 @@ export class WatchController {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.SELLER)
   @Post()
-  @UseInterceptors(FilesInterceptor('images'))
+  @UseInterceptors(FilesInterceptor('images', 10, { storage: storageConfig() }))
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: CreateWatchDto })
   async createWatchProduct(

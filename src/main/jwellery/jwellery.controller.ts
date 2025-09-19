@@ -18,6 +18,7 @@ import { UserRole } from 'src/utils/common/enum/userEnum';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes } from '@nestjs/swagger';
 import { CreateJewelleryDto } from './dto/create-jwellery.dto';
+import { storageConfig } from 'src/utils/file/fileUpload';
 
 @Controller('jewellery')
 export class JwelleryController {
@@ -29,7 +30,7 @@ export class JwelleryController {
   @UseGuards(AuthGuard)
   @Roles(UserRole.SELLER)
   @Post()
-  @UseInterceptors(FilesInterceptor('images'))
+  @UseInterceptors(FilesInterceptor('images', 10, { storage: storageConfig() }))
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: CreateJewelleryDto })
   async createJewelleryProduct(
@@ -40,7 +41,7 @@ export class JwelleryController {
     return this.productService.handleProductCreation(
       createProductDto,
       images,
-      req.userid, // Use the user ID from the request
+      req.userid,
     );
   }
 

@@ -3,9 +3,7 @@ import {
   Get,
   Post,
   Body,
-
   Param,
-
   UseGuards,
   UseInterceptors,
   UploadedFiles,
@@ -19,18 +17,19 @@ import { Roles } from 'src/guards/roles.decorator';
 import { UserRole } from 'src/utils/common/enum/userEnum';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes } from '@nestjs/swagger';
+import { storageConfig } from 'src/utils/file/fileUpload';
 
 @Controller('yacht')
 export class YachtController {
   constructor(
     private readonly yachtService: YachtService,
     private readonly productService: ProductService,
-  ) { }
+  ) {}
 
   @UseGuards(AuthGuard)
   @Roles(UserRole.SELLER)
   @Post()
-  @UseInterceptors(FilesInterceptor('images'))
+  @UseInterceptors(FilesInterceptor('images', 10, { storage: storageConfig() }))
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: CreateYachtDto })
   async createYachtProduct(
@@ -54,8 +53,4 @@ export class YachtController {
   findOne(@Param('id') id: string) {
     return this.yachtService.findOne(id);
   }
-
-
-
-
 }

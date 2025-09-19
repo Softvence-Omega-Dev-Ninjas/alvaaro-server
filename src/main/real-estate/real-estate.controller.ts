@@ -17,18 +17,19 @@ import { Roles } from 'src/guards/roles.decorator';
 import { UserRole } from 'src/utils/common/enum/userEnum';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes } from '@nestjs/swagger';
+import { storageConfig } from 'src/utils/file/fileUpload';
 
 @Controller('real-estate')
 export class RealEstateController {
   constructor(
     private readonly realEstateService: RealEstateService,
     private readonly productService: ProductService,
-  ) { }
+  ) {}
 
   @UseGuards(AuthGuard)
   @Roles(UserRole.SELLER)
   @Post()
-  @UseInterceptors(FilesInterceptor('images'))
+  @UseInterceptors(FilesInterceptor('images', 10, { storage: storageConfig() }))
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: CreateRealEstateDto })
   async createRealEstateProduct(
@@ -52,5 +53,4 @@ export class RealEstateController {
   findOne(@Param('id') id: string) {
     return this.realEstateService.findOne(id);
   }
-
 }

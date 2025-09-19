@@ -29,25 +29,27 @@ export class ProductService {
   ) {
     try {
       const sellerId = await this.helperService.sellerExists(userid);
-      const imageUrls = images?.length
-        ? (await uploadMultipleToCloudinary(images)).map(
-            (res: { secure_url: string }) => res.secure_url,
-          )
-        : [];
+      if (images.length === 0) {
+        return ApiResponse.error('At least one image is required');
+      }
+
+      const uploadedImages = images.map(
+        (f) => `${process.env.DOMAIN}/uploads/${f.filename}`,
+      );
+
       const location = await getLatLngByGoogle(
         dto.address,
         dto.city,
         dto.zip,
         dto.state,
       );
-      console.log({ location });
 
       const product = await this.prisma.product.create({
         data: {
           name: dto.name,
           description: dto.description,
           price: dto.price,
-          images: imageUrls,
+          images: uploadedImages,
           category: dto.category,
           address: dto.address,
           city: dto.city,
