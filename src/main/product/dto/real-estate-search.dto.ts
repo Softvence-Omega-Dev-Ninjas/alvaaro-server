@@ -1,7 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional, IsString, IsNumberString } from 'class-validator';
 
-export class RealEstateSearchQueryDto {
+export class ProductSearchQueryDto {
   @ApiPropertyOptional({
     description: 'Search by address, city, state, or zip',
   })
@@ -18,11 +18,4 @@ export class RealEstateSearchQueryDto {
   @IsOptional()
   @IsNumberString()
   maxPrice?: string;
-
-  @ApiPropertyOptional({
-    description: 'Property type (e.g., Apartment, Villa)',
-  })
-  @IsOptional()
-  @IsString()
-  type?: string;
 }

@@ -88,7 +88,20 @@ export class SellerController {
     });
   }
 
-  @UseGuards(AuthGuard, RolesGuard, TimeValidation)
+  // @Patch('profile/update')
+  // @UseGuards(AuthGuard, RolesGuard)
+  // @Roles(UserRole.SELLER)
+  // async updateSellerProfile(
+  //   @Body() updateSellerDto: CreateSellerDto,
+  //   @Req() req: Request,
+  // ) {
+  //   return await this.sellerService.updateSellerProfile(
+  //     updateSellerDto,
+  //     req['userid'] as string,
+  //   );
+  // }
+
+  @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.SELLER)
   @Get('inquiry')
   getInquiryBySellerId(@Req() req: { userid: string }) {

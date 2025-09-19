@@ -112,10 +112,6 @@ model RealEstate {
   beds      String
   washroom  String
   size      String
-  state     String
-  city      String
-  zip       String
-  address   String
   features  String[]
 }
 
@@ -127,10 +123,6 @@ model Yacht {
   beds      String
   washroom  String
   size      String
-  state     String
-  city      String
-  zip       String
-  address   String
   features  String[]
 }
 
