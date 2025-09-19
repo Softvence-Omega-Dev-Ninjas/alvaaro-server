@@ -46,6 +46,6 @@ export async function getLatLngByGoogle(
 
   return {
     lat: parseFloat(top.lat),
-    lon: parseFloat(top.lon),
+    long: parseFloat(top.lon),
   };
 }

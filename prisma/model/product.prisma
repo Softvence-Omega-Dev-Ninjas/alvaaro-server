@@ -13,10 +13,11 @@ model Product {
   category    CategoryType
   isExclusive Boolean?
   views       Int
-
-  trending  Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  latitude    Float        @default(0)
+  longitude   Float        @default(0)
+  trending    Int          @default(0)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 
   Car        Car?
   Watch      Watch?
