@@ -10,6 +10,7 @@ import { contactSellerTemplate } from 'src/utils/mail/templates/contact-seller.t
 import { ContactSellerDto } from './dto/contact-seller.dto';
 import { HelperService } from 'src/utils/helper/helper.service';
 import { ProductService } from '../product/product.service';
+import e from 'express';
 
 @Injectable()
 export class SellerService {
@@ -35,13 +36,13 @@ export class SellerService {
       }
       // console.log({ createSellerDto, userId, userEmail });
       // check if user payment in uservalidate table
-      // const userPaymentValidate =
-      //   await this.prisma.userSubscriptionValidity.findUnique({
-      //     where: { userId, subscribedPlan: createSellerDto.subscriptionPlan },
-      //   });
-      // if (!userPaymentValidate) {
-      //   return ApiResponse.error('User payment not found');
-      // }
+      const userPaymentValidate =
+        await this.prisma.userSubscriptionValidity.findUnique({
+          where: { userId, subscribedPlan: createSellerDto.subscriptionPlan },
+        });
+      if (!userPaymentValidate) {
+        return ApiResponse.error('User payment not found');
+      }
       const result = await this.prisma.seller.create({
         data: {
           userId,
@@ -303,5 +304,23 @@ export class SellerService {
       result,
       'Seller dashboard analytics retrieved successfully!',
     );
+  }
+  // seller update
+  async updateSeller(id: string, updateData: Partial<CreateSellerDto>) {
+    try {
+      const seller = await this.prisma.seller.findUnique({
+        where: { userId: id },
+      });
+      if (!seller) {
+        throw new NotFoundException('Seller not found');
+      }
+      const updatedSeller = await this.prisma.seller.update({
+        where: { userId: id },
+        data: updateData,
+      });
+      return ApiResponse.success(updatedSeller, 'Seller updated successfully');
+    } catch (error) {
+      throw new ForbiddenException(error.message);
+    }
   }
 }

@@ -5,7 +5,7 @@ import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 
 @Injectable()
 export class WatchService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async findAll() {
     try {
@@ -31,49 +31,6 @@ export class WatchService {
     }
   }
 
-  async update(id: string, updateWatchDto: UpdateWatchDto) {
-    try {
-      const updatedWatch = await this.prisma.watch.update({
-        where: { id },
-        data: {
-          condition: updateWatchDto.condition,
-          manufacture: updateWatchDto.manufacture,
-          warranty: updateWatchDto.warranty,
-          model: updateWatchDto.model,
-          waterResistance: updateWatchDto.waterResistance,
-          displayType: updateWatchDto.displayType,
-          strapMaterial: updateWatchDto.strapMaterial,
-          movement: updateWatchDto.movement,
-          size: updateWatchDto.size,
-          tractionType: updateWatchDto.tractionType,
-          features: Array.isArray(updateWatchDto.features)
-            ? updateWatchDto.features
-            : typeof updateWatchDto.features === 'string'
-              ? updateWatchDto.features.split(',').map((f) => f.trim())
-              : [],
-          product: {
-            update: {
-              name: updateWatchDto.name,
-              description: updateWatchDto.description,
-              price:
-                updateWatchDto.price !== undefined
-                  ? String(updateWatchDto.price)
-                  : undefined,
-              // images: updateWatchDto.images,
-
-            },
-          },
-        },
-        include: { product: true },
-      });
-
-      return ApiResponse.success(updatedWatch, 'Watch updated successfully');
-    } catch (error) {
-      console.log({ error });
-      return ApiResponse.error('Failed to update watch', error);
-    }
-  }
-
   async remove(id: string) {
     try {
       const existingWatch = await this.prisma.watch.findUnique({
@@ -89,8 +46,10 @@ export class WatchService {
         where: { id: existingWatch.productId },
       });
 
-      return ApiResponse.success(null, 'Watch and associated product deleted successfully');
-
+      return ApiResponse.success(
+        null,
+        'Watch and associated product deleted successfully',
+      );
     } catch (error) {
       return ApiResponse.error('Failed to delete watch', error);
     }

@@ -3,7 +3,6 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   UseGuards,
@@ -15,7 +14,6 @@ import { WatchService } from './watch.service';
 import { CreateWatchDto } from './dto/create-watch.dto';
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { UpdateWatchDto } from './dto/update-watch.dto';
 import { ProductService } from '../product/product.service';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { Roles } from 'src/guards/roles.decorator';
@@ -28,7 +26,7 @@ export class WatchController {
   constructor(
     private readonly watchService: WatchService,
     private readonly productService: ProductService,
-  ) { }
+  ) {}
 
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.SELLER)
@@ -51,31 +49,21 @@ export class WatchController {
   @Get()
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.SELLER)
-  findAll() {
-    return this.watchService.findAll();
+  async findAll() {
+    return await this.watchService.findAll();
   }
 
   @Get(':id')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.SELLER)
-  findOne(@Param('id') id: string) {
-    return this.watchService.findOne(id);
-  }
-
-  @Patch(':id')
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles(UserRole.SELLER)
-  @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FilesInterceptor('images'))
-  @ApiBody({ type: UpdateWatchDto })
-  update(@Param('id') id: string, @Body() updateWatchDto: UpdateWatchDto) {
-    return this.watchService.update(id, updateWatchDto);
+  async findOne(@Param('id') id: string) {
+    return await this.watchService.findOne(id);
   }
 
   @Delete(':id')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.SELLER)
-  remove(@Param('id') id: string) {
-    return this.watchService.remove(id);
+  async remove(@Param('id') id: string) {
+    return await this.watchService.remove(id);
   }
 }
