@@ -20,9 +20,8 @@ import { Public } from 'src/guards/public.decorator';
 export class PaymentController {
   constructor(private readonly stripeService: PaymentService) {}
 
-  // * Routes for Stripe Checkout
-  @UseGuards(AuthGuard)
   @Post('checkout')
+  @Public()
   async checkout(
     @Req() req: { userid: string },
     @Body() createPaymentDto: CreatePaymentDto,
@@ -37,22 +36,6 @@ export class PaymentController {
       couponCode,
     );
   }
-
-  // @Get('payment-success')
-  // @Public()
-  // paymentSuccess(@Res() res: Response) {
-  //   return res.send(
-  //     '<h1>Payment Successful!</h1><p>Thank you for your purchase.</p>',
-  //   );
-  // }
-
-  // @Get('payment-cancel')
-  // @Public()
-  // paymentCancel(@Res() res: Response) {
-  //   return res.send(
-  //     '<h1>Payment Cancelled</h1><p>Your payment was cancelled.</p>',
-  //   );
-  // }
 
   // * Webhook
   @Post('webhook')
