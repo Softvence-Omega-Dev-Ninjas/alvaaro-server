@@ -1,13 +1,12 @@
 model UserSubscriptionValidity {
-    id             String           @unique @default(uuid())
-    userId         String           @unique
-    user           User             @relation(fields: [userId], references: [id])
-    subscribedPlan String           @unique
-    subscription   SubscriptionPlan @relation(fields: [subscribedPlan], references: [id])
+    id             String   @unique @default(uuid())
+    userId         String   @unique
+    user           User     @relation(fields: [userId], references: [id])
+    subscribedPlan String   @unique
     startTime      DateTime
     expiryTime     DateTime
     payabeAmount   String
-    createdAt      DateTime         @default(now())
-    updatedAt      DateTime         @updatedAt
+    createdAt      DateTime @default(now())
+    updatedAt      DateTime @updatedAt
     Seller         Seller[]
 }

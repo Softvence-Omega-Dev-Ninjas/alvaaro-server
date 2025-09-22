@@ -1,21 +1,17 @@
-// src/stripe/stripe.controller.ts
 import {
   Body,
   Controller,
-  Get,
   Headers,
   Post,
   RawBodyRequest,
   Req,
-  Res,
   UseGuards,
 } from '@nestjs/common';
 import { PaymentService } from './payment.service';
-import { Request, Response } from 'express';
+import { Request } from 'express';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { Public } from 'src/guards/public.decorator';
-import { UpdatePaymentDto } from './dto/update-payment.dto';
 
 @Controller('stripe')
 export class PaymentController {
