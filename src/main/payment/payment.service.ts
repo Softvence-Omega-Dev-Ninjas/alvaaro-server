@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
 import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 import { HelperService } from 'src/utils/helper/helper.service';
@@ -24,6 +24,7 @@ export class PaymentService {
     couponCode?: string,
   ) {
     try {
+      console.log({ userId, packageId, couponCode });
       //
       // 1. Check if the user exists in the database
       const userExists = await this.helperService.userExists(userId);
@@ -86,24 +87,28 @@ export class PaymentService {
               ],
             }
           : {}),
-
         // success_url: 'http://localhost:3000/stripe/payment-success',
         success_url: 'http://localhost:5173/payment-success',
         cancel_url: 'http://localhost:3000/stripe/payment-cancel',
       });
+      console.log(session);
       return ApiResponse.success(
         { url: session.url },
         'Checkout session created successfully',
       );
     } catch (error) {
-      console.error('Error creating checkout session:', error);
+      return ApiResponse.error(
+        'Failed to create checkout session',
+        error.message,
+      );
     }
   }
+
   // Handle Stripe webhook events
   async handleWebhook(payload: Buffer, sig: string) {
     try {
       console.log('Webhook received');
-      const event = this.stripe.webhooks.constructEvent(
+      const event = await this.stripe.webhooks.constructEvent(
         payload,
         sig,
         process.env.STRIPE_WEBHOOK_SECRET as string,

@@ -15,29 +15,28 @@ import { Request, Response } from 'express';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { Public } from 'src/guards/public.decorator';
+import { UpdatePaymentDto } from './dto/update-payment.dto';
 
 @Controller('stripe')
 export class PaymentController {
   constructor(private readonly stripeService: PaymentService) {}
 
   @Post('checkout')
-  @Public()
+  @UseGuards(AuthGuard)
   async checkout(
-    @Req() req: { userid: string },
+    @Req() req: Request,
     @Body() createPaymentDto: CreatePaymentDto,
   ) {
-    const userId = req.userid;
     const packageId = createPaymentDto.packageId;
     const couponCode = createPaymentDto.couponCode;
-
+    console.log(req['userid'] as string);
     return this.stripeService.createCheckoutSession(
-      userId,
+      req['userid'] as string,
       packageId,
       couponCode,
     );
   }
 
-  // * Webhook
   @Post('webhook')
   @Public()
   async handleWebhook(
