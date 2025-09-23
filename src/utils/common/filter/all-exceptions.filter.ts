@@ -5,7 +5,7 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
-import { Response } from 'express';
+import e, { Response } from 'express';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
@@ -26,7 +26,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
         message = res;
       } else if (typeof res === 'object' && res !== null) {
         errorData = res;
-        message = (res as any).message || message;
+        message = (res as any).message || 'this is unknown error';
       }
     }
 
@@ -53,7 +53,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       success: false,
       statusCode: status,
       error: errorData.message,
-      message,
+      message: errorData,
     });
   }
 }
