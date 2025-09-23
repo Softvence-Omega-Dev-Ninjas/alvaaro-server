@@ -130,7 +130,9 @@ export class PaymentService {
           ?.planType as string | undefined;
 
         if (!planType) {
-          throw new Error('Plan type is missing in subscription metadata.');
+          throw new ForbiddenException(
+            'Plan type is missing in subscription metadata.',
+          );
         }
 
         const subscribedPlan =
