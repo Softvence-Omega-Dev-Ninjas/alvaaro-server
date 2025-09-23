@@ -117,7 +117,7 @@ export class PaymentService {
         },
       );
       if (!session) {
-        throw new Error('Session not found');
+        throw new ForbiddenException('Session not found');
       }
       if (session.payment_status === 'paid') {
         const subscriptionEventData = session;
