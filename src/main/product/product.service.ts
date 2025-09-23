@@ -151,6 +151,27 @@ export class ProductService {
     }
   }
 
+  async getTrendingProducts() {
+    const products = await this.prisma.product.findMany({
+      orderBy: { views: 'desc' },
+      take: 10,
+      include: {
+        seller: true,
+        RealEstate: true,
+        Car: true,
+        Yacht: true,
+        Watch: true,
+        Jewellery: true,
+        _count: { select: { Wishlist: true } },
+      },
+    });
+
+    return ApiResponse.success(
+      products,
+      'Trending products fetched successfully',
+    );
+  }
+
   async findAllProducts(
     category?: CategoryType,
     location?: string,
