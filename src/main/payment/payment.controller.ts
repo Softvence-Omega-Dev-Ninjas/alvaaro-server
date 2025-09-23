@@ -12,6 +12,7 @@ import { Request } from 'express';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { Public } from 'src/guards/public.decorator';
+import { SaveSessionDto } from './dto/update-payment.dto';
 
 @Controller('stripe')
 export class PaymentController {
@@ -25,7 +26,6 @@ export class PaymentController {
   ) {
     const packageId = createPaymentDto.packageId;
     const couponCode = createPaymentDto.couponCode;
-    console.log(req['userid'] as string);
     return this.stripeService.createCheckoutSession(
       req['userid'] as string,
       packageId,
@@ -33,17 +33,9 @@ export class PaymentController {
     );
   }
 
-  @Post('webhook')
-  @Public()
-  async handleWebhook(
-    @Req() req: RawBodyRequest<Request>,
-    @Headers('stripe-signature') sig: string,
-  ) {
-    try {
-      await this.stripeService.handleWebhook(req.body, sig);
-      return { received: true };
-    } catch (err) {
-      return { error: 'Webhook Error', details: err };
-    }
+  @Post('save-session')
+  @UseGuards(AuthGuard)
+  async saveSession(@Body() data: SaveSessionDto, @Req() req: Request) {
+    return await this.stripeService.saveSession(data, req['userid'] as string);
   }
 }

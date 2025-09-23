@@ -36,11 +36,6 @@ export class CreateSellerDto {
   @IsString()
   zip: string;
 
-  @ApiProperty({ example: false, required: false })
-  @IsOptional()
-  @IsBoolean()
-  subscriptionStatus?: boolean;
-
   @ApiProperty({
     description: 'Document showing the problem (required)',
     type: 'array',

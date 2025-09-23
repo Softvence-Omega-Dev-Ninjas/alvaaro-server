@@ -1,10 +1,15 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
 import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 import { HelperService } from 'src/utils/helper/helper.service';
 import Stripe from 'stripe';
 import { SubscriptionPlanType } from './type/subscriptionPlanType';
 import { MailService } from 'src/utils/mail/mail.service';
+import { SaveSessionDto } from './dto/update-payment.dto';
 
 @Injectable()
 export class PaymentService {
@@ -24,7 +29,6 @@ export class PaymentService {
     couponCode?: string,
   ) {
     try {
-      console.log({ userId, packageId, couponCode });
       //
       // 1. Check if the user exists in the database
       const userExists = await this.helperService.userExists(userId);
@@ -88,10 +92,11 @@ export class PaymentService {
             }
           : {}),
         // success_url: 'http://localhost:3000/stripe/payment-success',
-        success_url: 'http://localhost:5173/payment-success',
+        success_url:
+          'http://localhost:5173/payment-success?session_id={CHECKOUT_SESSION_ID}',
         cancel_url: 'http://localhost:3000/stripe/payment-cancel',
       });
-      console.log(session);
+      console.log({ session });
       return ApiResponse.success(
         { url: session.url },
         'Checkout session created successfully',
@@ -103,28 +108,116 @@ export class PaymentService {
       );
     }
   }
+  //
+  async saveSession(data: SaveSessionDto, userId: string) {
+    try {
+      const session = await this.stripe.checkout.sessions.retrieve(
+        data.sessionId,
+        {
+          expand: ['payment_intent', 'subscription'],
+        },
+      );
+      if (!session) {
+        throw new Error('Session not found');
+      }
+      if (session.payment_status === 'paid') {
+        const subscriptionEventData = session;
+        console.log({ subscriptionEventData });
+        const invoiceDetails = await this.stripe.invoices.retrieve(
+          (session.subscription as Stripe.Subscription)
+            ?.latest_invoice as string,
+        );
+        const subscription = session.subscription as Stripe.Subscription;
+        const planType = subscription?.items?.data?.[0]?.price?.metadata
+          ?.planType as string | undefined;
 
+        if (!planType) {
+          throw new Error('Plan type is missing in subscription metadata.');
+        }
+
+        const subscribedPlan =
+          await this.prismaService.subscriptionPlan.findFirst({
+            where: {
+              type: planType as SubscriptionPlanType,
+            },
+          });
+
+        if (!subscribedPlan) {
+          return ApiResponse.error('Subscribed plan not found');
+        }
+
+        // Calculate start and expiry times
+        const startTime = new Date(); // Current time
+        const expiryTime = this.calculateExpiryTime(
+          startTime,
+          subscribedPlan.length,
+        );
+
+        // Validate that expiryTime is valid
+        if (isNaN(expiryTime.getTime())) {
+          throw new BadRequestException(
+            `Invalid expiry time calculated from plan length: ${subscribedPlan.length}`,
+          );
+        }
+
+        if (!subscriptionEventData.metadata) {
+          throw new BadRequestException('Subscription metadata is missing.');
+        }
+        await this.prismaService.userSubscriptionValidity.upsert({
+          where: { userId: userId },
+          update: {
+            subscribedPlan: subscribedPlan.id,
+            startTime: startTime,
+            expiryTime: expiryTime,
+            payabeAmount: (Number(invoiceDetails.amount_paid) / 100).toString(),
+          },
+          create: {
+            userId: userId,
+            subscribedPlan: subscribedPlan.id,
+            startTime: startTime,
+            expiryTime: expiryTime,
+            payabeAmount: (Number(invoiceDetails.amount_paid) / 100).toString(),
+          },
+        });
+
+        await this.prismaService.amount.create({
+          data: {
+            invoiceNumber: invoiceDetails.number as string,
+            amount: (Number(invoiceDetails.amount_paid) / 100).toString(),
+          },
+        });
+        await this.mailService.sendReceiptEmail({
+          to: subscriptionEventData.metadata.email,
+          subject: 'Your Subscription Receipt',
+          title: 'Subscription Activated',
+          message: `Your subscription for the ${subscribedPlan.type} plan has been activated. It is valid until ${expiryTime.toDateString()}`,
+          buttonText: 'View Invoice',
+          buttonUrl: invoiceDetails.invoice_pdf as string,
+          footerText: 'Thank you for subscribing to our service!',
+        });
+      }
+      return ApiResponse.success('Subscription validity updated successfully');
+    } catch (error) {
+      throw new ForbiddenException('Failed to retrieve session', error.message);
+    }
+  }
   // Handle Stripe webhook events
   async handleWebhook(payload: Buffer, sig: string) {
     try {
-      console.log('Webhook received');
+      console.log({ payload });
+      console.log({ sig });
       const event = await this.stripe.webhooks.constructEvent(
         payload,
         sig,
         process.env.STRIPE_WEBHOOK_SECRET as string,
       );
-      console.log('1', { event });
-      if (
-        event.type === 'customer.subscription.created' ||
-        event.type === 'customer.subscription.updated' ||
-        event.type === 'invoice.payment_succeeded'
-      ) {
+      console.log({ event });
+      if (event.type === 'customer.subscription.created') {
         const subscriptionEventData = event.data.object as Stripe.Subscription;
 
         const invoiceDetails = await this.stripe.invoices.retrieve(
           subscriptionEventData?.latest_invoice as string,
         );
-        console.log('2', { invoiceDetails });
         const planType = subscriptionEventData?.items?.data?.[0]?.price
           ?.metadata?.planType as string | undefined;
 

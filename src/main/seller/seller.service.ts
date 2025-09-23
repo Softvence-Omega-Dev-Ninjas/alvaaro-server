@@ -16,6 +16,7 @@ import { ContactSellerDto } from './dto/contact-seller.dto';
 import { HelperService } from 'src/utils/helper/helper.service';
 import { ProductService } from '../product/product.service';
 import e from 'express';
+import { use } from 'passport';
 
 @Injectable()
 export class SellerService {
@@ -34,6 +35,7 @@ export class SellerService {
     documents: string[],
   ) {
     try {
+      console.log(userId, createSellerDto.subscriptionPlan);
       const sellerExists = await this.prisma.seller.findUnique({
         where: { userId },
       });
@@ -61,6 +63,7 @@ export class SellerService {
           zip: createSellerDto.zip,
           subscriptionStatus: true,
           document: documents,
+          subscriptionsId: userPaymentValidate.id,
         },
       });
 
@@ -74,6 +77,7 @@ export class SellerService {
       await this.cacheManager.del(`seller-info-${userEmail}`);
       return ApiResponse.success(result, 'Seller created successfully');
     } catch (error) {
+      console.log(error);
       throw new ForbiddenException(error.message);
     }
   }
