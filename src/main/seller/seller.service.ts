@@ -35,14 +35,12 @@ export class SellerService {
     documents: string[],
   ) {
     try {
-      console.log(userId, createSellerDto.subscriptionPlan);
       const sellerExists = await this.prisma.seller.findUnique({
         where: { userId },
       });
       if (sellerExists) {
         return ApiResponse.error('Seller already exists in same email');
       }
-      // console.log({ createSellerDto, userId, userEmail });
       // check if user payment in uservalidate table
       const userPaymentValidate =
         await this.prisma.userSubscriptionValidity.findUnique({
@@ -77,7 +75,6 @@ export class SellerService {
       await this.cacheManager.del(`seller-info-${userEmail}`);
       return ApiResponse.success(result, 'Seller created successfully');
     } catch (error) {
-      console.log(error);
       throw new ForbiddenException(error.message);
     }
   }

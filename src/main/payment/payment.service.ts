@@ -121,7 +121,6 @@ export class PaymentService {
       }
       if (session.payment_status === 'paid') {
         const subscriptionEventData = session;
-        console.log({ subscriptionEventData });
         const invoiceDetails = await this.stripe.invoices.retrieve(
           (session.subscription as Stripe.Subscription)
             ?.latest_invoice as string,
@@ -203,14 +202,11 @@ export class PaymentService {
   // Handle Stripe webhook events
   async handleWebhook(payload: Buffer, sig: string) {
     try {
-      console.log({ payload });
-      console.log({ sig });
       const event = await this.stripe.webhooks.constructEvent(
         payload,
         sig,
         process.env.STRIPE_WEBHOOK_SECRET as string,
       );
-      console.log({ event });
       if (event.type === 'customer.subscription.created') {
         const subscriptionEventData = event.data.object as Stripe.Subscription;
 
@@ -312,8 +308,6 @@ export class PaymentService {
 
     const amount = parseInt(lengthMatch[1]);
     const unit = lengthMatch[2].toLowerCase();
-
-    console.log(`Parsed plan length: ${amount} ${unit}`);
 
     switch (unit) {
       case 'day':

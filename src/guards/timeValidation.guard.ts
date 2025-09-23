@@ -21,7 +21,6 @@ export class TimeValidation implements CanActivate {
     const userExists = await this.prisma.userSubscriptionValidity.findUnique({
       where: { userId: request.userid },
     });
-    console.log(userExists);
     if (!userExists || !userExists.id) {
       throw new ForbiddenException('Unauthorized: No user found');
     }

@@ -38,7 +38,6 @@ export class AuthGuard implements CanActivate {
       const payload = await this.jwtService.verifyAsync<UserInfoJwt>(token, {
         secret: process.env.JWT_SECRET,
       });
-      // console.log("Payload from JWT:", payload)
       if (!payload) return false;
       const user = await this.prisma.user.findFirst({
         where: { email: payload.email },

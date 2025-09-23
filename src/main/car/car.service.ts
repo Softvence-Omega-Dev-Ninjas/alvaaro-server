@@ -6,8 +6,7 @@ import { UpdateCarDto } from './dto/update-car.dto';
 
 @Injectable()
 export class CarService {
-  constructor(private prisma: PrismaService) { }
-
+  constructor(private prisma: PrismaService) {}
 
   async findAll() {
     try {
@@ -34,7 +33,6 @@ export class CarService {
   }
   async findOne(id: string) {
     try {
-      console.log('id', id);
       const carDetails = await this.prisma.car.findUnique({
         where: { id },
         include: {
@@ -55,9 +53,8 @@ export class CarService {
   async carUpdate(id: string, updateCarDto: UpdateCarDto) {
     try {
       const carDetails = await this.prisma.car.findUnique({
-        where: { id }
+        where: { id },
       });
-
     } catch (error) {
       console.error('Error updating car:', error);
       return ApiResponse.error('Failed to update car.', error);
@@ -80,6 +77,4 @@ export class CarService {
       return ApiResponse.error('Failed to delete car.', error);
     }
   }
-
-
 }

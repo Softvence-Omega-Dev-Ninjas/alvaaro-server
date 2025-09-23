@@ -145,10 +145,8 @@ export class AdminService {
         where: { userId: id },
         data: { verificationStatus: status.status },
       });
-      console.log('Updated Seller:', updatedSeller);
       return ApiResponse.success(updatedSeller, 'Seller verified successfully');
     } catch (error) {
-      console.log('Error verifying seller:', error);
       return ApiResponse.error('Error verifying seller', error);
     }
   }
@@ -161,7 +159,6 @@ export class AdminService {
       });
       return ApiResponse.success(null, 'Seller deleted successfully');
     } catch (error) {
-      console.log('Error deleting seller:', error);
       return ApiResponse.error('Error deleting seller', error);
     }
   }
@@ -184,14 +181,12 @@ export class AdminService {
         `User ${updatedUser.isBlocked ? 'blocked' : 'unblocked'} successfully`,
       );
     } catch (error) {
-      console.log('Error blocking/unblocking user:', error);
       return ApiResponse.error('Error blocking/unblocking user', error);
     }
   }
   // update role
   async updateUserRole(id: string, role: UpdateRoleDto) {
     try {
-      console.log(role);
       const user = await this.prisma.user.findUnique({
         where: { id },
       });

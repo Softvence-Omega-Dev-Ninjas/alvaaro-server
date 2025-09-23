@@ -43,8 +43,6 @@ export class SellerController {
     @Req() req: Request,
     @UploadedFiles() files: Express.Multer.File[],
   ) {
-    console.log({ files });
-
     const filess = files.map(
       (f) => `${process.env.DOMAIN}/uploads/${f.filename}`,
     );
