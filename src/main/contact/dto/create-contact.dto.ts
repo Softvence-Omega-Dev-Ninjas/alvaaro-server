@@ -24,6 +24,13 @@ export class CreateContactDto {
   number: string;
 
   @ApiProperty({
+    example: 'example@gmail.com',
+    description: 'Email address of the person',
+  })
+  @IsString()
+  email: string;
+
+  @ApiProperty({
     example: 'I am interested in your services.',
     description: 'Message or inquiry from the person',
   })

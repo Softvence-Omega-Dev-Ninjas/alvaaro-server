@@ -142,6 +142,7 @@ model Contact {
   name      String
   country   String
   number    String
+  email     String
   message   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

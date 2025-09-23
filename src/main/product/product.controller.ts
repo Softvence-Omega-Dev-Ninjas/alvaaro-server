@@ -71,6 +71,11 @@ export class ProductController {
     return this.productService.searchRealEstate(query);
   }
 
+  @Get('trending')
+  getTrendingProducts() {
+    return this.productService.getTrendingProducts();
+  }
+
   @Get(':id')
   findProductById(@Param('id') id: string) {
     return this.productService.findProductById(id);

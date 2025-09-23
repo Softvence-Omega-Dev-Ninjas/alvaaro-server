@@ -96,7 +96,6 @@ export class PaymentService {
           'http://localhost:5173/payment-success?session_id={CHECKOUT_SESSION_ID}',
         cancel_url: 'http://localhost:3000/stripe/payment-cancel',
       });
-      console.log({ session });
       return ApiResponse.success(
         { url: session.url },
         'Checkout session created successfully',
