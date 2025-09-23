@@ -53,6 +53,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       success: false,
       statusCode: status,
       error: errorData.message,
+      message,
     });
   }
 }

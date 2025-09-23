@@ -192,7 +192,7 @@ export class PaymentService {
       }
       return ApiResponse.success('Subscription validity updated successfully');
     } catch (error) {
-      throw new ForbiddenException(`Webhook Error: ${error.message}`);
+      throw new ForbiddenException('Webhook handling failed: ', error);
     }
   }
 
