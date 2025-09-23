@@ -108,7 +108,7 @@ export class PaymentService {
   async handleWebhook(payload: Buffer, sig: string) {
     try {
       console.log('Webhook received');
-      const event = await this.stripe.webhooks.constructEvent(
+      const event = this.stripe.webhooks.constructEvent(
         payload,
         sig,
         process.env.STRIPE_WEBHOOK_SECRET as string,
