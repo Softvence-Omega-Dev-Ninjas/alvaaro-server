@@ -28,7 +28,7 @@ export class ProductService {
     userid: string,
   ) {
     try {
-      const sellerId = await this.helperService.sellerExists(userid);
+      // const sellerId = await this.helperService.sellerExists(userid);
       if (images.length === 0) {
         return ApiResponse.error('At least one image is required');
       }
@@ -58,7 +58,7 @@ export class ProductService {
           latitude: location.lat,
           longitude: location.long,
           isExclusive: Boolean(dto.isExclusive),
-          sellerId,
+          sellerId: '0555e8c6-212a-48bf-a3c0-56e01ad887cb',
           views: 0,
         },
       });
@@ -143,6 +143,7 @@ export class ProductService {
       }
       return ApiResponse.success(product, 'Product created successfully');
     } catch (error) {
+      console.log(error);
       return ApiResponse.error(
         'Failed to create product, please try again later',
         error,

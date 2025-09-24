@@ -15,14 +15,14 @@ export async function seed() {
       update: {
         password: hashedPassword,
         fullName: process.env.SUPER_ADMIN_NAME || 'Alvaaro',
-        role: UserRole.SUPER_ADMIN,
+        role: UserRole.ADMIN,
         isOtpVerified: true,
       },
       create: {
         email: process.env.SUPER_ADMIN_EMAIL || 'alvaaro@gmail.com',
         password: hashedPassword,
         fullName: process.env.SUPER_ADMIN_NAME || 'Alvaaro',
-        role: UserRole.SUPER_ADMIN,
+        role: UserRole.ADMIN,
         isOtpVerified: true,
       },
     });
