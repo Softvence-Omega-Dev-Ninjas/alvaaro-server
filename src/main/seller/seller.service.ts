@@ -15,8 +15,6 @@ import { contactSellerTemplate } from 'src/utils/mail/templates/contact-seller.t
 import { ContactSellerDto } from './dto/contact-seller.dto';
 import { HelperService } from 'src/utils/helper/helper.service';
 import { ProductService } from '../product/product.service';
-import e from 'express';
-import { use } from 'passport';
 
 @Injectable()
 export class SellerService {
