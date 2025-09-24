@@ -12,7 +12,7 @@ async function bootstrap() {
   app.useGlobalFilters(new AllExceptionsFilter());
 
   app.enableCors({
-    origin: true,
+    origin: ['http://localhost:5173', 'https://xn--privestate-e7a.com'],
     credentials: true,
   });
   const config = new DocumentBuilder()
