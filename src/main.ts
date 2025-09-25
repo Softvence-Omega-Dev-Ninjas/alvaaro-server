@@ -8,16 +8,13 @@ import { seed } from './prisma-service/seed';
 async function bootstrap() {
   // apply seed data
   await seed();
+
   const app = await NestFactory.create(AppModule);
+
   app.useGlobalFilters(new AllExceptionsFilter());
-  app.enableCors({
-    origin: [
-      'http://localhost:5173',
-      'http://localhost:5174',
-      'https://xn--privestate-e7a.com',
-    ],
-    credentials: true,
-  });
+
+  app.enableCors();
+
   const config = new DocumentBuilder()
     .setTitle('Alvaaro Server')
     .setDescription('API description')
