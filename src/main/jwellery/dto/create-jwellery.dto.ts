@@ -24,6 +24,10 @@ export class CreateJewelleryDto {
   @IsString()
   zip: string;
 
+  // @ApiProperty()
+  // @IsString()
+  // country: string;
+
   @ApiProperty()
   @IsString()
   address: string;

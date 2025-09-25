@@ -28,7 +28,7 @@ export class ProductService {
     userid: string,
   ) {
     try {
-      // const sellerId = await this.helperService.sellerExists(userid);
+      const sellerId = await this.helperService.sellerExists(userid);
       if (images.length === 0) {
         return ApiResponse.error('At least one image is required');
       }
@@ -36,13 +36,15 @@ export class ProductService {
       const uploadedImages = images.map(
         (f) => `${process.env.DOMAIN}/uploads/${f.filename}`,
       );
-
+      console.log(uploadedImages, 'uploadedImages');
       const location = await getLatLngByGoogle(
         dto.address,
         dto.city,
         dto.zip,
         dto.state,
       );
+
+      console.log(location, 'location');
 
       const product = await this.prisma.product.create({
         data: {
@@ -58,7 +60,7 @@ export class ProductService {
           latitude: location.lat,
           longitude: location.long,
           isExclusive: Boolean(dto.isExclusive),
-          sellerId: '0555e8c6-212a-48bf-a3c0-56e01ad887cb',
+          sellerId,
           views: 0,
         },
       });
@@ -143,7 +145,8 @@ export class ProductService {
       }
       return ApiResponse.success(product, 'Product created successfully');
     } catch (error) {
-      console.log(error);
+      console.log(error, 'error');
+      console.log(error.TypeError, 'error');
       return ApiResponse.error(
         'Failed to create product, please try again later',
         error,
