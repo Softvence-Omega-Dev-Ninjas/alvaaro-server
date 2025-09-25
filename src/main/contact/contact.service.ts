@@ -5,7 +5,7 @@ import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 
 @Injectable()
 export class ContactService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   async create(createContactDto: CreateContactDto) {
     const contact = await this.prisma.contact.create({
