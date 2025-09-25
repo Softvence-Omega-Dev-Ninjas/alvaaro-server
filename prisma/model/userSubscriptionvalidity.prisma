@@ -1,6 +1,6 @@
 model UserSubscriptionValidity {
     id             String   @unique @default(uuid())
-    userId         String
+    userId         String   @unique
     user           User     @relation(fields: [userId], references: [id])
     subscribedPlan String
     startTime      DateTime
