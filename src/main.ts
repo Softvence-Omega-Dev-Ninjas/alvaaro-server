@@ -13,7 +13,10 @@ async function bootstrap() {
 
   app.useGlobalFilters(new AllExceptionsFilter());
 
-  app.enableCors();
+  app.enableCors({
+    origin: '*',
+    credentials: true,
+  });
 
   const config = new DocumentBuilder()
     .setTitle('Alvaaro Server')
