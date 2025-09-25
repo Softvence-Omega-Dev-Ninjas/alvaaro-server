@@ -10,7 +10,6 @@ async function bootstrap() {
   await seed();
   const app = await NestFactory.create(AppModule);
   app.useGlobalFilters(new AllExceptionsFilter());
-
   app.enableCors({
     origin: [
       'http://localhost:5173',
