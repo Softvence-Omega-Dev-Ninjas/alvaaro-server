@@ -7,7 +7,6 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
-import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 
 @Injectable()
 export class TimeValidation implements CanActivate {
@@ -19,7 +18,7 @@ export class TimeValidation implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const userExists = await this.prisma.userSubscriptionValidity.findUnique({
-      where: { userId: request.userid },
+      where: { userId: request.userid as string },
     });
     if (!userExists || !userExists.id) {
       throw new ForbiddenException('Unauthorized: No user found');

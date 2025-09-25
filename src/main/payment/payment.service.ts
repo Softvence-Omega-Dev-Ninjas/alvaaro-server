@@ -169,14 +169,18 @@ export class PaymentService {
             subscribedPlan: subscribedPlan.id,
             startTime: startTime,
             expiryTime: expiryTime,
-            payabeAmount: (Number(invoiceDetails.amount_paid) / 100).toString(),
+            payableAmount: (
+              Number(invoiceDetails.amount_paid) / 100
+            ).toString(),
           },
           create: {
             userId: userId,
             subscribedPlan: subscribedPlan.id,
             startTime: startTime,
             expiryTime: expiryTime,
-            payabeAmount: (Number(invoiceDetails.amount_paid) / 100).toString(),
+            payableAmount: (
+              Number(invoiceDetails.amount_paid) / 100
+            ).toString(),
           },
         });
 
