@@ -13,7 +13,14 @@ async function bootstrap() {
 
   app.useGlobalFilters(new AllExceptionsFilter());
 
-  app.enableCors();
+  app.enableCors({
+    origin: [
+      'http://localhost:5173',
+      'http://localhost:5174',
+      'https://xn--privestate-e7a.com',
+    ],
+    credentials: true,
+  });
 
   const config = new DocumentBuilder()
     .setTitle('Alvaaro Server')
