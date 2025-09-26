@@ -35,7 +35,6 @@ export class AuthController {
     @Body() createAuthDto: CreateUserDto,
     @UploadedFiles() files: Express.Multer.File[],
   ) {
-    console.log(files);
     const filess = files.map(
       (f) => `${process.env.DOMAIN}/uploads/${f.filename}`,
     );
