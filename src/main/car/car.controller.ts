@@ -19,6 +19,7 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes } from '@nestjs/swagger';
 import { CreateCarDto } from './dto/create-car.dto';
 import { Public } from 'src/guards/public.decorator';
+import { storageConfig } from 'src/utils/file/fileUpload';
 
 @Controller('car')
 export class CarController {
@@ -30,7 +31,7 @@ export class CarController {
   @UseGuards(AuthGuard)
   @Roles(UserRole.SELLER)
   @Post()
-  @UseInterceptors(FilesInterceptor('images'))
+  @UseInterceptors(FilesInterceptor('images', 10, { storage: storageConfig() }))
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: CreateCarDto })
   async createCarProduct(
