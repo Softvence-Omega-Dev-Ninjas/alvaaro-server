@@ -20,7 +20,7 @@ export async function getLatLngByGoogle(
 
     const res = await fetch(url, {
       headers: {
-        'User-Agent': 'my-geocoder-app/1.0 (your-email@example.com)', // polite usage
+        'User-Agent': 'my-geocoder-app/1.0 info@privéestate.com', // polite usage
         'Accept-Language': 'en',
       },
     });
