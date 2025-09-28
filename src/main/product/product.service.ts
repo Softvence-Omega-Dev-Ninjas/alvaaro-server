@@ -44,6 +44,12 @@ export class ProductService {
         dto.state,
       );
 
+      if (!location) {
+        return ApiResponse.error(
+          'Invalid address, please provide a valid address',
+        );
+      }
+
       const product = await this.prisma.product.create({
         data: {
           name: dto.name,
