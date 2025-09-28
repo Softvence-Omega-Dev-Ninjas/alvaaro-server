@@ -36,15 +36,13 @@ export class ProductService {
       const uploadedImages = images.map(
         (f) => `${process.env.DOMAIN}/uploads/${f.filename}`,
       );
-      console.log(uploadedImages, 'uploadedImages');
+
       const location = await getLatLngByGoogle(
         dto.address,
         dto.city,
         dto.zip,
         dto.state,
       );
-
-      console.log(location, 'location');
 
       const product = await this.prisma.product.create({
         data: {
@@ -57,8 +55,8 @@ export class ProductService {
           city: dto.city,
           state: dto.state,
           zip: dto.zip,
-          latitude: location.lat,
-          longitude: location.long,
+          latitude: location?.lat || 0,
+          longitude: location?.long || 0,
           isExclusive: Boolean(dto.isExclusive),
           sellerId,
           views: 0,
@@ -145,8 +143,6 @@ export class ProductService {
       }
       return ApiResponse.success(product, 'Product created successfully');
     } catch (error) {
-      console.log(error, 'error');
-      console.log(error.TypeError, 'error');
       return ApiResponse.error(
         'Failed to create product, please try again later',
         error,
