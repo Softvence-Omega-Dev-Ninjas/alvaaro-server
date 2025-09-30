@@ -1,6 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { CategoryType } from '@prisma/client';
-import { IsBoolean, IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class CreateProductDto {
   @ApiProperty({
@@ -79,5 +85,6 @@ export class CreateProductDto {
     example: false,
   })
   @IsBoolean({ message: 'premium must be true or false (boolean)' })
-  isExclusive: boolean;
+  @IsOptional()
+  isExclusive?: boolean;
 }
