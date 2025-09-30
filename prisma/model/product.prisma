@@ -11,7 +11,7 @@ model Product {
   address     String
   images      String[]
   category    CategoryType
-  isExclusive Boolean?
+  isExclusive Boolean?     @default(false)
   views       Int
   latitude    Float        @default(0)
   longitude   Float        @default(0)
