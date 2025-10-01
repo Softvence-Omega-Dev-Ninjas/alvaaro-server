@@ -145,6 +145,7 @@ export class AdminService {
         where: { userId: id },
         data: { verificationStatus: status.status },
       });
+
       return ApiResponse.success(updatedSeller, 'Seller verified successfully');
     } catch (error) {
       return ApiResponse.error('Error verifying seller', error);
