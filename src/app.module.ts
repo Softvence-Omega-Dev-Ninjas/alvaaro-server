@@ -21,6 +21,7 @@ import { AdminModule } from './main/admin/admin.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './guards/auth.guard';
 import { AppController } from './app.controller';
+import { NewsModule } from './main/news/news.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { AppController } from './app.controller';
     PaymentModule,
     CouponModule,
     AdminModule,
+    NewsModule,
   ],
   controllers: [AppController],
   providers: [{ provide: APP_GUARD, useClass: AuthGuard }],

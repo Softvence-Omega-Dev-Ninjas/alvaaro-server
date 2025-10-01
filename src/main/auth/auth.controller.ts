@@ -11,7 +11,6 @@ import { AuthService } from './auth.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ApiConsumes } from '@nestjs/swagger';
-import { uploadMultipleToCloudinary } from 'src/utils/common/cloudinary/cloudinary';
 import { SignInDto } from './dto/signin.dto';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { Request } from 'express';
@@ -21,6 +20,7 @@ import { ForgotPasswordDto } from './dto/forgotPassword.dto';
 import { VerifyOtpForgottenPasswordDto } from './dto/verifyOtpForgottenPassword.dto';
 import { VerifyOtpAndCreateUserDto } from './dto/verifyOtpAndCreateUser.dto';
 import { ResendOtpDto } from './dto/resendOtp.dto';
+import { storageConfig } from 'src/utils/file/fileUpload';
 
 @Controller('auth')
 @UseGuards(AuthGuard)
@@ -29,7 +29,7 @@ export class AuthController {
 
   @Post('signup')
   @Public()
-  @UseInterceptors(FilesInterceptor('images'))
+  @UseInterceptors(FilesInterceptor('images', 10, { storage: storageConfig() }))
   @ApiConsumes('multipart/form-data')
   async signup(
     @Body() createAuthDto: CreateUserDto,

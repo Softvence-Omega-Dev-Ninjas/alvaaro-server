@@ -44,6 +44,12 @@ export class ProductService {
         dto.state,
       );
 
+      if (!location) {
+        return ApiResponse.error(
+          'Invalid address, please provide a valid address',
+        );
+      }
+
       const product = await this.prisma.product.create({
         data: {
           name: dto.name,
@@ -55,8 +61,8 @@ export class ProductService {
           city: dto.city,
           state: dto.state,
           zip: dto.zip,
-          latitude: location.lat,
-          longitude: location.long,
+          latitude: location?.lat || 0,
+          longitude: location?.long || 0,
           isExclusive: Boolean(dto.isExclusive),
           sellerId,
           views: 0,

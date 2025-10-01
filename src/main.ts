@@ -4,17 +4,29 @@ import * as bodyParser from 'body-parser';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './utils/common/filter/all-exceptions.filter';
 import { seed } from './prisma-service/seed';
+import { seedSuperAdmin } from './prisma-service/seeders/super-admin.seeder';
 
 async function bootstrap() {
   // apply seed data
   await seed();
+  await seedSuperAdmin();
+
   const app = await NestFactory.create(AppModule);
+
+  app.use(bodyParser.json({ limit: '20mb' }));
+  app.use(bodyParser.urlencoded({ limit: '20mb', extended: true }));
+
   app.useGlobalFilters(new AllExceptionsFilter());
 
   app.enableCors({
-    origin: true,
+    origin: [
+      'http://localhost:5173',
+      'http://localhost:5174',
+      'https://xn--privestate-e7a.com',
+    ],
     credentials: true,
   });
+
   const config = new DocumentBuilder()
     .setTitle('Alvaaro Server')
     .setDescription('API description')

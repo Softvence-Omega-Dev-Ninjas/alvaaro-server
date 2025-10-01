@@ -93,7 +93,7 @@ export class PaymentService {
           : {}),
         // success_url: 'http://localhost:3000/stripe/payment-success',
         success_url:
-          'http://localhost:5173/payment-success?session_id={CHECKOUT_SESSION_ID}',
+          'https://xn--privestate-e7a.com/auth/payment-success?session_id={CHECKOUT_SESSION_ID}',
         cancel_url: 'http://localhost:3000/stripe/payment-cancel',
       });
       return ApiResponse.success(
@@ -169,14 +169,18 @@ export class PaymentService {
             subscribedPlan: subscribedPlan.id,
             startTime: startTime,
             expiryTime: expiryTime,
-            payabeAmount: (Number(invoiceDetails.amount_paid) / 100).toString(),
+            payableAmount: (
+              Number(invoiceDetails.amount_paid) / 100
+            ).toString(),
           },
           create: {
             userId: userId,
             subscribedPlan: subscribedPlan.id,
             startTime: startTime,
             expiryTime: expiryTime,
-            payabeAmount: (Number(invoiceDetails.amount_paid) / 100).toString(),
+            payableAmount: (
+              Number(invoiceDetails.amount_paid) / 100
+            ).toString(),
           },
         });
 
@@ -198,7 +202,7 @@ export class PaymentService {
       }
       return ApiResponse.success('Subscription validity updated successfully');
     } catch (error) {
-      throw new ForbiddenException('Failed to retrieve session', error.message);
+      throw new ForbiddenException(error.message, 'Failed to retrieve session');
     }
   }
 

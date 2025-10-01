@@ -9,7 +9,6 @@ import {
   Req,
   Post,
   Body,
-  Patch,
 } from '@nestjs/common';
 import { CarService } from './car.service';
 import { ProductService } from '../product/product.service';
@@ -19,20 +18,20 @@ import { UserRole } from 'src/utils/common/enum/userEnum';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes } from '@nestjs/swagger';
 import { CreateCarDto } from './dto/create-car.dto';
-import { UpdateCarDto } from './dto/update-car.dto';
 import { Public } from 'src/guards/public.decorator';
+import { storageConfig } from 'src/utils/file/fileUpload';
 
 @Controller('car')
 export class CarController {
   constructor(
     private readonly carService: CarService,
     private readonly productService: ProductService,
-  ) { }
+  ) {}
 
   @UseGuards(AuthGuard)
   @Roles(UserRole.SELLER)
   @Post()
-  @UseInterceptors(FilesInterceptor('images'))
+  @UseInterceptors(FilesInterceptor('images', 10, { storage: storageConfig() }))
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: CreateCarDto })
   async createCarProduct(
@@ -62,23 +61,23 @@ export class CarController {
   // update a car
   // @UseGuards(AuthGuard)
   // @Roles(UserRole.SELLER)
-  @Patch(':id')
-  @Public()
-  @UseInterceptors(FilesInterceptor('images'))
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({ type: CreateCarDto })
-  async updateCarProduct(
-    @UploadedFiles() images: Express.Multer.File[],
-    @Body() updateProductDto: UpdateCarDto,
-    @Param('id') id: string,
+  // @Patch(':id')
+  // @Public()
+  // @UseInterceptors(FilesInterceptor('images'))
+  // @ApiConsumes('multipart/form-data')
+  // @ApiBody({ type: CreateCarDto })
+  // async updateCarProduct(
+  //   @UploadedFiles() images: Express.Multer.File[],
+  //   @Body() updateProductDto: UpdateCarDto,
+  //   @Param('id') id: string,
 
-  ) {
-    return await this.carService.carUpdate(
-      id,
-      updateProductDto,
+  // ) {
+  //   return await this.carService.carUpdate(
+  //     id,
+  //     updateProductDto,
 
-    );
-  }
+  //   );
+  // }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
