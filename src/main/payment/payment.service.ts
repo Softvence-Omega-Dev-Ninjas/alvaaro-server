@@ -6,10 +6,10 @@ import {
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
 import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 import { HelperService } from 'src/utils/helper/helper.service';
-import Stripe from 'stripe';
-import { SubscriptionPlanType } from './type/subscriptionPlanType';
 import { MailService } from 'src/utils/mail/mail.service';
+import Stripe from 'stripe';
 import { SaveSessionDto } from './dto/update-payment.dto';
+import { SubscriptionPlanType } from './type/subscriptionPlanType';
 
 @Injectable()
 export class PaymentService {
@@ -84,12 +84,12 @@ export class PaymentService {
         ],
         ...(couponExists.length > 0
           ? {
-              discounts: [
-                {
-                  coupon: couponExists[0]?.stripeCouponId,
-                },
-              ],
-            }
+            discounts: [
+              {
+                coupon: couponExists[0]?.stripeCouponId,
+              },
+            ],
+          }
           : {}),
         // success_url: 'http://localhost:3000/stripe/payment-success',
         success_url:
@@ -169,14 +169,14 @@ export class PaymentService {
             subscribedPlan: subscribedPlan.id,
             startTime: startTime,
             expiryTime: expiryTime,
-            payabeAmount: (Number(invoiceDetails.amount_paid) / 100).toString(),
+            payableAmount: (Number(invoiceDetails.amount_paid) / 100).toString(),
           },
           create: {
             userId: userId,
             subscribedPlan: subscribedPlan.id,
             startTime: startTime,
             expiryTime: expiryTime,
-            payabeAmount: (Number(invoiceDetails.amount_paid) / 100).toString(),
+            payableAmount: (Number(invoiceDetails.amount_paid) / 100).toString(),
           },
         });
 

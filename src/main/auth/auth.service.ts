@@ -1,14 +1,14 @@
 import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
-import { CreateUserDto } from '../user/dto/create-user.dto';
-import * as bcrypt from 'bcrypt';
-import { PrismaService } from '../../prisma-service/prisma-service.service';
-import { SignInDto } from './dto/signin.dto';
 import { JwtService } from '@nestjs/jwt';
-import { PasswordDto } from './dto/passwords.dto';
+import * as bcrypt from 'bcrypt';
 import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 import { HelperService } from 'src/utils/helper/helper.service';
 import { MailService } from 'src/utils/mail/mail.service';
 import { buildOtpEmail } from 'src/utils/mail/templates/html/otp.template';
+import { PrismaService } from '../../prisma-service/prisma-service.service';
+import { CreateUserDto } from '../user/dto/create-user.dto';
+import { PasswordDto } from './dto/passwords.dto';
+import { SignInDto } from './dto/signin.dto';
 
 @Injectable()
 export class AuthService {
@@ -17,16 +17,16 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly helper: HelperService,
     private readonly mailService: MailService,
-  ) {}
+  ) { }
 
   async signup(createUserDto: CreateUserDto, imageUrl: string) {
     try {
       const existingUser = await this.prisma.user.findUnique({
         where: { email: createUserDto.email, isDeleted: false },
       });
-      if (existingUser) {
-        throw new HttpException('User with this email already exists', 400);
-      }
+      // if (existingUser) {
+      //   throw new HttpException('User with this email already exists', 400);
+      // }
       const saltOrRounds = 10;
       const hashedPassword = await bcrypt.hash(
         createUserDto.password,
@@ -93,7 +93,7 @@ export class AuthService {
     if (
       !user.otpExpiry ||
       new Date(user.otpExpiry as string | number | Date) <
-        new Date(getCurrentTime)
+      new Date(getCurrentTime)
     ) {
       throw new NotFoundException('Verification token not found or expired');
     }
@@ -226,7 +226,7 @@ export class AuthService {
     if (
       !user.otpExpiry ||
       new Date(user.otpExpiry as string | number | Date) <
-        new Date(getCurrentTime)
+      new Date(getCurrentTime)
     ) {
       return ApiResponse.error('OTP has expired');
     }
@@ -255,7 +255,7 @@ export class AuthService {
     if (
       !user.otpExpiry ||
       new Date(user.otpExpiry as string | number | Date) <
-        new Date(getCurrentTime)
+      new Date(getCurrentTime)
     ) {
       throw new NotFoundException('Verification token not found or expired');
     }
