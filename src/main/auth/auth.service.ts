@@ -24,9 +24,9 @@ export class AuthService {
       const existingUser = await this.prisma.user.findUnique({
         where: { email: createUserDto.email, isDeleted: false },
       });
-      // if (existingUser) {
-      //   throw new HttpException('User with this email already exists', 400);
-      // }
+      if (existingUser) {
+        throw new HttpException('User with this email already exists', 400);
+      }
       const saltOrRounds = 10;
       const hashedPassword = await bcrypt.hash(
         createUserDto.password,
