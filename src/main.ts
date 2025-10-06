@@ -23,6 +23,7 @@ async function bootstrap() {
       'http://localhost:5173',
       'http://localhost:5174',
       'https://xn--privestate-e7a.com',
+      'https://xn--privestate-e7a.es',
     ],
     credentials: true,
   });
