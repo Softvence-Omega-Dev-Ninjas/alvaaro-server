@@ -24,7 +24,7 @@ async function bootstrap() {
       'http://localhost:5174',
       'https://xn--privestate-e7a.com',
       'https://xn--privestate-e7a.es',
-      'https://priveestate.com'
+      'https://priveestate.es'
     ],
     credentials: true,
   });
