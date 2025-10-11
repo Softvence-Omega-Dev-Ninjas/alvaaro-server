@@ -1,21 +1,41 @@
-FROM node:22-alpine
+# Stage 1: Build
+FROM node:20 AS builder
 
 WORKDIR /app
 
-# Copy package files first for better caching
+# Copy package files
 COPY package*.json ./
-COPY prisma ./prisma/
 
-# Install dependencies without running postinstall scripts
-RUN npm ci --ignore-scripts
+# Install deps
+RUN npm i -g pnpm@latest && pnpm i 
 
-# Generate Prisma client (without database connection)
-RUN npx prisma generate
+# Copy prisma folder
+COPY prisma ./prisma
+COPY prisma.config.ts ./
 
-# Copy the rest of the application
+# Copy source code
 COPY . .
 
-# Build the app
-RUN npm run build
+# Generate Prisma client
+RUN pnpm prisma:generate
 
-CMD ["npm", "run", "start:prod"]
+# Build the app
+RUN pnpm build
+
+# Stage 2: Run
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy build output & dependencies
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./
+COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
+
+# Set production env
+ENV NODE_ENV=production
+EXPOSE 5001
+
+CMD ["npm", "run", "start:docker"]
