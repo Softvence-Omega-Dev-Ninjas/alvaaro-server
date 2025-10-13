@@ -76,6 +76,12 @@ export class ProductController {
     return this.productService.getTrendingProducts();
   }
 
+  @Get('top-locations')
+  async getTopCites() {
+    const result = await this.productService.getTopCites();
+    return result;
+  }
+
   @Get(':id')
   findProductById(@Param('id') id: string) {
     return this.productService.findProductById(id);
