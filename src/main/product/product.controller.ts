@@ -47,7 +47,7 @@ export class ProductController {
       maxPrice,
     );
   }
-
+ 
   @Get('/premium')
   @ApiQuery({ name: 'category', enum: CategoryType, required: false })
   @ApiQuery({
