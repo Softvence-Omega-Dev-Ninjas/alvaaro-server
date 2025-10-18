@@ -20,4 +20,4 @@ import { MailModule } from 'src/utils/mail/mail.module';
   providers: [AuthService],
   exports: [JwtModule],
 })
-export class AuthModule { }
+export class AuthModule {}

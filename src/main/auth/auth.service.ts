@@ -17,7 +17,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly helper: HelperService,
     private readonly mailService: MailService,
-  ) { }
+  ) {}
 
   async signup(createUserDto: CreateUserDto, imageUrl: string) {
     try {
@@ -93,7 +93,7 @@ export class AuthService {
     if (
       !user.otpExpiry ||
       new Date(user.otpExpiry as string | number | Date) <
-      new Date(getCurrentTime)
+        new Date(getCurrentTime)
     ) {
       throw new NotFoundException('Verification token not found or expired');
     }
@@ -226,7 +226,7 @@ export class AuthService {
     if (
       !user.otpExpiry ||
       new Date(user.otpExpiry as string | number | Date) <
-      new Date(getCurrentTime)
+        new Date(getCurrentTime)
     ) {
       return ApiResponse.error('OTP has expired');
     }
@@ -255,7 +255,7 @@ export class AuthService {
     if (
       !user.otpExpiry ||
       new Date(user.otpExpiry as string | number | Date) <
-      new Date(getCurrentTime)
+        new Date(getCurrentTime)
     ) {
       throw new NotFoundException('Verification token not found or expired');
     }

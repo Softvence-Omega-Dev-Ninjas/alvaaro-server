@@ -9,4 +9,4 @@ import { HelperModule } from 'src/utils/helper/helper.module';
   controllers: [UserController],
   providers: [UserService],
 })
-export class UserModule { }
+export class UserModule {}

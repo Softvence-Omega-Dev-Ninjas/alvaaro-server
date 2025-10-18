@@ -34,7 +34,7 @@ export async function seed() {
     await prisma.$disconnect();
   }
 }
- 
+
 seed()
   .catch((e) => {
     console.error(e);

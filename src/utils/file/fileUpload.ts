@@ -9,4 +9,4 @@ export const storageConfig = (folder = './public/uploads') =>
       const ext = extname(file.originalname); // keeps dot + extension (.jpg, .png)
       callback(null, `${uniqueSuffix}${ext}`);
     },
-  }); 
+  });

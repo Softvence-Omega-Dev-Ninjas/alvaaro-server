@@ -4,12 +4,12 @@ import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 
 @Injectable()
 export class YachtService {
-  constructor(private readonly prismaService: PrismaService) { }
+  constructor(private readonly prismaService: PrismaService) {}
 
   async findAll() {
     try {
       const yachts = await this.prismaService.yacht.findMany({
-        include: { product: true }
+        include: { product: true },
       });
       return ApiResponse.success(yachts, 'Yachts retrieved successfully');
     } catch (error) {
@@ -21,7 +21,7 @@ export class YachtService {
     try {
       const yacht = await this.prismaService.yacht.findUnique({
         where: { id },
-        include: { product: true }
+        include: { product: true },
       });
 
       if (!yacht) {
@@ -32,6 +32,4 @@ export class YachtService {
       return ApiResponse.error('Failed to retrieve yacht', error);
     }
   }
-
-
 }

@@ -22,7 +22,10 @@
     "start:migrate:prod": "prisma migrate deploy && npx prisma generate && npm run start:prod",
     "prisma:generate": "npx prisma generate",
     "prisma:migrate": "npx prisma migrate deploy",
-    "start:docker": "prisma generate && prisma migrate deploy && node dist/src/main"
+    "start:docker": "prisma generate && prisma migrate deploy && node dist/src/main",
+    "lint:fix": "eslint . --ext .ts,.js,.jsx,.tsx --fix",
+    "format:fix": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\"",
+    "ci:fix": "npm run format:fix"
   },
   "dependencies": {
     "@nestjs/axios": "^4.0.1",

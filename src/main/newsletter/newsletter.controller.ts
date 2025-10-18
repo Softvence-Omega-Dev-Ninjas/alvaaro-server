@@ -5,7 +5,7 @@ import { Public } from 'src/guards/public.decorator';
 
 @Controller('newsletter')
 export class NewsletterController {
-  constructor(private readonly newsletterService: NewsletterService) { }
+  constructor(private readonly newsletterService: NewsletterService) {}
 
   @Post()
   @Public()

@@ -9,10 +9,9 @@ export class NewsletterService {
   constructor(
     private prisma: PrismaService,
     private mailService: MailService,
-  ) { }
+  ) {}
 
   async create(createNewsletterDto: CreateNewsletterDto) {
-
     await this.prisma.newsletter.upsert({
       where: { email: createNewsletterDto.email },
       update: {},
@@ -30,6 +29,9 @@ export class NewsletterService {
   }
 
   async findAll() {
-    return ApiResponse.success(await this.prisma.newsletter.findMany(), 'Newsletters retrieved successfully');
+    return ApiResponse.success(
+      await this.prisma.newsletter.findMany(),
+      'Newsletters retrieved successfully',
+    );
   }
 }

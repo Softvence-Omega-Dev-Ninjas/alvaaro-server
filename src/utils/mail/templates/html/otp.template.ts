@@ -109,7 +109,6 @@
 // <body>
 //   <div class="container">
 
-
 //     <h2>Verify Your Email Address</h2>
 //     <p>Use the following One-Time Password (OTP) to complete your verification:</p>
 
@@ -126,8 +125,6 @@
 // </html>`;
 // }
 
-
-
 export function buildOtpEmail(options: {
   otp: string;
   year?: number;
@@ -137,8 +134,8 @@ export function buildOtpEmail(options: {
   const {
     otp,
     year = new Date().getFullYear(),
-    companyName = "Privé Estates",
-    brandColor = "#2563eb" // Azul principal (puedes cambiarlo a tu color)
+    companyName = 'Privé Estates',
+    brandColor = '#2563eb', // Azul principal (puedes cambiarlo a tu color)
   } = options;
 
   return `<!DOCTYPE html>

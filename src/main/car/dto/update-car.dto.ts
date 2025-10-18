@@ -43,7 +43,6 @@ export class UpdateCarDto {
     required: false,
     example: 'Automatic',
   })
-
   @IsString()
   @IsNotEmpty()
   transmission?: string;

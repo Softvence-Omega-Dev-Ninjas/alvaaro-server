@@ -84,12 +84,12 @@ export class PaymentService {
         ],
         ...(couponExists.length > 0
           ? {
-            discounts: [
-              {
-                coupon: couponExists[0]?.stripeCouponId,
-              },
-            ],
-          }
+              discounts: [
+                {
+                  coupon: couponExists[0]?.stripeCouponId,
+                },
+              ],
+            }
           : {}),
         // success_url: 'http://localhost:3000/stripe/payment-success',
         success_url:
@@ -169,14 +169,18 @@ export class PaymentService {
             subscribedPlan: subscribedPlan.id,
             startTime: startTime,
             expiryTime: expiryTime,
-            payableAmount: (Number(invoiceDetails.amount_paid) / 100).toString(),
+            payableAmount: (
+              Number(invoiceDetails.amount_paid) / 100
+            ).toString(),
           },
           create: {
             userId: userId,
             subscribedPlan: subscribedPlan.id,
             startTime: startTime,
             expiryTime: expiryTime,
-            payableAmount: (Number(invoiceDetails.amount_paid) / 100).toString(),
+            payableAmount: (
+              Number(invoiceDetails.amount_paid) / 100
+            ).toString(),
           },
         });
 

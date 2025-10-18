@@ -3,20 +3,19 @@ import { ApiProperty } from '@nestjs/swagger';
 export class UpdateWatchDto {
   @ApiProperty({
     required: false,
-    example: 'Luxury Watch'
-
+    example: 'Luxury Watch',
   })
   name?: string;
 
   @ApiProperty({
     required: false,
-    example: 'A luxury watch with diamond encrusted bezel'
+    example: 'A luxury watch with diamond encrusted bezel',
   })
   description?: string;
 
   @ApiProperty({
     required: false,
-    example: 2500
+    example: 2500,
   })
   price?: number;
 
@@ -29,72 +28,69 @@ export class UpdateWatchDto {
   })
   images?: Express.Multer.File[];
 
-
-
-
   @ApiProperty({
     required: false,
-    example: 'New'
+    example: 'New',
   })
   condition?: string;
 
   @ApiProperty({
     required: false,
-    example: '2020'
+    example: '2020',
   })
   manufacture?: string;
 
   @ApiProperty({
     required: false,
-    example: '2 years'
+    example: '2 years',
   })
   warranty?: string;
 
   @ApiProperty({
     required: false,
-    example: 'Model X'
+    example: 'Model X',
   })
   model?: string;
 
   @ApiProperty({
     required: false,
-    example: '50m'
+    example: '50m',
   })
   waterResistance?: string;
 
   @ApiProperty({
     required: false,
-    example: 'Analog'
+    example: 'Analog',
   })
   displayType?: string;
 
   @ApiProperty({
     required: false,
-    example: 'Leather'
+    example: 'Leather',
   })
   strapMaterial?: string;
 
   @ApiProperty({
     required: false,
-    example: 'Automatic'
+    example: 'Automatic',
   })
   movement?: string;
 
   @ApiProperty({
     required: false,
-    example: '40mm'
+    example: '40mm',
   })
   size?: string;
 
   @ApiProperty({
     required: false,
-    example: 'Sport'
+    example: 'Sport',
   })
   tractionType?: string;
 
   @ApiProperty({
     required: false,
-    example: ['Water-resistant', 'Chronograph']
+    example: ['Water-resistant', 'Chronograph'],
   })
   features?: string[] | string;
 }
