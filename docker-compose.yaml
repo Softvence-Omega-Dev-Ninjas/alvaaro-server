@@ -37,6 +37,9 @@ services:
   db:
     image: postgres:15
     restart: always
+    profiles:
+      - dev
+      - prod
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
