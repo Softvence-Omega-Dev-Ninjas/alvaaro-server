@@ -379,7 +379,7 @@ cat >> "$CD_YAML" <<'EOF'
           if [ ! -f ~/.docker/cli-plugins/docker-compose ]; then
             echo "Installing Docker Compose..."
             mkdir -p ~/.docker/cli-plugins/
-            url -SL https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
+            curl -SL https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
             chmod +x ~/.docker/cli-plugins/docker-compose
           fi
 
