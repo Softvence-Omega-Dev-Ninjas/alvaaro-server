@@ -60,3 +60,4 @@ docker-compose.yml
 
 # Ignore uploads folder
 /public/uploads
+.env.production

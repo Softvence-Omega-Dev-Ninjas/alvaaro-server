@@ -1,22 +1,24 @@
 services:
   app:
+    profiles:
+      - prod
     platform: linux/amd64
     build:
       context: .
-    image: imranwebstudio/alvaro-server:latest
-    container_name: alvaro-server
+    image: ${DOCKER_USERNAME}/${PACKAGE_NAME}:${PACKAGE_VERSION}
+    container_name: ${PACKAGE_NAME}
     ports:
-      - 5001:5001
-    environment:
-      - NODE_ENV=production
-      - PORT=5001
-      - DATABASE_URL=postgres://postgres:postgres@db:5432/alvaaroDB
-      - JWT_SECRET=hjdkhfjrwiuerui324hjhfd
-      - STRIPE_SECRET_KEY=sk_test_51RyC0XPuycoSWbPEuamNEM0vJxVwn2mC9zd5Y6UkXjv5knhRuUeP7AVgh47NoR0I2IJ4uSJWBAdCaPqnZU2ZMy5C00dgIWQdhw
-      - DOMAIN=http://localhost:5000
-      - EMAIL_USER=info@privéestate.com
-      - APP_PASS=bhqdxblplojydkdu
-
+      - ${PORT}:${PORT}
+    env_file:
+      - .env
+    command: >
+      sh -c "
+        echo '🏁 Waiting for DB...';
+        sleep 5;
+        npx prisma migrate deploy;
+        echo '🚀 Starting app...';
+        npm run start:docker
+        "
     depends_on:
       db:
         condition: service_healthy

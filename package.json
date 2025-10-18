@@ -22,7 +22,7 @@
     "start:migrate:prod": "prisma migrate deploy && npx prisma generate && npm run start:prod",
     "prisma:generate": "npx prisma generate",
     "prisma:migrate": "npx prisma migrate deploy",
-    "start:docker": "node dist/src/main"
+    "start:docker": "prisma generate && prisma migrate deploy && node dist/src/main"
   },
   "dependencies": {
     "@nestjs/axios": "^4.0.1",

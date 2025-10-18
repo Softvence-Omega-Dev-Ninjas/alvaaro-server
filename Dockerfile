@@ -36,6 +36,6 @@ COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
 
 # Set production env
 ENV NODE_ENV=production
-EXPOSE 5001
+EXPOSE 5000
 
 CMD ["npm", "run", "start:docker"]
