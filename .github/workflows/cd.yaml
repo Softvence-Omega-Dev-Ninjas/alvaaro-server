@@ -25,6 +25,7 @@ jobs:
           DOMAIN: ${{ secrets.DOMAIN }}
           EMAIL_USER: ${{ secrets.EMAIL_USER }}
           APP_PASS: ${{ secrets.APP_PASS }}
+          VITE_NEWS_API: ${{ secrets.VITE_NEWS_API }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
           GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
           VPS_HOST: ${{ secrets.VPS_HOST }}
@@ -112,6 +113,7 @@ jobs:
           export DOMAIN="${{secrets.DOMAIN}}"
           export EMAIL_USER="${{secrets.EMAIL_USER}}"
           export APP_PASS="${{secrets.APP_PASS}}"
+          export VITE_NEWS_API="${{secrets.VITE_NEWS_API}}"
           export DOCKER_PASSWORD="${{secrets.DOCKER_PASSWORD}}"
           export GIT_TOKEN="${{secrets.GIT_TOKEN}}"
           export VPS_HOST="${{secrets.VPS_HOST}}"

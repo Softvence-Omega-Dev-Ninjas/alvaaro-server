@@ -37,6 +37,9 @@ inputs:
   APP_PASS:
     description: "APP_PASS from .env.production"
     required: true
+  VITE_NEWS_API:
+    description: "VITE_NEWS_API from .env.production"
+    required: true
   DOCKER_PASSWORD:
     description: "DOCKER_PASSWORD from .env.production"
     required: true
@@ -72,6 +75,7 @@ runs:
           echo "DOMAIN=${{ inputs.DOMAIN }}"
           echo "EMAIL_USER=${{ inputs.EMAIL_USER }}"
           echo "APP_PASS=${{ inputs.APP_PASS }}"
+          echo "VITE_NEWS_API=${{ inputs.VITE_NEWS_API }}"
           echo "DOCKER_PASSWORD=${{ inputs.DOCKER_PASSWORD }}"
           echo "GIT_TOKEN=${{ inputs.GIT_TOKEN }}"
           echo "VPS_HOST=${{ inputs.VPS_HOST }}"
