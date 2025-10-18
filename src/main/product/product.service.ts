@@ -483,4 +483,25 @@ export class ProductService {
       'Total views retrieved successfully',
     );
   }
+
+  async getTopCites() {
+    try {
+      const topCities = await this.prisma.product.groupBy({
+        by: ['city'],
+        _count: { city: true },
+        orderBy: {
+          _count: { city: 'desc' },
+        },
+        take: 6,
+      });
+
+      return ApiResponse.success(
+        topCities,
+        'Top Locations fetched successfully!',
+      );
+    } catch (error) {
+      console.log(error);
+      return ApiResponse.error('Something went wrong', error);
+    }
+  }
 }

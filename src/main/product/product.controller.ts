@@ -47,7 +47,7 @@ export class ProductController {
       maxPrice,
     );
   }
-
+  //  Comment
   @Get('/premium')
   @ApiQuery({ name: 'category', enum: CategoryType, required: false })
   @ApiQuery({
@@ -74,6 +74,12 @@ export class ProductController {
   @Get('trending')
   getTrendingProducts() {
     return this.productService.getTrendingProducts();
+  }
+
+  @Get('top-locations')
+  async getTopCites() {
+    const result = await this.productService.getTopCites();
+    return result;
   }
 
   @Get(':id')
