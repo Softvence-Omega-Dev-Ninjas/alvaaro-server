@@ -60,7 +60,23 @@ services:
       retries: 5
       start_period: 15s
 
+  caddy:
+    image: caddy:latest
+    profiles:
+      - prod
+    container_name: caddy_server
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+
 volumes:
   alvaaro_pg:
+  caddy_data:
+  caddy_config:
 networks:
   default:
