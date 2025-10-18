@@ -13,7 +13,7 @@ CI_FILE=".github/workflows/ci.yaml"
 CD_FILE=".github/workflows/cd.yaml"
 
 # Static values
-DOCKER_USERNAME="devlopersabbir"
+DOCKER_USERNAME="softvence"
 EMAIL="devlopersabbir@gmail.com"
 
 # Get values from package.json

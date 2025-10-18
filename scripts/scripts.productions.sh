@@ -4,7 +4,7 @@
 ENV_FILE=".env.production"
 
 # Static values
-DOCKER_USERNAME="devlopersabbir"
+DOCKER_USERNAME="softvence"
 EMAIL="devlopersabbir@gmail.com"
 
 # Get values from package.json

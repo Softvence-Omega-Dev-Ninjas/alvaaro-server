@@ -10,7 +10,7 @@ CI_YAML=".github/workflows/ci.yaml"
 CD_YAML=".github/workflows/cd.yaml"
 
 # Static values
-DOCKER_USERNAME="devlopersabbir"
+DOCKER_USERNAME="softvence"
 EMAIL="devlopersabbir@gmail.com"
 
 # Sensitive keys (skip auto-upload)
