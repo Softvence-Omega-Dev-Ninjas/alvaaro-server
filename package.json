@@ -1,7 +1,8 @@
 {
   "name": "alvaro-backend",
-  "version": "0.0.1",
-  "description": "",
+  "displayName": "Alvaro API Server",
+  "version": "0.0.2",
+  "description": "Premium Marketplace API - Cars, Real Estate, Yachts & More",
   "author": "",
   "private": true,
   "license": "UNLICENSED",

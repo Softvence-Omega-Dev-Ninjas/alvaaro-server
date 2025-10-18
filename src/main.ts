@@ -5,6 +5,7 @@ import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './utils/common/filter/all-exceptions.filter';
 import { seed } from './prisma-service/seed';
 import { seedSuperAdmin } from './prisma-service/seeders/super-admin.seeder';
+import appMetadata from './app-metadata/app-metadata';
 
 async function bootstrap() {
   // apply seed data
@@ -30,9 +31,9 @@ async function bootstrap() {
   });
 
   const config = new DocumentBuilder()
-    .setTitle('Alvaaro Server')
-    .setDescription('API description')
-    .setVersion('1.0')
+    .setTitle(appMetadata.displayName)
+    .setDescription(appMetadata.description)
+    .setVersion(appMetadata.version)
     .addBearerAuth(
       {
         type: 'http',
