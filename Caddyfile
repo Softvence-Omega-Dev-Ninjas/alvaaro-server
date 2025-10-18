@@ -1,7 +1,6 @@
 api.priveestate.es {
     reverse_proxy app:5000
     header {
-        Access-Control-Allow-Origin https://priveestate.es
         Access-Control-Allow-Methods GET,POST,PUT,DELETE,OPTIONS
         Access-Control-Allow-Headers *
     }
@@ -11,4 +10,7 @@ priveestate.es {
     root * /var/www/dist
     try_files {path} /index.html
     file_server
+    header {
+        Cache-Control "public, max-age=31536000, immutable"
+    }
 }
