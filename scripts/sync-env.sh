@@ -14,7 +14,7 @@ CD_FILE=".github/workflows/cd.yaml"
 
 # Static values
 DOCKER_USERNAME="softvence"
-EMAIL="devlopersabbir@gmail.com"
+EMAIL="softvenceomega@gmail.com"
 
 # Get values from package.json
 PACKAGE_NAME=$(node -p "require('./package.json').name || 'empty_name'")

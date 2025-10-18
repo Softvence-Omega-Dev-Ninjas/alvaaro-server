@@ -11,7 +11,7 @@ CD_YAML=".github/workflows/cd.yaml"
 
 # Static values
 DOCKER_USERNAME="softvence"
-EMAIL="devlopersabbir@gmail.com"
+EMAIL="softvenceomega@gmail.com"
 
 # Sensitive keys (skip auto-upload)
 SENSITIVE_KEYS=(
