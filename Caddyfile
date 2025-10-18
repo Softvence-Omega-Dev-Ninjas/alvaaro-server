@@ -1,0 +1,3 @@
+api.priveestate.es {
+    reverse_proxy app:5000
+}
