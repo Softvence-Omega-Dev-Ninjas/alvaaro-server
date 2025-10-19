@@ -49,6 +49,7 @@
     "class-validator": "^0.14.2",
     "cloudinary": "^1.41.3",
     "date-fns": "^4.1.0",
+    "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.1",
     "multer-storage-cloudinary": "^4.0.0",
