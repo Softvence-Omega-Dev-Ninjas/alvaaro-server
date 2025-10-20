@@ -24,6 +24,7 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 import { RolesGuard } from 'src/guards/role.guard';
 import { Roles } from 'src/guards/roles.decorator';
 
+@Public()
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
@@ -76,6 +77,7 @@ export class ProductController {
     return this.productService.getTrendingProducts();
   }
 
+  @Public()
   @Get('top-locations')
   async getTopCites() {
     const result = await this.productService.getTopCites();
