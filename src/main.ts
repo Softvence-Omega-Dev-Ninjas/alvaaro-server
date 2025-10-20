@@ -3,18 +3,15 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as bodyParser from 'body-parser';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './utils/common/filter/all-exceptions.filter';
-import { seed } from './prisma-service/seed';
-import { seedSuperAdmin } from './prisma-service/seeders/super-admin.seeder';
 import appMetadata from './app-metadata/app-metadata';
 import { static as serverFile } from 'express';
 import { join } from 'path';
 
 async function bootstrap() {
-  // apply seed data
-  await seed();
-  await seedSuperAdmin();
-
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    rawBody: true,
+    bodyParser: true,
+  });
 
   app.use(bodyParser.json({ limit: '20mb' }));
   app.use(bodyParser.urlencoded({ limit: '20mb', extended: true }));
@@ -66,7 +63,6 @@ async function bootstrap() {
 
   SwaggerModule.setup('api', app, documentFactory);
 
-  app.use('/stripe/webhook', bodyParser.raw({ type: 'application/json' }));
   app.use('/uploads', serverFile(join(process.cwd(), 'public', 'uploads')));
   await app.listen(process.env.PORT ?? 3000);
 }

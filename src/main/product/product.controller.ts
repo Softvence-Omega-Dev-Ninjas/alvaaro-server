@@ -76,6 +76,7 @@ export class ProductController {
     return this.productService.getTrendingProducts();
   }
 
+  @Public()
   @Get('top-locations')
   async getTopCites() {
     const result = await this.productService.getTopCites();

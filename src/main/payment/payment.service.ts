@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
+  RawBodyRequest,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
 import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
@@ -10,6 +11,7 @@ import { MailService } from 'src/utils/mail/mail.service';
 import Stripe from 'stripe';
 import { SaveSessionDto } from './dto/update-payment.dto';
 import { SubscriptionPlanType } from './type/subscriptionPlanType';
+import { Request } from 'express';
 
 @Injectable()
 export class PaymentService {
@@ -93,8 +95,8 @@ export class PaymentService {
           : {}),
         // success_url: 'http://localhost:3000/stripe/payment-success',
         success_url:
-          'https://xn--privestate-e7a.com/auth/payment-success?session_id={CHECKOUT_SESSION_ID}',
-        cancel_url: 'http://localhost:3000/stripe/payment-cancel',
+          'https://priveestate.es/auth/payment-success?session_id={CHECKOUT_SESSION_ID}',
+        cancel_url: 'https://priveestate.es/stripe/payment-cancel',
       });
       return ApiResponse.success(
         { url: session.url },
@@ -204,6 +206,44 @@ export class PaymentService {
     } catch (error) {
       throw new ForbiddenException(error.message, 'Failed to retrieve session');
     }
+  }
+
+  handleWebhook(req: RawBodyRequest<Request>) {
+    const signature = req.headers['stripe-signature'] as string;
+    const rawBody = req.rawBody;
+    console.log({ signature, rawBody });
+    if (!rawBody) {
+      throw new BadRequestException('No webhook payload was provided.');
+    }
+    let event: Stripe.Event;
+
+    try {
+      event = this.stripe.webhooks.constructEvent(
+        rawBody,
+        signature,
+        process.env.STRIPE_WEBHOOK_SECRET as string,
+      );
+    } catch {
+      throw new BadRequestException('Invalid Stripe signature');
+    }
+    switch (event.type) {
+      case 'checkout.session.completed': {
+        const session = event.data.object;
+        // const orderId = session.metadata?.orderId;
+
+        break;
+      }
+
+      case 'payment_intent.payment_failed': {
+        // codes
+        break;
+      }
+
+      default:
+        console.log(`Unhandled event type ${event.type}`);
+    }
+
+    return { received: true, type: event.type };
   }
 
   // Add this helper method to calculate expiry time
