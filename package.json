@@ -1,8 +1,8 @@
 {
   "name": "alvaro-backend",
   "displayName": "Alvaro API Server",
-  "version": "0.0.2",
-  "description": "Premium Marketplace API - Cars, Real Estate, Yachts & More",
+  "version": "0.0.3",
+  "description": "Premium Marketplace API - Cars, Real Estate, Yachts & More and more...",
   "author": "",
   "private": true,
   "license": "UNLICENSED",
@@ -49,6 +49,7 @@
     "class-validator": "^0.14.2",
     "cloudinary": "^1.41.3",
     "date-fns": "^4.1.0",
+    "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.1",
     "multer-storage-cloudinary": "^4.0.0",
@@ -95,6 +96,7 @@
     "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.20.6",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.20.0"
   }
