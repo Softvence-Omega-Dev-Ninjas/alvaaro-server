@@ -5,7 +5,7 @@ services:
     platform: linux/amd64
     build:
       context: .
-    image: ${DOCKER_USERNAME}/${PACKAGE_NAME}:${PACKAGE_VERSION}
+    image: ${IMAGE_TAG}
     container_name: ${PACKAGE_NAME}
     ports:
       - ${PORT}:${PORT}
@@ -73,7 +73,7 @@ services:
       - '80:80'
       - '443:443'
     volumes:
-      - /var/www:/var/www
+      - /var/www/html:/var/www/html
       - ./Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data
       - caddy_config:/config

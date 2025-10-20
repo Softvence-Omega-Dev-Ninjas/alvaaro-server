@@ -7,7 +7,7 @@ api.priveestate.es {
 }
 
 priveestate.es {
-    root * /var/www/dist
+    root * /var/www/html/dist
     try_files {path} /index.html
     file_server
     header {
