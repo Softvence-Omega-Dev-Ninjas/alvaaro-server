@@ -20,6 +20,7 @@ import { ApiBody, ApiConsumes } from '@nestjs/swagger';
 import { CreateCarDto } from './dto/create-car.dto';
 import { Public } from 'src/guards/public.decorator';
 import { storageConfig } from 'src/utils/file/fileUpload';
+import { TimeValidation } from 'src/guards/timeValidation.guard';
 
 @Controller('car')
 export class CarController {
@@ -28,7 +29,7 @@ export class CarController {
     private readonly productService: ProductService,
   ) {}
 
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, TimeValidation)
   @Roles(UserRole.SELLER)
   @Post()
   @UseInterceptors(FilesInterceptor('images', 10, { storage: storageConfig() }))

@@ -28,7 +28,9 @@ export class TimeValidation implements CanActivate {
     const endTime = new Date(userExists.expiryTime);
 
     if (now > endTime) {
-      throw new BadRequestException('Subscription plan has expired');
+      throw new BadRequestException(
+        'Subscription period has ended. Please renew your plan to continue.',
+      );
     }
 
     return true; // allow access

@@ -22,7 +22,7 @@ export class PaymentService {
     private readonly helperService: HelperService,
     private readonly mailService: MailService,
   ) {
-    this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {});
+    this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
   }
 
   async createCheckoutSession(
@@ -208,34 +208,80 @@ export class PaymentService {
     }
   }
 
-  handleWebhook(req: RawBodyRequest<Request>) {
+  async handleWebhook(req: RawBodyRequest<Request>) {
     const signature = req.headers['stripe-signature'] as string;
     const rawBody = req.rawBody;
-    console.log({ signature, rawBody });
     if (!rawBody) {
       throw new BadRequestException('No webhook payload was provided.');
     }
-    let event: Stripe.Event;
 
+    let event: Stripe.Event;
     try {
       event = this.stripe.webhooks.constructEvent(
         rawBody,
         signature,
-        process.env.STRIPE_WEBHOOK_SECRET as string,
+        process.env.STRIPE_WEBHOOK_KEY as string,
       );
     } catch {
       throw new BadRequestException('Invalid Stripe signature');
     }
-    switch (event.type) {
-      case 'checkout.session.completed': {
-        const session = event.data.object;
-        // const orderId = session.metadata?.orderId;
 
+    switch (event.type) {
+      case 'invoice.payment_succeeded': {
+        const invoice = event.data.object;
+        const subscriptionId = invoice.parent?.subscription_details
+          ?.subscription as string;
+
+        if (!subscriptionId) {
+          console.warn('⚠️ No subscription ID found in invoice.');
+          break;
+        }
+
+        // Fetch subscription details
+        const subscription = await this.stripe.subscriptions.retrieve(
+          subscriptionId,
+          {
+            expand: ['latest_invoice', 'items.data.price.product'],
+          },
+        );
+
+        const subscriptionData = subscription.items.data;
+        const startDate = new Date(
+          subscriptionData[0].current_period_start * 1000,
+        );
+        const endDate = new Date(subscriptionData[0].current_period_end * 1000);
+        const userId = subscription.metadata?.userId;
+
+        if (!userId) {
+          console.warn('⚠️ No userId found in subscription metadata');
+          break;
+        }
+
+        await this.prismaService.userSubscriptionValidity.upsert({
+          where: { userId },
+          update: {
+            startTime: startDate,
+            expiryTime: endDate,
+            subscribedPlan: subscription.items.data[0]?.price?.id || 'unknown',
+            payableAmount: `${invoice.amount_paid / 100}`,
+          },
+          create: {
+            userId,
+            startTime: startDate,
+            expiryTime: endDate,
+            subscribedPlan: subscription.items.data[0]?.price?.id || 'unknown',
+            payableAmount: `${invoice.amount_paid / 100}`,
+          },
+        });
+
+        console.log(
+          `✅ Subscription renewed for user ${userId}, valid until ${endDate.toISOString()}`,
+        );
         break;
       }
 
-      case 'payment_intent.payment_failed': {
-        // codes
+      case 'invoice.payment_failed': {
+        console.log('⚠️ Subscription renewal failed');
         break;
       }
 

@@ -19,6 +19,7 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes } from '@nestjs/swagger';
 import { CreateJewelleryDto } from './dto/create-jwellery.dto';
 import { storageConfig } from 'src/utils/file/fileUpload';
+import { TimeValidation } from 'src/guards/timeValidation.guard';
 
 @Controller('jewellery')
 export class JwelleryController {
@@ -27,7 +28,7 @@ export class JwelleryController {
     private readonly productService: ProductService,
   ) {}
 
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, TimeValidation)
   @Roles(UserRole.SELLER)
   @Post()
   @UseInterceptors(FilesInterceptor('images', 10, { storage: storageConfig() }))

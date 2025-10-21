@@ -1,6 +1,5 @@
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import * as bodyParser from 'body-parser';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './utils/common/filter/all-exceptions.filter';
 import appMetadata from './app-metadata/app-metadata';
@@ -12,9 +11,6 @@ async function bootstrap() {
     rawBody: true,
     bodyParser: true,
   });
-
-  app.use(bodyParser.json({ limit: '20mb' }));
-  app.use(bodyParser.urlencoded({ limit: '20mb', extended: true }));
 
   app.useGlobalFilters(new AllExceptionsFilter());
 
