@@ -11,7 +11,7 @@ export default {
 
   migrations: {
     path: path.join('prisma', 'migrations'),
-    // seed: 'tsx src/main/prisma-service/seed.ts', // optional
+    seed: 'ts-node --transpile-only prisma/seed/seed.ts',
   },
   views: {
     path: path.join('prisma', 'views'),

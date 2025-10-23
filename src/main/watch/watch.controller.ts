@@ -20,6 +20,7 @@ import { Roles } from 'src/guards/roles.decorator';
 import { UserRole } from 'src/utils/common/enum/userEnum';
 import { RolesGuard } from 'src/guards/role.guard';
 import { storageConfig } from 'src/utils/file/fileUpload';
+import { TimeValidation } from 'src/guards/timeValidation.guard';
 
 @ApiTags('Watch')
 @Controller('watch')
@@ -29,7 +30,7 @@ export class WatchController {
     private readonly productService: ProductService,
   ) {}
 
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard, TimeValidation)
   @Roles(UserRole.SELLER)
   @Post()
   @UseInterceptors(FilesInterceptor('images', 10, { storage: storageConfig() }))

@@ -1,9 +1,17 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  RawBodyRequest,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import { Request } from 'express';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { SaveSessionDto } from './dto/update-payment.dto';
+import { Public } from 'src/guards/public.decorator';
 
 @Controller('stripe')
 export class PaymentController {
@@ -28,5 +36,15 @@ export class PaymentController {
   @UseGuards(AuthGuard)
   async saveSession(@Body() data: SaveSessionDto, @Req() req: Request) {
     return await this.stripeService.saveSession(data, req['userid'] as string);
+  }
+
+  @Public()
+  @Post('webhook')
+  async webhook(
+    // @Headers('stripe-signature') signature: string,
+    @Req() req: RawBodyRequest<Request>,
+  ) {
+    // console.log({ req });
+    return await this.stripeService.handleWebhook(req);
   }
 }
