@@ -96,7 +96,7 @@ export class PaymentService {
         // success_url: 'http://localhost:3000/stripe/payment-success',
         success_url:
           'https://priveestate.es/auth/payment-success?session_id={CHECKOUT_SESSION_ID}',
-        cancel_url: 'https://priveestate.es/stripe/payment-cancel',
+        cancel_url: 'https://priveestate.es/auth/stripe/payment-cancel',
       });
       return ApiResponse.success(
         { url: session.url },
