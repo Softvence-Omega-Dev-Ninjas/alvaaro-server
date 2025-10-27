@@ -283,7 +283,7 @@ export class PaymentService {
 
         // Send email to customer
         const emailSubject = 'Your Subscription Payment Was Successful!';
-        const mail = await this.mailService.sendMail(
+        await this.mailService.sendMail(
           email,
           emailSubject,
           subscriptionPurchaseTemplate(
@@ -295,7 +295,6 @@ export class PaymentService {
             invoiceUrl,
           ),
         );
-        console.log('mail', mail);
 
         console.log(
           `✅ Subscription renewed for user ${userId}, valid until ${endDate.toISOString()}`,
