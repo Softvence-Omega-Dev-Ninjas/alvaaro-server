@@ -12,6 +12,7 @@ import Stripe from 'stripe';
 import { SaveSessionDto } from './dto/update-payment.dto';
 import { SubscriptionPlanType } from './type/subscriptionPlanType';
 import { Request } from 'express';
+import { subscriptionPurchaseTemplate } from 'src/utils/mail/templates/subscription-purchase.template';
 
 @Injectable()
 export class PaymentService {
@@ -31,7 +32,6 @@ export class PaymentService {
     couponCode?: string,
   ) {
     try {
-      //
       // 1. Check if the user exists in the database
       const userExists = await this.helperService.userExists(userId);
       if (!userExists) {
@@ -226,9 +226,16 @@ export class PaymentService {
       throw new BadRequestException('Invalid Stripe signature');
     }
 
+    // {
+    //   email: 'shantohmmm@gmail.com',
+    //   userId: '471ad381-5d94-403b-b686-de1ed8e3b000'
+    // }
     switch (event.type) {
       case 'invoice.payment_succeeded': {
         const invoice = event.data.object;
+        const metadata = invoice.parent?.subscription_details?.metadata;
+        const email = metadata?.email as string;
+        const invoiceUrl = invoice.hosted_invoice_url as string;
         const subscriptionId = invoice.parent?.subscription_details
           ?.subscription as string;
 
@@ -273,6 +280,22 @@ export class PaymentService {
             payableAmount: `${invoice.amount_paid / 100}`,
           },
         });
+
+        // Send email to customer
+        const emailSubject = 'Your Subscription Payment Was Successful!';
+        const mail = await this.mailService.sendMail(
+          email,
+          emailSubject,
+          subscriptionPurchaseTemplate(
+            email,
+            subscription,
+            invoice,
+            startDate,
+            endDate,
+            invoiceUrl,
+          ),
+        );
+        console.log('mail', mail);
 
         console.log(
           `✅ Subscription renewed for user ${userId}, valid until ${endDate.toISOString()}`,
