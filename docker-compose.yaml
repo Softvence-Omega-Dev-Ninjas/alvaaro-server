@@ -5,7 +5,7 @@ services:
     platform: linux/amd64
     build:
       context: .
-    image: ${IMAGE_TAG}
+    image: ${DOCKER_USERNAME}/${PACKAGE_NAME}:latest
     container_name: ${PACKAGE_NAME}
     ports:
       - ${PORT}:${PORT}
@@ -21,44 +21,53 @@ services:
         "
     depends_on:
       db:
-        condition: service_healthy
+    condition: service_healthy
     restart: unless-stopped
     # Enhanced health check for better zero-downtime deployment
     healthcheck:
       disable: true
-
-    # Add logging configuration
-    logging:
-      driver: 'json-file'
-      options:
-        max-size: '10m'
-        max-file: '3'
+    volumes:
+      - files-data:/app/uploads
 
   db:
-    image: postgres:15
+    image: postgres:17
     restart: always
     profiles:
       - dev
       - prod
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=root_user
+      - POSTGRES_PASSWORD=root_postgres_pass
       - POSTGRES_DB=alvaaroDB
     ports:
-      - 5432:5432
+      - 5433:5432
     volumes:
-      - alvaaro_pg:/var/lib/postgresql/data
-    logging:
-      driver: 'json-file'
-      options:
-        max-size: '10m'
-        max-file: '3'
+      - pg:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD', 'pg_isready', '-U', postgres, '-d', alvaaroDB]
+      test: ['CMD', 'pg_isready', '-U', postgres, '-d', mydb]
       interval: 30s
       timeout: 10s
       retries: 5
       start_period: 15s
+
+  redis:
+    image: redis:7-alpine # Use Alpine version for smaller size
+    container_name: redis
+    restart: always
+    profiles:
+      - dev
+      - prod
+    ports:
+      - 6380:6379
+    volumes:
+      - redis:/data
+    # Add health check for Redis
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
 
   caddy:
     image: caddy:latest
@@ -68,19 +77,22 @@ services:
     restart: unless-stopped
     depends_on:
       - db
+      - redis
       - app
     ports:
       - '80:80'
       - '443:443'
     volumes:
-      - /var/www/html:/var/www/html
+      - /var/www:/var/www
       - ./Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data
       - caddy_config:/config
 
 volumes:
-  alvaaro_pg:
+  redis:
+  pg:
   caddy_data:
   caddy_config:
+  files-data:
 networks:
   default:
