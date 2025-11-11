@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
 import { SubscriptionPlanType } from '@prisma/client';
+import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class CreateSubscriptionPlanDto {
   @ApiProperty({
@@ -14,6 +14,11 @@ export class CreateSubscriptionPlanDto {
   @IsString()
   @IsNotEmpty()
   length: string;
+
+  @ApiProperty({ example: 10, type: Number })
+  @IsNumber()
+  @IsNotEmpty()
+  listingLimit: string;
 
   @ApiProperty({ example: '100.99' })
   @IsString()

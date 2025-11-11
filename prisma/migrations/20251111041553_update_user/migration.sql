@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "User" ADD COLUMN     "accessLog" INTEGER NOT NULL DEFAULT 0;

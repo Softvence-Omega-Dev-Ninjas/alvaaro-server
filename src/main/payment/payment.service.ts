@@ -4,15 +4,15 @@ import {
   Injectable,
   RawBodyRequest,
 } from '@nestjs/common';
+import { Request } from 'express';
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
 import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 import { HelperService } from 'src/utils/helper/helper.service';
 import { MailService } from 'src/utils/mail/mail.service';
+import { subscriptionPurchaseTemplate } from 'src/utils/mail/templates/subscription-purchase.template';
 import Stripe from 'stripe';
 import { SaveSessionDto } from './dto/update-payment.dto';
 import { SubscriptionPlanType } from './type/subscriptionPlanType';
-import { Request } from 'express';
-import { subscriptionPurchaseTemplate } from 'src/utils/mail/templates/subscription-purchase.template';
 
 @Injectable()
 export class PaymentService {
@@ -109,7 +109,7 @@ export class PaymentService {
       );
     }
   }
-  //
+
   async saveSession(data: SaveSessionDto, userId: string) {
     try {
       const session = await this.stripe.checkout.sessions.retrieve(
@@ -144,6 +144,8 @@ export class PaymentService {
             },
           });
 
+        console.log(subscribedPlan);
+
         if (!subscribedPlan) {
           return ApiResponse.error('Subscribed plan not found');
         }
@@ -169,6 +171,7 @@ export class PaymentService {
           where: { userId: userId },
           update: {
             subscribedPlan: subscribedPlan.id,
+            subscribedPlanId: subscribedPlan.id,
             startTime: startTime,
             expiryTime: expiryTime,
             payableAmount: (
@@ -178,6 +181,7 @@ export class PaymentService {
           create: {
             userId: userId,
             subscribedPlan: subscribedPlan.id,
+            subscribedPlanId: subscribedPlan.id,
             startTime: startTime,
             expiryTime: expiryTime,
             payableAmount: (
@@ -274,6 +278,8 @@ export class PaymentService {
           },
           create: {
             userId,
+            subscribedPlanId:
+              subscription.items.data[0]?.price?.id || 'unknown',
             startTime: startDate,
             expiryTime: endDate,
             subscribedPlan: subscription.items.data[0]?.price?.id || 'unknown',
@@ -312,6 +318,83 @@ export class PaymentService {
     }
 
     return { received: true, type: event.type };
+  }
+
+  async cancelSubscription(userId: string) {
+    try {
+      // 1. Check if the user exists
+      const userExists = await this.helperService.userExists(userId);
+      if (!userExists) {
+        return ApiResponse.error('User does not exist');
+      }
+
+      // 2. Get user's subscription validity from database
+      const userSubscription =
+        await this.prismaService.userSubscriptionValidity.findUnique({
+          where: { userId },
+        });
+
+      if (!userSubscription) {
+        return ApiResponse.error('No active subscription found');
+      }
+
+      // 3. Find customer in Stripe
+      const customerInStripe = await this.stripe.customers.search({
+        query: `email:'${userExists.email}'`,
+      });
+
+      if (customerInStripe.data.length === 0) {
+        return ApiResponse.error('Customer not found in Stripe');
+      }
+
+      const customerId = customerInStripe.data[0].id;
+
+      // 4. List all active subscriptions for the customer
+      const subscriptions = await this.stripe.subscriptions.list({
+        customer: customerId,
+        status: 'active',
+      });
+
+      if (subscriptions.data.length === 0) {
+        return ApiResponse.error('No active subscription found in Stripe');
+      }
+
+      // 5. Cancel the subscription (can be immediate or at period end)
+      // Using cancel_at_period_end: true allows user to access until current period ends
+      const canceledSubscription = await this.stripe.subscriptions.update(
+        subscriptions.data[0].id,
+        {
+          cancel_at_period_end: true,
+        },
+      );
+
+      // 6. Optional: Update database to reflect cancellation
+      // You might want to add a status field to track this
+      // await this.prismaService.userSubscriptionValidity.update({
+      //   where: { userId },
+      //   update: {
+
+      //   },
+      // });
+
+      // 7. Send cancellation confirmation email
+      await this.mailService.sendReceiptEmail({
+        to: userExists.email,
+        subject: 'Subscription Cancellation Confirmed',
+        title: 'Subscription Cancelled',
+        message: `Your subscription has been cancelled. You will retain access until ${new Date(userSubscription.expiryTime).toDateString()}`,
+        buttonText: 'View Account',
+        buttonUrl: 'https://priveestate.es/dashboard',
+        footerText: 'We hope to see you again soon!',
+      });
+
+      return ApiResponse.success(
+        canceledSubscription,
+        'Subscription cancelled successfully. Access will continue until the end of the current billing period.',
+      );
+    } catch (error) {
+      return ApiResponse.error('Failed to cancel subscription', error.message);
+    }
   }
 
   // Add this helper method to calculate expiry time

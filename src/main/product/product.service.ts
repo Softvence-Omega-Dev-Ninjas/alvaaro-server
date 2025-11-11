@@ -1,7 +1,12 @@
 import { Injectable } from '@nestjs/common';
+import { CategoryType } from '@prisma/client';
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
+import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 import { uploadMultipleToCloudinary } from 'src/utils/common/cloudinary/cloudinary';
+import { getLatLngByGoogle } from 'src/utils/findlocation/getLatLngByGoogle';
+import { HelperService } from 'src/utils/helper/helper.service';
 import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
 import {
   isCarDto,
   isJewelleryDto,
@@ -9,11 +14,6 @@ import {
   isWatchDto,
   isYachtDto,
 } from './matchers';
-import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
-import { CategoryType } from '@prisma/client';
-import { UpdateProductDto } from './dto/update-product.dto';
-import { HelperService } from 'src/utils/helper/helper.service';
-import { getLatLngByGoogle } from 'src/utils/findlocation/getLatLngByGoogle';
 
 @Injectable()
 export class ProductService {
@@ -147,6 +147,12 @@ export class ProductService {
           },
         });
       }
+
+      await this.prisma.user.update({
+        where: { id: userid },
+        data: { accessLogs: { increment: 1 } },
+      });
+
       return ApiResponse.success(product, 'Product created successfully');
     } catch (error) {
       return ApiResponse.error(

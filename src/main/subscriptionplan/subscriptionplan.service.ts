@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { CreateSubscriptionPlanDto } from './dto/create-subscriptionplan.dto';
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
 import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 import Stripe from 'stripe';
+import { CreateSubscriptionPlanDto } from './dto/create-subscriptionplan.dto';
 
 @Injectable()
 export class SubscriptionplanService {
@@ -57,6 +57,7 @@ export class SubscriptionplanService {
             price: dto.price,
             length: dto.length,
             features: dto.features || [],
+            listingLimit: Number(dto.listingLimit),
             stripeProductId: stripeProduct.id,
             stripePriceId: stripePrice.id,
           },

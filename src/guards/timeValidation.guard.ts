@@ -1,9 +1,9 @@
 import {
+  BadRequestException,
   CanActivate,
   ExecutionContext,
-  Injectable,
   ForbiddenException,
-  BadRequestException,
+  Injectable,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
@@ -20,10 +20,24 @@ export class TimeValidation implements CanActivate {
     const userExists = await this.prisma.userSubscriptionValidity.findUnique({
       where: { userId: request.userid as string },
     });
-    if (!userExists || !userExists.id) {
+
+    const user = await this.prisma.user.findUnique({
+      where: { id: request.userid as string },
+    });
+    if (!userExists || !userExists.id || !user) {
       throw new ForbiddenException('Unauthorized: No user found');
     }
 
+    const subscriptionPlan = await this.prisma.subscriptionPlan.findUnique({
+      where: { id: userExists.subscribedPlan },
+    });
+    if (!subscriptionPlan) {
+      throw new BadRequestException('Subscription plan not found');
+    }
+
+    if (subscriptionPlan.listingLimit <= user.accessLogs) {
+      throw new BadRequestException('You have reached your listing limit');
+    }
     const now = new Date();
     const endTime = new Date(userExists.expiryTime);
 
