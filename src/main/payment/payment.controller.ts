@@ -38,6 +38,14 @@ export class PaymentController {
     return await this.stripeService.saveSession(data, req['userid'] as string);
   }
 
+  @Post('cancel-subscription')
+  @UseGuards(AuthGuard)
+  async cancelSubscription(@Req() req: Request) {
+    return await this.stripeService.cancelSubscription(
+      req['userid'] as string,
+    );
+  }
+
   @Public()
   @Post('webhook')
   async webhook(

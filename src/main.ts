@@ -18,8 +18,6 @@ async function bootstrap() {
     origin: [
       'http://localhost:5173',
       'http://localhost:5174',
-      'https://xn--privestate-e7a.com',
-      'https://xn--privestate-e7a.es',
       'https://priveestate.es',
     ],
     credentials: true,
@@ -60,6 +58,8 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, documentFactory);
 
   app.use('/uploads', serverFile(join(process.cwd(), 'public', 'uploads')));
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.PORT ?? 3000, () => {
+    console.log(`⚡Server is running on port: ${process.env.PORT ?? 3000}`);
+  });
 }
 void bootstrap();

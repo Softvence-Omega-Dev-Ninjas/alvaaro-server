@@ -13,7 +13,6 @@ export class PrismaService
     try {
       // Connect to the database when the module is initialized
       await this.$connect();
-      console.log('✅ Connect to the database successfully');
     } catch (error) {
       console.log(error);
     }
