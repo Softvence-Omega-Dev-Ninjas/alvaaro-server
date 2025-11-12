@@ -5,7 +5,7 @@ services:
     platform: linux/amd64
     build:
       context: .
-    image: ${DOCKER_USERNAME}/${PACKAGE_NAME}:latest
+    image: ${IMAGE_TAG}
     container_name: ${PACKAGE_NAME}
     ports:
       - ${PORT}:${PORT}
@@ -40,7 +40,7 @@ services:
       - POSTGRES_PASSWORD=root_postgres_pass
       - POSTGRES_DB=alvaaroDB
     ports:
-      - 5433:5432
+      - 5432:5430
     volumes:
       - pg:/var/lib/postgresql/data
     healthcheck:
