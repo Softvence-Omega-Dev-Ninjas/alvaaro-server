@@ -287,6 +287,13 @@ export class PaymentService {
           },
         });
 
+        await this.prismaService.user.update({
+          where: { id: userId },
+          data: {
+            accessLogs: 0,
+          },
+        });
+
         // Send email to customer
         const emailSubject = 'Your Subscription Payment Was Successful!';
         await this.mailService.sendMail(
