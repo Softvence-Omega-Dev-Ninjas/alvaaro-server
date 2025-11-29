@@ -39,7 +39,7 @@ services:
       - POSTGRES_PASSWORD=root_postgres_pass
       - POSTGRES_DB=alvaaroDB
     ports:
-      - 5432:5430
+      - 5432:5432
     volumes:
       - pg:/var/lib/postgresql/data
     healthcheck:
