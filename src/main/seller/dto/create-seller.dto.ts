@@ -1,10 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
-  IsString,
-  IsBoolean,
-  IsOptional,
-  IsPhoneNumber,
   IsNotEmpty,
+  IsPhoneNumber,
+  IsString,
 } from 'class-validator';
 
 export class CreateSellerDto {
@@ -37,13 +35,10 @@ export class CreateSellerDto {
   zip: string;
 
   @ApiProperty({
-    description: 'Document showing the problem (required)',
-    type: 'array',
-    items: { type: 'file', format: 'binary' },
-    required: true,
+    description: 'Document showing the problem (required)'
   })
   @IsNotEmpty()
-  documents: Express.Multer.File[];
+  documents: string[];
 
   @ApiProperty({ example: '4b28bdea-cd53-4dae-aacb-2545a039012d' })
   @IsNotEmpty()
