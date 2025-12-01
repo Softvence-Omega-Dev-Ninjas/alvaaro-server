@@ -1,20 +1,20 @@
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import {
   ForbiddenException,
   Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateSellerDto } from './dto/create-seller.dto';
-import { PrismaService } from 'src/prisma-service/prisma-service.service';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Cache } from 'cache-manager';
-import { MailService } from 'src/utils/mail/mail.service';
-import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 import { VerificationStatusType } from '@prisma/client';
-import { contactSellerTemplate } from 'src/utils/mail/templates/contact-seller.template';
-import { ContactSellerDto } from './dto/contact-seller.dto';
+import { Cache } from 'cache-manager';
+import { PrismaService } from 'src/prisma-service/prisma-service.service';
+import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 import { HelperService } from 'src/utils/helper/helper.service';
+import { MailService } from 'src/utils/mail/mail.service';
+import { contactSellerTemplate } from 'src/utils/mail/templates/contact-seller.template';
 import { ProductService } from '../product/product.service';
+import { ContactSellerDto } from './dto/contact-seller.dto';
+import { CreateSellerDto } from './dto/create-seller.dto';
 
 @Injectable()
 export class SellerService {
@@ -24,13 +24,12 @@ export class SellerService {
     private mail: MailService,
     private readonly helper: HelperService,
     private productService: ProductService,
-  ) {}
+  ) { }
 
   async createSeller(
     createSellerDto: CreateSellerDto,
     userId: string,
     userEmail: string,
-    documents: string[],
   ) {
     try {
       const sellerExists = await this.prisma.seller.findUnique({
@@ -58,7 +57,7 @@ export class SellerService {
           city: createSellerDto.city,
           zip: createSellerDto.zip,
           subscriptionStatus: true,
-          document: documents,
+          document: createSellerDto.documents.map((i) => i),
           subscriptionsId: userPaymentValidate.id,
         },
       });
@@ -77,7 +76,7 @@ export class SellerService {
     }
   }
 
-  // async updateS
+  // async updateS                
 
   async findAll(filters: {
     verificationStatus?: 'PENDING' | 'VERIFIED' | 'REJECTED';
