@@ -113,14 +113,14 @@ export class SellerController {
     return this.sellerService.contactSeller(productId, contactSellerDto);
   }
 
-  @UseGuards(AuthGuard, RolesGuard, TimeValidation)
+  @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.SELLER)
   @Get('dashboard/stats')
   getDashboardStatistics(@Req() req: { userid: string }) {
     return this.sellerService.getDashboardStatistics(req.userid);
   }
 
-  @UseGuards(AuthGuard, RolesGuard, TimeValidation)
+  @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.SELLER)
   @Get('dashboard/analysis')
   getDashboardAnalysis(@Req() req: { userid: string }) {
