@@ -85,6 +85,7 @@ export class SubscriptionplanService {
           type: true,
           price: true,
           length: true,
+          listingLimit: true,
           features: true,
           stripeProductId: false,
           stripePriceId: false,

@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
 import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
 import { HelperService } from 'src/utils/helper/helper.service';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
@@ -51,5 +52,18 @@ export class UserService {
       return ApiResponse.success(null, 'No active plan found for user');
     }
     return ApiResponse.success(Currentplan, 'Current plan found successfully');
+  }
+  async updateCurrentUser(userId: string, dto: UpdateUserDto) {
+    const userExist = await this.helper.userExists(userId);
+    if (!userExist) {
+      throw new NotFoundException('User does not exist');
+    }
+    const updatedUser = await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        ...dto
+      },
+    });
+    return ApiResponse.success(updatedUser, 'User updated successfully');
   }
 }
