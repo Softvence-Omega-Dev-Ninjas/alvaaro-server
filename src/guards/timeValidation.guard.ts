@@ -13,7 +13,7 @@ export class TimeValidation implements CanActivate {
   constructor(
     private readonly prisma: PrismaService,
     private readonly reflector: Reflector,
-  ) {}
+  ) { }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
@@ -47,6 +47,6 @@ export class TimeValidation implements CanActivate {
       );
     }
 
-    return true; // allow access
+    return true;
   }
 }
