@@ -218,38 +218,51 @@ export class SellerService {
 
   //? Seller dashboard stats
   async getDashboardStatistics(userId: string) {
+    console.log(userId);
     const sellerId = await this.helper.sellerExists(userId);
 
+    if (!sellerId || sellerId === null) {
+      return ApiResponse.error("Seller not found!");
+    }
+
     try {
-      const [totalViews, totalListings, totalEngagement, totalSaves] =
-        await Promise.all([
-          this.productService.getTotalViews(sellerId),
-          this.prisma.product.count({
-            where: {
-              sellerId,
-            },
-          }),
-          this.prisma.inquiry.count({
-            where: { sellerId },
-          }),
-          this.prisma.wishlist.count({
-            where: { product: { sellerId } },
-          }),
-        ]);
+      // 1️⃣ Total Views
+      const totalViews = await this.productService.getTotalViews(sellerId);
+
+      // 2️⃣ Total Listings
+      const totalListings = await this.prisma.product.count({
+        where: { sellerId },
+      });
+
+      // 3️⃣ Total Engagement (inquiries)
+      const totalEngagement = await this.prisma.inquiry.count({
+        where: { sellerId },
+      });
+
+      // 4️⃣ Total Saves (wishlist)
+      const totalSaves = await this.prisma.wishlist.count({
+        where: { product: { sellerId } },
+      });
+
+      // Calculate engagement rate safely
+      const engagementRate =
+        totalListings > 0
+          ? `${((totalEngagement / totalListings) * 100).toFixed(1)}%`
+          : `0%`;
 
       const result = {
         totalViews,
         totalListings,
-        engagementRate: `${((totalEngagement / totalListings) * 100).toFixed(1)}%`,
+        engagementRate,
         totalSaves,
       };
 
       return ApiResponse.success(
         result,
-        'Seller stats retrieved successfully!',
+        "Seller statistics retrieved successfully!"
       );
     } catch (error) {
-      return ApiResponse.error('Something went wrong', error);
+      return ApiResponse.error("Something went wrong", error);
     }
   }
 

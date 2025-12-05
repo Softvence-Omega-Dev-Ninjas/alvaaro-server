@@ -8,7 +8,7 @@ export class UserService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly helper: HelperService,
-  ) {}
+  ) { }
   async findAll() {
     const users = await this.prisma.user.findMany();
 
@@ -26,7 +26,7 @@ export class UserService {
         where: { userId: userId },
       });
       return ApiResponse.success(
-        { ...userExist, sellerId: sellerDetails?.id },
+        { ...userExist, sellerDetails },
         'Current user found successfully',
       );
     }

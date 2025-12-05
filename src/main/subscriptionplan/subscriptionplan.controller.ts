@@ -12,11 +12,11 @@ import { SubscriptionplanService } from './subscriptionplan.service';
 export class SubscriptionplanController {
   constructor(
     private readonly subscriptionplanService: SubscriptionplanService,
-  ) {}
+  ) { }
 
   @Post('create-plan')
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   async create(@Body() dto: CreateSubscriptionPlanDto) {
     return await this.subscriptionplanService.createSubscription(dto);
   }

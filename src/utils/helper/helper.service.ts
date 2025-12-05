@@ -1,10 +1,10 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
 import { ApiResponse } from '../common/apiresponse/apiresponse';
 
 @Injectable()
 export class HelperService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly prismaService: PrismaService) { }
 
   async userExists(userId: string) {
     const user = await this.prismaService.user.findUnique({
@@ -19,8 +19,8 @@ export class HelperService {
       select: { id: true },
     });
 
-    if (!seller) {
-      throw new HttpException('You Are not Verified From Admin', 403);
+    if (!seller || seller === null) {
+      throw new BadRequestException('You Are not Verified From Admin');
     }
 
     return seller.id;
