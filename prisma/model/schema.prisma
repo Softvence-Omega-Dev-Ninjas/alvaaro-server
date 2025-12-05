@@ -31,9 +31,9 @@ model User {
 }
 
 model Seller {
-  id                 String                   @unique @default(uuid())
-  userId             String                   @unique
-  user               User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                 String                 @unique @default(uuid())
+  userId             String                 @unique
+  user               User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
   companyName        String
   companyWebsite     String
   phone              String
@@ -42,15 +42,15 @@ model Seller {
   city               String
   zip                String
   document           String[]
-  verificationStatus VerificationStatusType   @default(PENDING)
-  subscriptionStatus Boolean                  @default(false)
+  verificationStatus VerificationStatusType @default(PENDING)
+  subscriptionStatus Boolean                @default(false)
   subscriptionsId    String
-  subscriptions      UserSubscriptionValidity @relation(fields: [subscriptionsId], references: [id])
-  createdAt          DateTime                 @default(now())
-  updatedAt          DateTime                 @updatedAt
-  Product            Product[]
-  amounts            Amount[]
-  Inquiry            Inquiry[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  Product   Product[]
+  amounts   Amount[]
+  Inquiry   Inquiry[]
 }
 
 // Cars

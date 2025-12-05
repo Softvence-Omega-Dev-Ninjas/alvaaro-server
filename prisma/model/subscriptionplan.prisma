@@ -1,15 +1,14 @@
 model SubscriptionPlan {
-    id                         String                     @id @default(uuid())
-    type                       SubscriptionPlanType       @unique
-    length                     String
-    price                      String
-    listingLimit               Int
-    features                   String[]
-    stripeProductId            String
-    stripePriceId              String
-    createdAt                  DateTime                   @default(now())
-    updatedAt                  DateTime                   @updatedAt
-    userSubscriptionValidities UserSubscriptionValidity[]
+    id              String               @id @default(uuid())
+    type            SubscriptionPlanType @unique
+    length          String
+    price           String
+    listingLimit    Int
+    features        String[]
+    stripeProductId String
+    stripePriceId   String
+    createdAt       DateTime             @default(now())
+    updatedAt       DateTime             @updatedAt
 }
 
 enum SubscriptionPlanType {

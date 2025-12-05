@@ -43,10 +43,10 @@ export class UserService {
       where: { userId: userId },
     });
     if (!plan) {
-      return ApiResponse.success(null, 'No active plan found for user');
+      throw new NotFoundException(' No active plan found for user');
     }
-    const Currentplan = await this.prisma.subscriptionPlan.findUnique({
-      where: { id: plan.subscribedPlan },
+    const Currentplan = await this.prisma.userSubscriptionValidity.findFirst({
+      where: { subscribedPlan: plan.subscribedPlan },
     });
     if (!plan) {
       return ApiResponse.success(null, 'No active plan found for user');
