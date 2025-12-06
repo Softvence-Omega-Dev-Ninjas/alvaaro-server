@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, IsNumber, IsNotEmpty } from 'class-validator';
+import { IsString, IsNumber, } from 'class-validator';
 import { CreateCarDto } from 'src/main/car/dto/create-car.dto';
 import { CreateJewelleryDto } from 'src/main/jwellery/dto/create-jwellery.dto';
 import { CreateRealEstateDto } from 'src/main/real-estate/dto/create-real-estate.dto';

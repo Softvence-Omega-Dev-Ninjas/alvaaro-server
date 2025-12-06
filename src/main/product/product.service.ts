@@ -405,6 +405,7 @@ export class ProductService {
         zip: updateDto.zip ?? existingProduct.zip,
         address: updateDto.address ?? existingProduct.address,
         price: updateDto.price ?? existingProduct.price,
+        images: updateDto.images ?? existingProduct.images,
       };
 
       // --- Handle relational updates ---
