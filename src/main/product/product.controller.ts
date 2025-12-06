@@ -27,7 +27,7 @@ import { Roles } from 'src/guards/roles.decorator';
 @Public()
 @Controller('product')
 export class ProductController {
-  constructor(private readonly productService: ProductService) {}
+  constructor(private readonly productService: ProductService) { }
 
   @Get()
   @Public()
@@ -109,6 +109,7 @@ export class ProductController {
     @Param('id') id: string,
     @Body() updateProductDto: UpdateProductDto,
   ) {
+
     const updatedProduct = await this.productService.updateProduct(
       id,
       images,

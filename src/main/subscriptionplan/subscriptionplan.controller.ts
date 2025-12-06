@@ -23,8 +23,6 @@ export class SubscriptionplanController {
 
   @Get('all-plan')
   @Public()
-  // @UseGuards(AuthGuard, RolesGuard)
-  // @Roles(UserRole.ADMIN, UserRole.SELLER, UserRole.USER)
   async findAll() {
     const result = await this.subscriptionplanService.findAll();
     return result;

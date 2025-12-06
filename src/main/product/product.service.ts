@@ -20,7 +20,7 @@ export class ProductService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly helperService: HelperService,
-  ) {}
+  ) { }
 
   async handleProductCreation(
     dto: CreateProductDto,
@@ -202,11 +202,11 @@ export class ProductService {
         }),
         ...(minPrice !== undefined || maxPrice !== undefined
           ? {
-              price: {
-                ...(minPrice !== undefined && { gte: minPrice }),
-                ...(maxPrice !== undefined && { lte: maxPrice }),
-              },
-            }
+            price: {
+              ...(minPrice !== undefined && { gte: minPrice }),
+              ...(maxPrice !== undefined && { lte: maxPrice }),
+            },
+          }
           : {}),
       },
       include: {
@@ -325,14 +325,14 @@ export class ProductService {
         AND: [
           type
             ? {
-                RealEstate: {
-                  is: {
-                    features: {
-                      has: type,
-                    },
+              RealEstate: {
+                is: {
+                  features: {
+                    has: type,
                   },
                 },
-              }
+              },
+            }
             : {},
         ],
       },
@@ -390,6 +390,7 @@ export class ProductService {
     files: Express.Multer.File[],
     updateDto: UpdateProductDto,
   ) {
+    console.log('ooo');
     try {
       const existingProduct = await this.prisma.product.findUnique({
         where: { id: productId },
