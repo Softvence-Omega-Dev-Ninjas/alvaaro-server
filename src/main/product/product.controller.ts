@@ -10,17 +10,14 @@ import {
   Post,
   UseGuards,
   Req,
-  UseInterceptors,
-  UploadedFiles,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
-import { ApiConsumes, ApiQuery } from '@nestjs/swagger';
+import { ApiBody, ApiQuery } from '@nestjs/swagger';
 import { CategoryType, UserRole } from '@prisma/client';
 import { ProductSearchQueryDto } from './dto/real-estate-search.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { Public } from 'src/guards/public.decorator';
-import { FilesInterceptor } from '@nestjs/platform-express';
 import { RolesGuard } from 'src/guards/role.guard';
 import { Roles } from 'src/guards/roles.decorator';
 
@@ -102,17 +99,14 @@ export class ProductController {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.SELLER)
   @Patch(':id')
-  @UseInterceptors(FilesInterceptor('images'))
-  @ApiConsumes('multipart/form-data')
+  @ApiBody({ type: UpdateProductDto })
   async updateProduct(
-    @UploadedFiles() images: Express.Multer.File[],
     @Param('id') id: string,
     @Body() updateProductDto: UpdateProductDto,
   ) {
-
+    console.log({ updateProductDto });
     const updatedProduct = await this.productService.updateProduct(
       id,
-      images,
       updateProductDto,
     );
     if (!updatedProduct) {

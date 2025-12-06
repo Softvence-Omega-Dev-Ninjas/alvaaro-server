@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { CategoryType } from '@prisma/client';
 import { PrismaService } from 'src/prisma-service/prisma-service.service';
 import { ApiResponse } from 'src/utils/common/apiresponse/apiresponse';
-import { uploadMultipleToCloudinary } from 'src/utils/common/cloudinary/cloudinary';
 import { getLatLngByGoogle } from 'src/utils/findlocation/getLatLngByGoogle';
 import { HelperService } from 'src/utils/helper/helper.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -387,10 +386,8 @@ export class ProductService {
   }
   async updateProduct(
     productId: string,
-    files: Express.Multer.File[],
     updateDto: UpdateProductDto,
   ) {
-    console.log('ooo');
     try {
       const existingProduct = await this.prisma.product.findUnique({
         where: { id: productId },
@@ -399,7 +396,6 @@ export class ProductService {
       if (!existingProduct) {
         return ApiResponse.error('Product not found');
       }
-
       // --- Build update object dynamically ---
       const productUpdateData: any = {
         name: updateDto.name ?? existingProduct.name,
@@ -421,15 +417,6 @@ export class ProductService {
         }
       }
 
-      // --- Handle image uploads ---
-      if (files?.length > 0) {
-        const uploadedImages = await uploadMultipleToCloudinary(files);
-        productUpdateData.images = uploadedImages.map(
-          (res: { secure_url: string }) => res.secure_url,
-        );
-      } else {
-        productUpdateData.images = existingProduct.images;
-      }
 
       // --- Update product ---
       const updatedProduct = await this.prisma.product.update({
@@ -444,16 +431,13 @@ export class ProductService {
           Jewellery: true,
         },
       });
-
       return ApiResponse.success(
         updatedProduct,
         'Product updated successfully',
       );
     } catch (error) {
-      console.error('Error updating product:', error);
       return ApiResponse.error(
-        'Failed to update product, please try again later',
-        error,
+        error as string || 'Failed to update product, please try again later',
       );
     }
   }

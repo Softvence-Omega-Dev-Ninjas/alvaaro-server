@@ -1,5 +1,5 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString, IsNumber } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsString, IsNumber, IsNotEmpty } from 'class-validator';
 import { CreateCarDto } from 'src/main/car/dto/create-car.dto';
 import { CreateJewelleryDto } from 'src/main/jwellery/dto/create-jwellery.dto';
 import { CreateRealEstateDto } from 'src/main/real-estate/dto/create-real-estate.dto';
@@ -7,8 +7,7 @@ import { CreateWatchDto } from 'src/main/watch/dto/create-watch.dto';
 import { CreateYachtDto } from 'src/main/yacht/dto/create-yacht.dto';
 
 export class UpdateProductDto {
-  @ApiPropertyOptional({ description: 'Product name', example: 'Luxury Watch' })
-  @IsOptional()
+  @ApiProperty({ description: 'Product name', example: 'Luxury Watch' })
   @IsString()
   name?: string;
 
@@ -16,49 +15,46 @@ export class UpdateProductDto {
     description: 'Product description',
     example: 'A premium luxury watch with diamond finish.',
   })
-  @IsOptional()
   @IsString()
   description?: string;
 
   @ApiPropertyOptional({ description: 'Product price', example: '2500' })
-  @IsOptional()
   @IsString()
   price?: number;
 
   @ApiPropertyOptional({ description: 'Zip', example: '1234' })
-  @IsOptional()
+
   @IsString()
   zip?: string;
 
   @ApiPropertyOptional({ description: 'City', example: 'Los Angeles' })
-  @IsOptional()
+
   @IsString()
   city?: string;
 
   @ApiPropertyOptional({ description: 'State', example: 'California' })
-  @IsOptional()
+
   @IsString()
   state?: string;
 
   @ApiPropertyOptional({ description: 'Address', example: '1234 Sunset Blvd' })
-  @IsOptional()
+
   @IsString()
   address?: string;
 
   @ApiPropertyOptional({
     description: 'Trending rank (1 = most trending)',
   })
-  @IsOptional()
+
   @IsNumber()
   trending?: number;
 
   @ApiPropertyOptional({
     description: 'Array of product images',
-    type: 'array',
-    items: { type: 'string', format: 'binary' },
+
   })
-  @IsOptional()
-  images?: Express.Multer.File[];
+
+  images?: string[];
 
   RealEstate?: CreateRealEstateDto;
   Car?: CreateCarDto;

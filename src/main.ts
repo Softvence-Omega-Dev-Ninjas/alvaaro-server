@@ -5,12 +5,14 @@ import { AllExceptionsFilter } from './utils/common/filter/all-exceptions.filter
 import appMetadata from './app-metadata/app-metadata';
 import { static as serverFile } from 'express';
 import { join } from 'path';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     rawBody: true,
     bodyParser: true,
   });
+
 
   app.useGlobalFilters(new AllExceptionsFilter());
 
@@ -58,6 +60,8 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, documentFactory);
 
   app.use('/uploads', serverFile(join(process.cwd(), 'public', 'uploads')));
+
+
   await app.listen(process.env.PORT ?? 3000, () => {
     console.log(`⚡Server is running on port: http://localhost:${process.env.PORT ?? 3000}/api`);
   });
